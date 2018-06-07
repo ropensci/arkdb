@@ -52,7 +52,6 @@ To create an archive, we just give `ark` the connection to the database and tell
 dir <- fs::dir_create("nycflights")
 ark(db, dir)
 
-DBI::dbDisconnect(db)
 ```
 
 We can take a look and confirm the files have been written. Note that we can use `fs::dir_info` to get a nice snapshot of the file sizes.  Compare the compressed sizes to the original database:
@@ -91,7 +90,10 @@ tbl(new_db, "flights")
 unlink("nycflights", TRUE)
 unlink("local.sqlite")
 unlink("nycflights13.sqlite")
-DBI::dbDisconnect(new_db)
+
+DBI::dbDisconnect(db[[1]])
+
+DBI::dbDisconnect(new_db[[1]])
 ```
 
 ## Footnote on package rationale
