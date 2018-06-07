@@ -21,13 +21,17 @@
 #' 
 #' @examples 
 #' \donttest{
-#' sql_path <- tempdir("sql")
+#' sql_path <- tempdir()
 #' db <- dbplyr::nycflights13_sqlite(sql_path)
-#' dir <- tempdir()
+#' dir <- file.path(tempdir(), "nycflights")
+#' dir.create(dir)
 #' 
-#' arc(db, dir)
+#' ark(db, dir)
+#' list.files(dir)
 #' 
-#' unlink(dir)
+#' 
+#' ## clean up
+#' unlink(dir, TRUE)
 #' }
 ark <- function(db_con, dir, lines = 10000L){
   if(!is(db_con, "src_dbi")){
@@ -37,20 +41,23 @@ ark <- function(db_con, dir, lines = 10000L){
   tables <- DBI::dbListTables(db_con[[1]])
   tables <- tables[!grepl("sqlite_", tables)]
   
-  lapply(tables, ark_file, db_con = db_con, lines = lines)
+  lapply(tables, ark_file, db_con = db_con, lines = lines, dir = dir)
+  
+  invisible(dir)
 }
 
 
 #' @importFrom dplyr collect summarise tbl n
 ark_file <- function(tablename, db_con, lines = 10000L, dir = "."){
-
-  end <- dplyr::collect(dplyr::summarise(dplyr::tbl(db, tablename), 
-                                         dplyr::n()))[[1]] 
+  
+  d <- dplyr::tbl(db_con, tablename)
+  n <- dplyr::summarise(d, n())
+  end <- dplyr::collect(n)[[1]] 
   
   start <- 1
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
   message(sprintf("Importing in %d line chunks:\n%s",
-                  lines, filename))
+                  lines, tablename))
   t0 <- Sys.time()
   repeat {
     p$tick()
@@ -60,27 +67,29 @@ ark_file <- function(tablename, db_con, lines = 10000L, dir = "."){
     if (start > end) {
       break
     }
-  
-  message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
   }
+  message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
 }
   
   
 #' @importFrom dplyr filter between row_number sql collect tbl  
 ark_chunk <- function(db_con, tablename, start = 1, lines = 10000L, dir = "."){
   
-  if (TRUE) { ## Assuming SQLite
-    query <- paste("SELECT * FROM", tablename, "LIMIT", lines, "OFFSET", (start-1)*lines)
+  if (TRUE) { ## Assumes SQLite.  FIXME detect if this is SQLITE.
+    query <- paste("SELECT * FROM", tablename, "LIMIT", 
+                   lines, "OFFSET", (start-1)*lines)
     chunk <- dplyr::collect( dplyr::tbl(db_con, dplyr::sql(query)) )
   } else {
-  ## Standard SQL compliant DBs
+  ## Standard SQL compliant DBs have a better / faster way to subset.
     tmp <- dplyr::filter(dplyr::tbl(db_con, d), 
                          dplyr::between(dplyr::row_number(), 
                                         start, start+lines))
     chunk <- dplyr::collect( tmp )
     
   }
-  
-  readr::write_tsv(chunk, file.path(dir, paste0(tablename, ".tsv.bz2")), append = TRUE)
+  append <- start != 1
+  readr::write_tsv(chunk, 
+                   file.path(dir, paste0(tablename, ".tsv.bz2")), 
+                   append = append)
 
 }

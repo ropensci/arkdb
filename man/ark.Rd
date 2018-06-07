@@ -2,9 +2,7 @@
 % Please edit documentation in R/ark.R
 \name{ark}
 \alias{ark}
-\title{sql_path <- tempdir("sql")
-db <- dbplyr::nycflights13_sqlite(sql_path)
-dir <- tempdir()}
+\title{Archive tables from a database as flat files}
 \usage{
 ark(db_con, dir, lines = 10000L)
 }
@@ -16,12 +14,9 @@ ark(db_con, dir, lines = 10000L)
 \item{lines}{the number of lines to use in each single chunk}
 }
 \description{
-arc(db, dir)
+Archive tables from a database as flat files
 }
 \details{
-unlink(dir)
-Archive tables from a database as flat files
-
 \code{ark} will archive tables from a database as compressed tsv files.
 \code{ark} does this by reading only chunks at a time into memory, allowing it to
 process tables that would be too large to read into memory all at once (which
@@ -31,4 +26,19 @@ transfer over networks.  Compressed plain-text files are also more archival
 friendly, as they rely on widely avialable and long-established open source compression
 algorithms and plain text, making them less vulnerable to loss by changes in
 database technology and formats.
+}
+\examples{
+\donttest{
+sql_path <- tempdir()
+db <- dbplyr::nycflights13_sqlite(sql_path)
+dir <- file.path(tempdir(), "nycflights")
+dir.create(dir)
+
+ark(db, dir)
+list.files(dir)
+
+
+## clean up
+unlink(dir, TRUE)
+}
 }

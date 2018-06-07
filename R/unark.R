@@ -20,6 +20,29 @@
 #' @importFrom RSQLite SQLite
 #' 
 #' @return a database connection (invisibly)
+#' 
+#' @examples \donttest{
+#'
+#' ## Setup: create an archive.
+#' sql_path <- tempdir()
+#' db <- dbplyr::nycflights13_sqlite(sql_path)
+#' dir <- file.path(tempdir(), "nycflights")
+#' dir.create(dir)
+#' ark(db, dir)
+#' rm(db) # delete the original database, since we have an archive
+#' 
+#' ## list all files in archive (full paths)
+#' files <- list.files(dir, "[.tsv.gz]", full.names = TRUE)
+#' 
+#' ## Read archived files into a new database (defaults to sqlite)
+#' new_db <-  unark(files, dbname = "local.sqlite")
+#' 
+#' ## Prove table is returned successfully.
+#' library(dplyr)
+#' tbl(new_db, "flights")
+#' 
+#' }
+#' @export
 unark <- function(files, lines = 10000L, drv = RSQLite::SQLite(), ...){
   db_con <- dbplyr::src_dbi(DBI::dbConnect(drv, ...))
   lapply(files, function(f) unark_file(f, db_con, lines = lines))
@@ -56,6 +79,8 @@ unark <- function(files, lines = 10000L, drv = RSQLite::SQLite(), ...){
 #' 
 #' ## and here we go:
 #' db_con <- unark_file(tsv, db)
+#' 
+#' ## display tables in database:
 #' db_con
 #' 
 #' unlink(tsv)

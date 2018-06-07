@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
 
 # arkdb
 
-The goal of arkdb is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite, see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. 
+The goal of arkdb is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite, see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. The key feature of arkdb is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.  
+
 
 ## Installation
 
@@ -25,10 +26,74 @@ You can install arkdb from github with:
 devtools::install_github("cboettig/arkdb")
 ```
 
-## Example
 
-This is a basic example which shows you how to solve a common problem:
+# Basic use
+
+```{r}
+library(arkdb)
+
+# additional libraries just for this demo
+library(dbplyr)
+library(nycflights13)
+library(fs)
+```
+
+## Creating an archive of an existing database
+
+First, we'll need an example database to work with.  Conveniently, there is a nice example using the NYC flights data built into the dbplyr package.
 
 ```{r example}
-## basic example code
+db <- dbplyr::nycflights13_sqlite(".")
 ```
+
+To create an archive, we just give `ark` the connection to the database and tell it where we want the `*.tsv.bz2` files to be archived:
+
+```{r}
+dir <- fs::dir_create("nycflights")
+ark(db, dir)
+
+DBI::dbDisconnect(db)
+```
+
+We can take a look and confirm the files have been written. Note that we can use `fs::dir_info` to get a nice snapshot of the file sizes.  Compare the compressed sizes to the original database:
+
+```{r}
+fs::dir_info(dir) %>% select(path, size)
+fs::file_info("nycflights13.sqlite") %>% select(path, size)
+
+```
+
+
+## Unarchive
+
+Now that we've gotten all the database into (compressed) plain text files, let's get them back out.  We simply need to pass `unark` a list of these compressed files:
+
+
+```{r}
+files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
+```
+
+`unark` defaults to an SQLite database.  Use the `dbname` argument to specify an persistant on-disk location to store the data:
+
+```{r}
+new_db <-  unark(files, dbname = "local.sqlite")
+```
+
+`unark` returns a `dplyr` databse connection that we can use in the usual way:
+
+```{r}
+library(dplyr)
+tbl(new_db, "flights")
+```
+
+
+```{r include=FALSE}
+unlink("nycflights", TRUE)
+unlink("local.sqlite")
+unlink("nycflights13.sqlite")
+DBI::dbDisconnect(new_db)
+```
+
+## Footnote on package rationale
+
+Note that while most relational database backends implement some form of `COPY` or IMPORT that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface.  Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client.  

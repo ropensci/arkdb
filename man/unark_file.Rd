@@ -38,6 +38,8 @@ db <- src_sqlite(sqlite, create = TRUE)
 
 ## and here we go:
 db_con <- unark_file(tsv, db)
+
+## display tables in database:
 db_con
 
 unlink(tsv)

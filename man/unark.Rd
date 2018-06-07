@@ -25,3 +25,26 @@ a database connection (invisibly)
 \description{
 Unarchive a list of \code{*.tsv.bz2} files into a databaase
 }
+\examples{
+\donttest{
+
+## Setup: create an archive.
+sql_path <- tempdir()
+db <- dbplyr::nycflights13_sqlite(sql_path)
+dir <- file.path(tempdir(), "nycflights")
+dir.create(dir)
+ark(db, dir)
+rm(db) # delete the original database, since we have an archive
+
+## list all files in archive (full paths)
+files <- list.files(dir, "[.tsv.gz]", full.names = TRUE)
+
+## Read archived files into a new database (defaults to sqlite)
+new_db <-  unark(files, dbname = "local.sqlite")
+
+## Prove table is returned successfully.
+library(dplyr)
+tbl(new_db, "flights")
+
+}
+}
