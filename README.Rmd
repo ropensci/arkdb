@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 
 # arkdb
 
-The goal of arkdb is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite, see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. The key feature of arkdb is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.  
+The goal of arkdb is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. The key feature of arkdb is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.  
 
 
 ## Installation
@@ -34,6 +34,7 @@ library(arkdb)
 
 # additional libraries just for this demo
 library(dbplyr)
+library(dplyr)
 library(nycflights13)
 library(fs)
 ```
@@ -81,7 +82,6 @@ new_db <-  unark(files, dbname = "local.sqlite")
 `unark` returns a `dplyr` databse connection that we can use in the usual way:
 
 ```{r}
-library(dplyr)
 tbl(new_db, "flights")
 ```
 
@@ -91,11 +91,11 @@ unlink("nycflights", TRUE)
 unlink("local.sqlite")
 unlink("nycflights13.sqlite")
 
-DBI::dbDisconnect(db[[1]])
-
-DBI::dbDisconnect(new_db[[1]])
+## dbplyr handles this automatically
+#DBI::dbDisconnect(db[[1]])
+#DBI::dbDisconnect(new_db[[1]])
 ```
 
 ## Footnote on package rationale
 
-Note that while most relational database backends implement some form of `COPY` or IMPORT that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface.  Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client.  
+Note that while most relational database backends implement some form of `COPY` or `IMPORT` that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface.  Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client.  
