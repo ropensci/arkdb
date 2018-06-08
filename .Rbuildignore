@@ -3,3 +3,4 @@
 ^README-.*\.png$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$

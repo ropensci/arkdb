@@ -13,7 +13,7 @@ Authors@R: c(person("Carl", "Boettiger",
               person("Richard", "FitzJohn", role = "ctb"))
 URL: https://github.com/cboettig/arkdb
 BugReports: https://github.com/cboettig/arkdb/issues
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
@@ -25,6 +25,10 @@ Imports:
     DBI,
     readr,
     RSQLite,
-    progress
+    progress,
+    dplyr,
+    methods
 Suggests: 
-    nycflights13
+    nycflights13,
+    testthat,
+    knitr

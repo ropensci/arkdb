@@ -17,6 +17,7 @@
 #' 
 #' @importFrom dbplyr src_dbi
 #' @importFrom DBI dbListTables
+#' @importFrom methods is
 #' @export
 #' 
 #' @examples 

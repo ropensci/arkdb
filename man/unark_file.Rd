@@ -9,9 +9,9 @@ unark_file(filename, db_con, lines = 10000L)
 \arguments{
 \item{filename}{a *.tsv.bz2 file to uncompress}
 
-\item{lines}{number of lines to read in a chunk.}
+\item{db_con}{a database src (\code{src_dbi} object from \code{dplyr})}
 
-\item{db}{a database src (\code{src_dbi} object from \code{dplyr})}
+\item{lines}{number of lines to read in a chunk.}
 }
 \value{
 the database connection (\code{src_dbi}, invisibly)

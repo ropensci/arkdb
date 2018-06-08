@@ -53,7 +53,7 @@ unark <- function(files, lines = 10000L, drv = RSQLite::SQLite(), ...){
 #' Unarchive a single tsv file into an existing database
 #' 
 #' @param filename a *.tsv.bz2 file to uncompress
-#' @param db a database src (`src_dbi` object from `dplyr`)
+#' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param lines number of lines to read in a chunk. 
 #' 
 #' @return the database connection (`src_dbi`, invisibly)
