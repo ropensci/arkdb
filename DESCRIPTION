@@ -31,4 +31,5 @@ Imports:
 Suggests: 
     nycflights13,
     testthat,
-    knitr
+    knitr,
+    covr
