@@ -94,9 +94,9 @@
 <div id="package-rationale" class="section level2">
 <h2 class="hasAnchor">
 <a href="#package-rationale" class="anchor"></a>Package rationale</h2>
-<p>Increasing data sizes create challenges for the fundamental tasks of publishing, distributing, and preserving data. Despite (or perhaps because of) the diverse and ever-expanding number of database and file formats, the humble plain text file such as comma or tab-separated-values <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> (<code>.tsv</code> files) remains the gold standard for data archiving and distribution. These files can read on almost any platform or tool and can be efficiently compressed using long-standing and widely available standard open source libraries like <code>gzip</code> or <code>bzip2</code>. In contrast, database storage formats and dumpsare usually particular to the database platform used to generate them, and will likely not be compatible between different database engines (e.g. Postgres -&gt; SQLite) or even between different versions of the same engine. Researchers unfamiliar with these databases will have difficulty accessing such data, and these dumps may also be in formats that are less efficient to compress.</p>
-<p>Working with tables that are too large for working memory on most machines by using external relational database stores is now a common R practice, thanks to ever-rising availablity of data and increasing support and popularity of packages such as <code>DBI</code>, <code>dplyr</code>, and <code>dbplyr</code>. Working with plain text files becomes increasingly difficult in this context. Many R users will not have sufficient RAM to simply read in a 10 GB .tsv file into R. Similarly, moving a 10 GB database out of a relational data file and into a plain text file for archiving and distribution is similarly challenging from R. While most relational database backends implement some form of <code>COPY</code> or <code>IMPORT</code> that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface. Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client. <code>arkdb</code> provides a simple solution to these two tasks.</p>
-<p>The goal of <code>arkdb</code> is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (see <a href="https://db.rstudio.com/dbi/">DBI</a>), and move tables out of such databases into text files. The key feature of <code>arkdb</code> is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once. This will be slower than reading the file into memory at one go, but can be scaled to larger data and larger data with no additional memory requirement.</p>
+<p>Increasing data sizes create challenges for the fundamental tasks of publishing, distributing, and preserving data. Despite (or perhaps because of) the diverse and ever-expanding number of database and file formats, the humble plain text file such as comma or tab-separated-values <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> (<code>.tsv</code> files) remains the gold standard for data archiving and distribution. These files can read on almost any platform or tool and can be efficiently compressed using long-standing and widely available standard open source libraries like <code>gzip</code> or <code>bzip2</code>. In contrast, database storage formats and dumps are usually particular to the database platform used to generate them, and will likely not be compatible between different database engines (e.g. PostgreSQL -&gt; SQLite) or even between different versions of the same engine. Researchers unfamiliar with these databases will have difficulty accessing such data, and these dumps may also be in formats that are less efficient to compress.</p>
+<p>Working with tables that are too large for working memory on most machines by using external relational database stores is now a common R practice, thanks to ever-rising availability of data and increasing support and popularity of packages such as <code>DBI</code>, <code>dplyr</code>, and <code>dbplyr</code>. Working with plain text files becomes increasingly difficult in this context. Many R users will not have sufficient RAM to simply read in a 10 GB <code>.tsv</code> file into R. Similarly, moving a 10 GB database out of a relational data file and into a plain text file for archiving and distribution is similarly challenging from R. While most relational database back-ends implement some form of <code>COPY</code> or <code>IMPORT</code> that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface. Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client. <code>arkdb</code> provides a simple solution to these two tasks.</p>
+<p>The goal of <code>arkdb</code> is to provide a convenient way to move data from large compressed text files (<code>.tsv.bz2</code>) into any DBI-compliant database connection (see <a href="https://db.rstudio.com/dbi/">DBI</a>), and move tables out of such databases into text files. The key feature of <code>arkdb</code> is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once. This will be slower than reading the file into memory at one go, but can be scaled to larger data and larger data with no additional memory requirement.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -106,9 +106,9 @@
 <a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cboettig/arkdb"</span>)</a></code></pre></div>
 </div>
 </div>
-<div id="basic-use" class="section level1">
+<div id="tutorial" class="section level1">
 <h1 class="hasAnchor">
-<a href="#basic-use" class="anchor"></a>Basic use</h1>
+<a href="#tutorial" class="anchor"></a>Tutorial</h1>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(arkdb)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co"># additional libraries just for this demo</span></a>
@@ -132,19 +132,19 @@
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; airlines</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.008424997 secs)</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.008064985 secs)</span></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; airports</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; ...Done! (in 0.02831197 secs)</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; ...Done! (in 0.02720904 secs)</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; flights</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.567785 secs)</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.441771 secs)</span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; planes</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; ...Done! (in 0.06974506 secs)</span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; ...Done! (in 0.09713221 secs)</span></a>
 <a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; weather</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; ...Done! (in 0.3622851 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; ...Done! (in 0.255239 secs)</span></a></code></pre></div>
 <p>We can take a look and confirm the files have been written. Note that we can use <code><a href="http://fs.r-lib.org/reference/dir_ls.html">fs::dir_info</a></code> to get a nice snapshot of the file sizes. Compare the compressed sizes to the original database:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_info</a></span>(dir) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(path, size)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 5 x 2</span></a>
@@ -170,19 +170,19 @@
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">new_db &lt;-<span class="st">  </span><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, <span class="dt">dbname =</span> <span class="st">"local.sqlite"</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; nycflights/airlines.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.03315282 secs)</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.03244805 secs)</span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; nycflights/airports.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.02713108 secs)</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.03159189 secs)</span></a>
 <a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; nycflights/flights.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.1790071 secs)</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.1452451 secs)</span></a>
 <a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; nycflights/planes.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.06233692 secs)</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.04813695 secs)</span></a>
 <a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; nycflights/weather.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.1466119 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.193701 secs)</span></a></code></pre></div>
 <p><code>unark</code> returns a <code>dplyr</code> database connection that we can use in the usual way:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(new_db, <span class="st">"flights"</span>)</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span></a>
@@ -211,6 +211,11 @@ To import a file into an existing database, use <code>unark_file</code> instead,
 <a href="#a-note-on-compression" class="anchor"></a>A note on compression</h2>
 <p><code>arkdb</code> uses the <code>bz2</code> compression algorithm, supported in base R, to compress <code>tsv</code> files. <code>bz2</code> offers excellent compression levels, and while it is considerably slower to compress than other popular formats like <code>gzip</code>, it is comparably fast to uncompress. Future versions of <code>arkdb</code> may provide more flexibility regarding compression.</p>
 </div>
+<div id="distributing-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#distributing-data" class="anchor"></a>Distributing data</h2>
+<p>Once you have archived your database files with <code>ark</code>, consider sharing them privately or publicly as part of your project GitHub repo using the <a href="https://github.com/cboettig/piggyback"><code>piggyback</code> R package</a>. For more permanent, versioned, and citable data archiving, upload your <code>*.tsv.bz2</code> files to a data repository like <a href="https://zenodo.org">Zenodo.org</a>.</p>
+</div>
 </div>
 <div class="footnotes">
 <hr>
@@ -232,10 +237,11 @@ To import a file into an existing database, use <code>unark_file</code> instead,
       </ul>
 </li>
       <li>
-<a href="#basic-use">Basic use</a><ul class="nav nav-pills nav-stacked">
+<a href="#tutorial">Tutorial</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#creating-an-archive-of-an-existing-database">Creating an archive of an existing database</a></li>
       <li><a href="#unarchive">Unarchive</a></li>
       <li><a href="#a-note-on-compression">A note on compression</a></li>
+      <li><a href="#distributing-data">Distributing data</a></li>
       </ul>
 </li>
       </ul>

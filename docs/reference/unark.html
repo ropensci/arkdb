@@ -157,26 +157,27 @@ For details see the appropriate <code>DBIDriver</code>.</p></td>
 <span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"nycflights"</span>)
 <span class='fu'>dir.create</span>(<span class='no'>dir</span>)
 <span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.008877039 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.03112388 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 2.116167 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.07663798 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.2811279 secs)</span></div><div class='input'><span class='fu'>rm</span>(<span class='no'>db</span>) <span class='co'># delete the original database, since we have an archive</span>
+#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.007138968 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.0274961 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.662707 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.08913112 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.3112619 secs)</span></div><div class='input'><span class='fu'>rm</span>(<span class='no'>db</span>) <span class='co'># delete the original database, since we have an archive</span>
 
 <span class='co'>## list all files in archive (full paths)</span>
 <span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='no'>dir</span>, <span class='st'>"[.tsv.gz]"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'>## Read archived files into a new database (defaults to sqlite)</span>
 <span class='no'>new_db</span> <span class='kw'>&lt;-</span>  <span class='fu'>unark</span>(<span class='no'>files</span>, <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>"local.sqlite"</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.06612206 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.1137121 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.1234572 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.04770112 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.115593 secs)</span></div><div class='input'>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.01690197 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.04454494 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.1573431 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.077842 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.111814 secs)</span></div><div class='input'>
 <span class='co'>## Prove table is returned successfully.</span>
 <span class='fu'>library</span>(<span class='no'>dplyr</span>)
 <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>new_db</span>, <span class='st'>"flights"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;flights&gt; [?? x 19]
-#&gt; # Database: sqlite 3.22.0 [local.sqlite]
+#&gt; # Database: sqlite 3.22.0
+#&gt; #   [/Users/cboettig/Documents/cboettig/arkdb/docs/reference/local.sqlite]
 #&gt;     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 #&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
 #&gt;  1  2013     1     1      517            515         2      830            819

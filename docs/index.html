@@ -89,6 +89,15 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#arkdb" class="anchor"></a>arkdb</h1></div>
 <p>The goal of arkdb is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see <a href="https://db.rstudio.com/dbi/">DBI</a>), and move tables out of such databases into text files. The key feature of arkdb is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.</p>
+<div id="links" class="section level2">
+<h2 class="hasAnchor">
+<a href="#links" class="anchor"></a>Links</h2>
+<ul>
+<li>A more detailed introduction to package design and use can be found in the package <a href="https://cboettig.github.io/arkdb/articles/arkdb_intro.html">Vignette</a>
+</li>
+<li><a href="https://cboettig.github.io/arkdb">Online versions of package documentation</a></li>
+</ul>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -121,19 +130,19 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/ark.html">ark</a></span>(db, <span class="st">"."</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; airlines</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.02032304 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.007902861 secs)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; airports</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.05643392 secs)</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.02704811 secs)</span></a>
 <a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; flights</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.4505911 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.474854 secs)</span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; planes</span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.125736 secs)</span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.07669806 secs)</span></a>
 <a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; weather</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.341882 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.207756 secs)</span></a></code></pre></div>
 </div>
 <div id="unarchive" class="section level2">
 <h2 class="hasAnchor">
@@ -143,19 +152,19 @@
 <a class="sourceLine" id="cb5-2" data-line-number="2">new_db &lt;-<span class="st">  </span><span class="kw"><a href="reference/unark.html">unark</a></span>(files, <span class="dt">dbname =</span> <span class="st">"local.sqlite"</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; airlines.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.03081489 secs)</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.04413486 secs)</span></a>
 <a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; airports.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; ...Done! (in 0.02737284 secs)</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; ...Done! (in 0.0274682 secs)</span></a>
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; flights.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.1264911 secs)</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.1319001 secs)</span></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; planes.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; ...Done! (in 0.04612994 secs)</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; ...Done! (in 0.04021597 secs)</span></a>
 <a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; weather.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; ...Done! (in 0.2589419 secs)</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; ...Done! (in 0.1502419 secs)</span></a>
 <a class="sourceLine" id="cb5-18" data-line-number="18"></a>
 <a class="sourceLine" id="cb5-19" data-line-number="19">new_db</a>
 <a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">#&gt; src:  sqlite 3.22.0 [local.sqlite]</span></a>

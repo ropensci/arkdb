@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 inst/doc
+*.sqlite
+*.tsv
+*.bz2
