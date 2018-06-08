@@ -102,6 +102,12 @@ unlink("nycflights13.sqlite")
 #DBI::dbDisconnect(new_db[[1]])
 ```
 
-## Footnote on package rationale
+## A Footnote on package rationale
 
 Note that while most relational database backends implement some form of `COPY` or `IMPORT` that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface.  Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client.  
+
+
+-----
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
+By participating in this project you agree to abide by its terms.

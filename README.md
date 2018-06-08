@@ -1,11 +1,19 @@
 
+[![Travis build
+status](https://travis-ci.org/cboettig/arkdb.svg?branch=master)](https://travis-ci.org/cboettig/arkdb)  
+[![Coverage
+status](https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/cboettig/arkdb?branch=master)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # arkdb
 
 The goal of arkdb is to provide a convienent way to move data from large
 compressed text files (tsv, csv, etc) into any DBI-compliant database
-connection (e.g. MYSQL, Postgres, SQLite, see
+connection (e.g. MYSQL, Postgres, SQLite; see
 [DBI](https://db.rstudio.com/dbi/)), and move tables out of such
 databases into text files. The key feature of arkdb is that files are
 moved between databases and text files in chunks of a fixed size,
@@ -68,19 +76,19 @@ dir <- fs::dir_create("nycflights")
 ark(db, dir)
 #> Importing in 10000 line chunks:
 #> airlines
-#> ...Done! (in 0.01660991 secs)
+#> ...Done! (in 0.03933191 secs)
 #> Importing in 10000 line chunks:
 #> airports
-#> ...Done! (in 0.09653592 secs)
+#> ...Done! (in 0.07561302 secs)
 #> Importing in 10000 line chunks:
 #> flights
-#> ...Done! (in 2.347863 secs)
+#> ...Done! (in 3.38947 secs)
 #> Importing in 10000 line chunks:
 #> planes
-#> ...Done! (in 0.09149814 secs)
+#> ...Done! (in 0.1876791 secs)
 #> Importing in 10000 line chunks:
 #> weather
-#> ...Done! (in 0.566844 secs)
+#> ...Done! (in 0.544976 secs)
 ```
 
 We can take a look and confirm the files have been written. Note that we
@@ -121,19 +129,19 @@ specify an persistant on-disk location to store the data:
 new_db <-  unark(files, dbname = "local.sqlite")
 #> Importing in 10000 line chunks:
 #> nycflights/airlines.tsv.bz2
-#> ...Done! (in 0.08665299 secs)
+#> ...Done! (in 0.140043 secs)
 #> Importing in 10000 line chunks:
 #> nycflights/airports.tsv.bz2
-#> ...Done! (in 0.07326293 secs)
+#> ...Done! (in 0.09119105 secs)
 #> Importing in 10000 line chunks:
 #> nycflights/flights.tsv.bz2
-#> ...Done! (in 0.2659941 secs)
+#> ...Done! (in 0.208385 secs)
 #> Importing in 10000 line chunks:
 #> nycflights/planes.tsv.bz2
-#> ...Done! (in 0.100368 secs)
+#> ...Done! (in 0.2518289 secs)
 #> Importing in 10000 line chunks:
 #> nycflights/weather.tsv.bz2
-#> ...Done! (in 0.1382751 secs)
+#> ...Done! (in 0.238585 secs)
 ```
 
 `unark` returns a `dplyr` databse connection that we can use in the

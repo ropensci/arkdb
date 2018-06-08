@@ -32,4 +32,5 @@ Suggests:
     nycflights13,
     testthat,
     knitr,
-    covr
+    covr,
+    fs
