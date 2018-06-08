@@ -33,4 +33,5 @@ Suggests:
     testthat,
     knitr,
     covr,
-    fs
+    fs,
+    rmarkdown

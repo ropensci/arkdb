@@ -35,9 +35,6 @@
 #' unlink(dir, TRUE)
 #' }
 ark <- function(db_con, dir, lines = 10000L){
-  if(!is(db_con, "src_dbi")){
-    db_con <- dbplyr::src_dbi(db_con)
-  }
   
   tables <- DBI::dbListTables(db_con[[1]])
   tables <- tables[!grepl("sqlite_", tables)]
@@ -82,11 +79,8 @@ ark_chunk <- function(db_con, tablename, start = 1, lines = 10000L, dir = "."){
     chunk <- dplyr::collect( dplyr::tbl(db_con, dplyr::sql(query)) )
   } else {
   ## Standard SQL compliant DBs have a better / faster way to subset.
-    tmp <- dplyr::filter(dplyr::tbl(db_con, d), 
-                         dplyr::between(dplyr::row_number(), 
-                                        start, start+lines))
-    chunk <- dplyr::collect( tmp )
-    
+    chunk <- collect(filter(tbl(db_con,d), 
+              between(row_number(), start, start+lines)))
   }
   append <- start != 1
   readr::write_tsv(chunk, 

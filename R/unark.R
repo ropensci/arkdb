@@ -152,3 +152,4 @@ base_name <- function(filename){
   path <- sub(ext_regex, "", path, perl = TRUE)
   sub(ext_regex, "", path, perl = TRUE)
 }
+
