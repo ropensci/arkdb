@@ -1,6 +1,6 @@
 
 [![Travis build
-status](https://travis-ci.org/cboettig/arkdb.svg?branch=master)](https://travis-ci.org/cboettig/arkdb)  
+status](https://travis-ci.org/cboettig/arkdb.svg?branch=master)](https://travis-ci.org/cboettig/arkdb)
 [![Coverage
 status](https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/cboettig/arkdb?branch=master)
 [![AppVeyor Build
@@ -68,19 +68,19 @@ Create an archive of the database:
 ark(db, ".", lines = 50000)
 #> Importing in 50000 line chunks:
 #> airlines
-#> ...Done! (in 0.01396799 secs)
+#> ...Done! (in 0.011554 secs)
 #> Importing in 50000 line chunks:
 #> airports
-#> ...Done! (in 0.05178308 secs)
+#> ...Done! (in 0.05471492 secs)
 #> Importing in 50000 line chunks:
 #> flights
-#> ...Done! (in 0.5828159 secs)
+#> ...Done! (in 0.5434999 secs)
 #> Importing in 50000 line chunks:
 #> planes
-#> ...Done! (in 0.09557915 secs)
+#> ...Done! (in 0.101465 secs)
 #> Importing in 50000 line chunks:
 #> weather
-#> ...Done! (in 0.3005581 secs)
+#> ...Done! (in 0.321594 secs)
 ```
 
 ## Unarchive
@@ -93,19 +93,19 @@ files <- fs::dir_ls(glob = "*.tsv.bz2")
 new_db <-  unark(files, dbname = "local.sqlite", lines = 50000)
 #> Importing in 50000 line chunks:
 #> airlines.tsv.bz2
-#> ...Done! (in 0.06316018 secs)
+#> ...Done! (in 0.05960894 secs)
 #> Importing in 50000 line chunks:
 #> airports.tsv.bz2
-#> ...Done! (in 0.04496694 secs)
+#> ...Done! (in 0.0306232 secs)
 #> Importing in 50000 line chunks:
 #> flights.tsv.bz2
-#> ...Done! (in 0.1594269 secs)
+#> ...Done! (in 0.2614648 secs)
 #> Importing in 50000 line chunks:
 #> planes.tsv.bz2
-#> ...Done! (in 0.1210289 secs)
+#> ...Done! (in 0.1022561 secs)
 #> Importing in 50000 line chunks:
 #> weather.tsv.bz2
-#> ...Done! (in 0.2026539 secs)
+#> ...Done! (in 0.173305 secs)
 
 new_db
 #> src:  sqlite 3.22.0 [local.sqlite]

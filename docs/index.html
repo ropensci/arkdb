@@ -83,7 +83,7 @@
 
     
     
-<p><a href="https://travis-ci.org/cboettig/arkdb"><img src="https://travis-ci.org/cboettig/arkdb.svg?branch=master" alt="Travis build status"></a><br><a href="https://codecov.io/github/cboettig/arkdb?branch=master"><img src="https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg" alt="Coverage status"></a> <a href="https://ci.appveyor.com/project/cboettig/arkdb"><img src="https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a> <a href="https://cran.r-project.org/package=arkdb"><img src="http://www.r-pkg.org/badges/version/arkdb" alt="CRAN_Status_Badge"></a></p>
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <div id="arkdb" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
@@ -130,19 +130,19 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/ark.html">ark</a></span>(db, <span class="st">"."</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; airlines</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.007902861 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.006972075 secs)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; airports</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.02704811 secs)</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.02719688 secs)</span></a>
 <a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; flights</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.474854 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.502002 secs)</span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; planes</span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.07669806 secs)</span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.06791997 secs)</span></a>
 <a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; weather</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.207756 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.212657 secs)</span></a></code></pre></div>
 </div>
 <div id="unarchive" class="section level2">
 <h2 class="hasAnchor">
@@ -152,19 +152,19 @@
 <a class="sourceLine" id="cb5-2" data-line-number="2">new_db &lt;-<span class="st">  </span><span class="kw"><a href="reference/unark.html">unark</a></span>(files, <span class="dt">dbname =</span> <span class="st">"local.sqlite"</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; airlines.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.04413486 secs)</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.03210592 secs)</span></a>
 <a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; airports.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; ...Done! (in 0.0274682 secs)</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; ...Done! (in 0.031497 secs)</span></a>
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; flights.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.1319001 secs)</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.1399879 secs)</span></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; planes.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; ...Done! (in 0.04021597 secs)</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; ...Done! (in 0.1772401 secs)</span></a>
 <a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; weather.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; ...Done! (in 0.1502419 secs)</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; ...Done! (in 0.115962 secs)</span></a>
 <a class="sourceLine" id="cb5-18" data-line-number="18"></a>
 <a class="sourceLine" id="cb5-19" data-line-number="19">new_db</a>
 <a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">#&gt; src:  sqlite 3.22.0 [local.sqlite]</span></a>
@@ -200,7 +200,16 @@
 </ul>
 </div>
 
-      </div>
+      <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://travis-ci.org/cboettig/arkdb"><img src="https://travis-ci.org/cboettig/arkdb.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://codecov.io/github/cboettig/arkdb?branch=master"><img src="https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
+<li><a href="https://ci.appveyor.com/project/cboettig/arkdb"><img src="https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
+<li><a href="https://cran.r-project.org/package=arkdb"><img src="http://www.r-pkg.org/badges/version/arkdb" alt="CRAN_Status_Badge"></a></li>
+</ul>
+</div>
+</div>
 
 </div>
 
