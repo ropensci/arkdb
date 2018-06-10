@@ -2,12 +2,9 @@
 
 export(ark)
 export(unark)
-export(unark_file)
 importFrom(DBI,dbConnect)
 importFrom(DBI,dbListTables)
 importFrom(DBI,dbWriteTable)
-importFrom(RSQLite,SQLite)
-importFrom(dbplyr,src_dbi)
 importFrom(dplyr,between)
 importFrom(dplyr,collect)
 importFrom(dplyr,filter)

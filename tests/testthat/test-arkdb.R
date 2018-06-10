@@ -1,15 +1,14 @@
-## ---- echo = FALSE-------------------------------------------------------
+## ----setup, include = FALSE----------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
+  comment = "#>"
 )
 
 ## ----gh-installation, eval = FALSE---------------------------------------
-#> # install.packages("devtools")
-#> devtools::install_github("cboettig/arkdb")
+## # install.packages("devtools")
+## devtools::install_github("cboettig/arkdb")
 
-## ------------------------------------------------------------------------
+## ----message = FALSE-----------------------------------------------------
 library(arkdb)
 
 # additional libraries just for this demo
@@ -23,7 +22,7 @@ db <- dbplyr::nycflights13_sqlite(".")
 
 ## ------------------------------------------------------------------------
 dir <- fs::dir_create("nycflights")
-ark(db, dir)
+ark(db, dir, lines = 50000)
 
 
 ## ------------------------------------------------------------------------
@@ -33,9 +32,11 @@ fs::file_info("nycflights13.sqlite") %>% select(path, size)
 
 ## ------------------------------------------------------------------------
 files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
+new_db <- src_sqlite("local.sqlite", create = TRUE)
+
 
 ## ------------------------------------------------------------------------
-new_db <-  unark(files, dbname = "local.sqlite")
+unark(files, new_db, lines = 50000)  
 
 ## ------------------------------------------------------------------------
 tbl(new_db, "flights")

@@ -17,7 +17,6 @@
 #' algorithms and plain text, making them less vulnerable to loss by changes in 
 #' database technology and formats. 
 #' 
-#' @importFrom dbplyr src_dbi
 #' @importFrom DBI dbListTables
 #' @importFrom methods is
 #' @export

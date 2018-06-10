@@ -2,45 +2,52 @@
 % Please edit documentation in R/unark.R
 \name{unark}
 \alias{unark}
-\title{Unarchive a list of \code{*.tsv.bz2} files into a databaase}
+\title{Unarchive a list of compressed tsv files into a databaase}
 \usage{
-unark(files, lines = 10000L, drv = RSQLite::SQLite(), ...)
+unark(files, lines = 10000L, db_con, ...)
 }
 \arguments{
-\item{files}{vector of filenames to be read in. Must be \code{*.tsv.bz2} format at present.}
+\item{files}{vector of filenames to be read in. Must be \code{tsv}
+format compressed using \code{bzip2}, \code{gzip}, \code{zip}, or \code{xz} format
+at present.}
 
 \item{lines}{number of lines to read in a chunk.}
 
-\item{drv}{an object that inherits from \linkS4class{DBIDriver},
-or an existing \linkS4class{DBIConnection}
-object (in order to clone an existing connection).}
+\item{db_con}{a database src (\code{src_dbi} object from \code{dplyr})}
 
-\item{...}{authentication arguments needed by the DBMS instance; these
-typically include \code{user}, \code{password}, \code{host}, \code{port}, \code{dbname}, etc.
-For details see the appropriate \code{DBIDriver}.}
+\item{...}{not used currently}
 }
 \value{
 a database connection (invisibly)
 }
 \description{
-Unarchive a list of \code{*.tsv.bz2} files into a databaase
+Unarchive a list of compressed tsv files into a databaase
+}
+\details{
+\code{unark} will read in a files in chunks and
+write them into a database.  This is essential for processing
+large compressed tables which may be too large to read into
+memory before writing into a database.  In general, increasing
+the \code{lines} parameter will result in a faster total transfer
+but require more free memory for working with these larger chunks.
+#'
 }
 \examples{
 \donttest{
 
 ## Setup: create an archive.
-sql_path <- tempdir()
-db <- dbplyr::nycflights13_sqlite(sql_path)
-dir <- file.path(tempdir(), "nycflights")
-dir.create(dir)
-ark(db, dir)
-rm(db) # delete the original database, since we have an archive
+dir <- tempdir() 
+db <- dbplyr::nycflights13_sqlite(tempdir())
+
+## database -> .tsv.bz2 
+ark(db)
 
 ## list all files in archive (full paths)
 files <- list.files(dir, "[.tsv.gz]", full.names = TRUE)
 
 ## Read archived files into a new database (defaults to sqlite)
-new_db <-  unark(files, dbname = "local.sqlite")
+new_db <- src_sqlite("local.sqlite", create=TRUE)
+unark(files, new_db)
 
 ## Prove table is returned successfully.
 library(dplyr)

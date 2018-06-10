@@ -78,17 +78,19 @@ fs::file_info("nycflights13.sqlite") %>% select(path, size)
 
 ## Unarchive
 
-Now that we've gotten all the database into (compressed) plain text files, let's get them back out.  We simply need to pass `unark` a list of these compressed files:
+Now that we've gotten all the database into (compressed) plain text files, let's get them back out.  We simply need to pass `unark` a list of these compressed files and a connection to the database.  Here we create a new local SQLite database.  Note that this design means that it is also easy to use `arkdb` to move data between databases.  
 
 
 ```{r}
 files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
+new_db <- src_sqlite("local.sqlite", create=TRUE)
+
 ```
 
-`unark` defaults to an SQLite database.  Use the `dbname` argument to specify an persistant on-disk location to store the data. As with `ark`, we can set the chunk size to control the memory footprint required:
+As with `ark`, we can set the chunk size to control the memory footprint required:
 
 ```{r}
-new_db <-  unark(files, dbname = "local.sqlite", lines = 50000)
+unark(files, new_db, lines = 50000)  
 ```
 
 `unark` returns a `dplyr` database connection that we can use in the usual way:
@@ -98,8 +100,6 @@ tbl(new_db, "flights")
 ```
 
 
-`unark()` creates a SQLite database by default, and tables are created with names matching the filenames provided, minus any extensions.  SQLite requires no extra dependencies or setup, and is thus often the most convenient choice for R users looking to work with data tables that are too large to fit in working memory.  
-To import a file into an existing database, use `unark_file` instead, which takes any database connection as an argument. 
 
 ## A note on compression
 

@@ -1,43 +1,43 @@
 
-# Adapted from @richfitz, MIT licensed
-# https://github.com/vimc/montagu-r/blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
-
-
 
 
 ## FIXMEs: 
-## 1. consider pluggable system for flat files, and 
-## 2. compression format. (currently assumes readr_tsv w/ bz2 compression)
-## 3. consider taking a directory instead of a filename and looping over all
+## 1. consider supporting non tsv formats?
 
 
 #' Unarchive a list of compressed tsv files into a databaase
 #' @param files vector of filenames to be read in. Must be `tsv`
 #' format compressed using `bzip2`, `gzip`, `zip`, or `xz` format
 #' at present.
+#' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param lines number of lines to read in a chunk.
-#' @inheritParams DBI::dbConnect
-#' @importFrom dbplyr src_dbi
+#' @param ... not used currently 
+#  @inheritDotParams readr::read_tsv
 #' @importFrom DBI dbConnect
-#' @importFrom RSQLite SQLite
-#' 
+#' @details `unark` will read in a files in chunks and 
+#' write them into a database.  This is essential for processing
+#' large compressed tables which may be too large to read into
+#' memory before writing into a database.  In general, increasing
+#' the `lines` parameter will result in a faster total transfer
+#' but require more free memory for working with these larger chunks.
+#' #' 
 #' @return a database connection (invisibly)
 #' 
 #' @examples \donttest{
 #'
 #' ## Setup: create an archive.
-#' sql_path <- tempdir()
-#' db <- dbplyr::nycflights13_sqlite(sql_path)
-#' dir <- file.path(tempdir(), "nycflights")
-#' dir.create(dir)
-#' ark(db, dir)
-#' rm(db) # delete the original database, since we have an archive
+#' dir <- tempdir() 
+#' db <- dbplyr::nycflights13_sqlite(tempdir())
+#' 
+#' ## database -> .tsv.bz2 
+#' ark(db)
 #' 
 #' ## list all files in archive (full paths)
 #' files <- list.files(dir, "[.tsv.gz]", full.names = TRUE)
 #' 
 #' ## Read archived files into a new database (defaults to sqlite)
-#' new_db <-  unark(files, dbname = "local.sqlite")
+#' new_db <- src_sqlite("local.sqlite", create=TRUE)
+#' unark(files, new_db)
 #' 
 #' ## Prove table is returned successfully.
 #' library(dplyr)
@@ -45,51 +45,17 @@
 #' 
 #' }
 #' @export
-unark <- function(files, lines = 10000L, drv = RSQLite::SQLite(), ...){
-  db_con <- dbplyr::src_dbi(DBI::dbConnect(drv, ...))
-  lapply(files, function(f) unark_file(f, db_con, lines = lines))
+unark <- function(files, lines = 10000L, db_con, ...){
+  lapply(files, unark_file, db_con, lines = lines, ...)
   invisible(db_con)  
 }
 
 
-#' Unarchive a single tsv file into an existing database
-#' 
-#' @param filename a compressed tsv file to uncompress
-#' @param db_con a database src (`src_dbi` object from `dplyr`)
-#' @param lines number of lines to read in a chunk. 
-#' 
-#' @return the database connection (`src_dbi`, invisibly)
-#' 
-#' @details `unark_file` will read in a file in chunks and 
-#' write them into a database.  This is essential for processing
-#' large compressed tables which may be too large to read into
-#' memory before writing into a database.  In general, increasing
-#' the `lines` parameter will result in a faster total transfer
-#' but require more free memory for working with these larger chunks.
-#' 
+
 #' @importFrom readr read_tsv
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-#' @export
-#' @examples \donttest{
-#' 
-#' ## set up example files and database
-#' tsv <- tempfile("flights", fileext=".tsv.bz2")
-#' sqlite <- tempfile("nycflights", fileext=".sql")
-#' readr::write_tsv(nycflights13::flights, tsv)
-#' db <- src_sqlite(sqlite, create = TRUE)
-#' 
-#' ## and here we go:
-#' db_con <- unark_file(tsv, db)
-#' 
-#' ## display tables in database:
-#' db_con
-#' 
-#' unlink(tsv)
-#' unlink(sql)
-#' }
-#' 
-unark_file <- function(filename, db_con, lines = 10000L){
+unark_file <- function(filename, db_con, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
     
@@ -117,10 +83,13 @@ unark_file <- function(filename, db_con, lines = 10000L){
   }
   message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
   
-  #DBI::dbDisconnect(db_con)
-  
   invisible(db_con)
 }
+
+
+# Adapted from @richfitz, MIT licensed
+# https://github.com/vimc/montagu-r/blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
+
 
 
 assert_connection <- function(x, name = deparse(substitute(x))) {
