@@ -65,7 +65,7 @@ ark(db, ".", lines = 50000)
 
 ## Unarchive
 
-Import a list of compressed tabular files (`*.tsv.bz2`) into a local SQLite database:
+Import a list of compressed tabular files (i.e. `*.tsv.bz2`) into a local SQLite database:
 
 
 ```{r}

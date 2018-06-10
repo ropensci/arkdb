@@ -27,7 +27,8 @@ Imports:
     RSQLite,
     progress,
     dplyr,
-    methods
+    methods,
+    tools
 Suggests: 
     nycflights13,
     testthat,

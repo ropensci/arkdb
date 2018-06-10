@@ -4,6 +4,8 @@
 #' @param db_con a database connection
 #' @param dir a directory where we will write the compressed text files ouput
 #' @param lines the number of lines to use in each single chunk
+#' @param compress file compression algorithm. Should be one of "bzip2" (default),
+#' "gzip" (faster write times, a bit less compression), or "xz".
 #' 
 #' @details `ark` will archive tables from a database as compressed tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
@@ -34,20 +36,26 @@
 #' ## clean up
 #' unlink(dir, TRUE)
 #' }
-ark <- function(db_con, dir, lines = 10000L){
+ark <- function(db_con, dir, lines = 10000L, 
+                compress = c("bzip2", "gzip", "xz")){
+  compress <- match.arg(compress)
   
-  tables <- DBI::dbListTables(db_con[[1]])
+  tables <- DBI::dbListTables(db_con$con)
   tables <- tables[!grepl("sqlite_", tables)]
   
-  lapply(tables, ark_file, db_con = db_con, lines = lines, dir = dir)
+  lapply(tables, ark_file, 
+         db_con = db_con, lines = lines, 
+         dir = dir, compress = compress)
   
   invisible(dir)
 }
 
 
 #' @importFrom dplyr collect summarise tbl n
-ark_file <- function(tablename, db_con, lines = 10000L, dir = "."){
+ark_file <- function(tablename, db_con, lines = 10000L, 
+                     dir = ".", compress = c("bzip2", "gzip", "xz")){
   
+  compress <- match.arg(compress)
   d <- dplyr::tbl(db_con, tablename)
   n <- dplyr::summarise(d, n())
   end <- dplyr::collect(n)[[1]] 
@@ -60,7 +68,8 @@ ark_file <- function(tablename, db_con, lines = 10000L, dir = "."){
   repeat {
     p$tick()
     ## Do stuff
-    ark_chunk(db_con, tablename, start = start, lines = 10000L, dir = dir)
+    ark_chunk(db_con, tablename, start = start, 
+              lines = 10000L, dir = dir, compress = compress)
     start <- start+lines  
     if (start > end) {
       break
@@ -71,7 +80,12 @@ ark_file <- function(tablename, db_con, lines = 10000L, dir = "."){
   
   
 #' @importFrom dplyr filter between row_number sql collect tbl  
-ark_chunk <- function(db_con, tablename, start = 1, lines = 10000L, dir = "."){
+ark_chunk <- function(db_con, tablename, start = 1, 
+                      lines = 10000L, dir = ".", 
+                      compress  = c("bzip2", "gzip", "xz")){
+  
+  compress <- match.arg(compress)
+  
   
   if (TRUE) { ## Assumes SQLite.  FIXME detect if this is SQLITE.
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
@@ -83,8 +97,15 @@ ark_chunk <- function(db_con, tablename, start = 1, lines = 10000L, dir = "."){
               between(row_number(), start, start+lines)))
   }
   append <- start != 1
+  
+  ext <- switch(compress,
+                "bzip2" = "bz2",
+                "gzip" = "gz",
+                "xz" = ".xz",
+                "bz2")
+  
   readr::write_tsv(chunk, 
-                   file.path(dir, paste0(tablename, ".tsv.bz2")), 
+                   file.path(dir, paste0(tablename, ".tsv.", ext)), 
                    append = append)
 
 }

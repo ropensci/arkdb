@@ -11,8 +11,10 @@
 ## 3. consider taking a directory instead of a filename and looping over all
 
 
-#' Unarchive a list of `*.tsv.bz2` files into a databaase
-#' @param files vector of filenames to be read in. Must be `*.tsv.bz2` format at present.
+#' Unarchive a list of compressed tsv files into a databaase
+#' @param files vector of filenames to be read in. Must be `tsv`
+#' format compressed using `bzip2`, `gzip`, `zip`, or `xz` format
+#' at present.
 #' @param lines number of lines to read in a chunk.
 #' @inheritParams DBI::dbConnect
 #' @importFrom dbplyr src_dbi
@@ -52,7 +54,7 @@ unark <- function(files, lines = 10000L, drv = RSQLite::SQLite(), ...){
 
 #' Unarchive a single tsv file into an existing database
 #' 
-#' @param filename a *.tsv.bz2 file to uncompress
+#' @param filename a compressed tsv file to uncompress
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param lines number of lines to read in a chunk. 
 #' 
@@ -92,8 +94,7 @@ unark_file <- function(filename, db_con, lines = 10000L){
   tbl_name <- base_name(filename)
     
   ## guess connection, don't assume bz2!
-  con <- bzfile(filename, "r")
-  #con <- file(filename, "r")
+  con <- compressed_file(filename, "r")
   on.exit(close(con))
   
   header <- readLines(con, n = 1L)
@@ -153,3 +154,11 @@ base_name <- function(filename){
   sub(ext_regex, "", path, perl = TRUE)
 }
 
+#' @importFrom tools file_ext
+compressed_file <- function(path, ...){
+  con <- switch(tools::file_ext(path),
+         gz = gzfile(path, ...),
+         bz2 = bzfile(path, ...),
+         xz = xzfile(path, ...),
+         zip = unz(path, ...))
+}

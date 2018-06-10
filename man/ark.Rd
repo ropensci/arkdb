@@ -4,7 +4,7 @@
 \alias{ark}
 \title{Archive tables from a database as flat files}
 \usage{
-ark(db_con, dir, lines = 10000L)
+ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"))
 }
 \arguments{
 \item{db_con}{a database connection}
@@ -12,6 +12,9 @@ ark(db_con, dir, lines = 10000L)
 \item{dir}{a directory where we will write the compressed text files ouput}
 
 \item{lines}{the number of lines to use in each single chunk}
+
+\item{compress}{file compression algorithm. Should be one of "bzip2" (default),
+"gzip" (faster write times, a bit less compression), or "xz".}
 }
 \description{
 Archive tables from a database as flat files
