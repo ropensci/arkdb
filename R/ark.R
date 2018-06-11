@@ -86,13 +86,13 @@ ark_chunk <- function(db_con, tablename, start = 1,
   compress <- match.arg(compress)
   
   
-  if (TRUE) { ## Assumes SQLite.  FIXME detect if this is SQLITE.
+  if (is(db_con$con, "SQLiteConnection")) {
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
                    lines, "OFFSET", (start-1)*lines)
     chunk <- dplyr::collect( dplyr::tbl(db_con, dplyr::sql(query)) )
   } else {
   ## Standard SQL compliant DBs have a better / faster way to subset.
-    chunk <- collect(filter(tbl(db_con,d), 
+    chunk <- collect(filter(tbl(db_con,tablename), 
               between(row_number(), start, start+lines)))
   }
   append <- start != 1

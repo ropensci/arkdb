@@ -11,8 +11,7 @@
 #' at present.
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param lines number of lines to read in a chunk.
-#' @param ... not used currently 
-#  @inheritDotParams readr::read_tsv
+#' @inheritDotParams readr::read_tsv
 #' @importFrom DBI dbConnect
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
@@ -45,7 +44,7 @@
 #' 
 #' }
 #' @export
-unark <- function(files, lines = 10000L, db_con, ...){
+unark <- function(files, db_con, lines = 10000L,  ...){
   lapply(files, unark_file, db_con, lines = lines, ...)
   invisible(db_con)  
 }
@@ -64,6 +63,9 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
   on.exit(close(con))
   
   header <- readLines(con, n = 1L)
+  if(length(header) == 0){ # empty file, would throw error
+    return(invisible(db_con))
+  }
   reader <- read_chunked(con, lines)
   
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
@@ -74,7 +76,7 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
     d <- reader()
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
-    chunk <- readr::read_tsv(body)
+    chunk <- readr::read_tsv(body, ...)
     DBI::dbWriteTable(db_con[[1]], tbl_name, chunk, append=TRUE)
     
     if (d$complete) {
@@ -103,6 +105,7 @@ read_chunked <- function(con, n) {
   assert_connection(con)
   next_chunk <- readLines(con, n)
   if (length(next_chunk) == 0L) {
+    # if we don't stop, we will hit an error!
     stop("connection has already been completely read")
   }
   function() {
