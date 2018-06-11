@@ -2,7 +2,7 @@
 % Please edit documentation in R/unark.R
 \name{unark}
 \alias{unark}
-\title{Unarchive a list of compressed tsv files into a databaase}
+\title{Unarchive a list of compressed tsv files into a database}
 \usage{
 unark(files, db_con, lines = 10000L, ...)
 }
@@ -86,7 +86,7 @@ setting option \code{readr.show_progress} to \code{FALSE}.}
 a database connection (invisibly)
 }
 \description{
-Unarchive a list of compressed tsv files into a databaase
+Unarchive a list of compressed tsv files into a database
 }
 \details{
 \code{unark} will read in a files in chunks and
@@ -99,23 +99,22 @@ but require more free memory for working with these larger chunks.
 }
 \examples{
 \donttest{
-
 ## Setup: create an archive.
+library(dplyr)
 dir <- tempdir() 
 db <- dbplyr::nycflights13_sqlite(tempdir())
 
 ## database -> .tsv.bz2 
-ark(db)
+ark(db, dir)
 
 ## list all files in archive (full paths)
-files <- list.files(dir, "[.tsv.gz]", full.names = TRUE)
+files <- list.files(dir, "[.]tsv\\\\.bz2$", full.names = TRUE)
 
 ## Read archived files into a new database (defaults to sqlite)
-new_db <- src_sqlite("local.sqlite", create=TRUE)
+new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
 unark(files, new_db)
 
 ## Prove table is returned successfully.
-library(dplyr)
 tbl(new_db, "flights")
 
 }

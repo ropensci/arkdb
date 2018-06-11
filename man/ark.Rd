@@ -9,7 +9,7 @@ ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"))
 \arguments{
 \item{db_con}{a database connection}
 
-\item{dir}{a directory where we will write the compressed text files ouput}
+\item{dir}{a directory where we will write the compressed text files output}
 
 \item{lines}{the number of lines to use in each single chunk}
 
@@ -26,22 +26,20 @@ process tables that would be too large to read into memory all at once (which
 is probably why you are using a database in the first place!)  Compressed
 text files will likely take up much less space, making them easier to store and
 transfer over networks.  Compressed plain-text files are also more archival
-friendly, as they rely on widely avialable and long-established open source compression
+friendly, as they rely on widely available and long-established open source compression
 algorithms and plain text, making them less vulnerable to loss by changes in
 database technology and formats.
 }
 \examples{
 \donttest{
-sql_path <- tempdir()
-db <- dbplyr::nycflights13_sqlite(sql_path)
-dir <- file.path(tempdir(), "nycflights")
-dir.create(dir)
+# setup
+library(dplyr)
+dir <- tempdir() 
+db <- dbplyr::nycflights13_sqlite(tempdir())
 
+## And here we go:
 ark(db, dir)
-list.files(dir)
 
 
-## clean up
-unlink(dir, TRUE)
 }
 }

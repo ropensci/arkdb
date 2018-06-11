@@ -5,7 +5,7 @@
 ## 1. consider supporting non tsv formats?
 
 
-#' Unarchive a list of compressed tsv files into a databaase
+#' Unarchive a list of compressed tsv files into a database
 #' @param files vector of filenames to be read in. Must be `tsv`
 #' format compressed using `bzip2`, `gzip`, `zip`, or `xz` format
 #' at present.
@@ -23,23 +23,22 @@
 #' @return a database connection (invisibly)
 #' 
 #' @examples \donttest{
-#'
 #' ## Setup: create an archive.
+#' library(dplyr)
 #' dir <- tempdir() 
 #' db <- dbplyr::nycflights13_sqlite(tempdir())
 #' 
 #' ## database -> .tsv.bz2 
-#' ark(db)
+#' ark(db, dir)
 #' 
 #' ## list all files in archive (full paths)
-#' files <- list.files(dir, "[.tsv.gz]", full.names = TRUE)
+#' files <- list.files(dir, "[.]tsv\\.bz2$", full.names = TRUE)
 #' 
 #' ## Read archived files into a new database (defaults to sqlite)
-#' new_db <- src_sqlite("local.sqlite", create=TRUE)
+#' new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
 #' unark(files, new_db)
 #' 
 #' ## Prove table is returned successfully.
-#' library(dplyr)
 #' tbl(new_db, "flights")
 #' 
 #' }
