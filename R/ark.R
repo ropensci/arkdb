@@ -66,7 +66,7 @@ ark_file <- function(tablename, db_con, lines = 10000L,
     p$tick()
     ## Do stuff
     ark_chunk(db_con, tablename, start = start, 
-              lines = 10000L, dir = dir, compress = compress)
+              lines = lines, dir = dir, compress = compress)
     start <- start+lines  
     if (start > end) {
       break
