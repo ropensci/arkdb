@@ -84,12 +84,14 @@ ark_chunk <- function(db_con, tablename, start = 1,
   compress <- match.arg(compress)
   
   
-  if (is(db_con$con, "SQLiteConnection")) {
+  if (is(db_con$con, "SQLiteConnection") |
+      is(db_con$con, "MySQLConnection") |
+      Sys.getenv("arkdb_windowing") == "FALSE") {
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
                    lines, "OFFSET", (start-1)*lines)
     chunk <- dplyr::collect( dplyr::tbl(db_con, dplyr::sql(query)) )
   } else {
-  ## Standard SQL compliant DBs have a better / faster way to subset.
+  ## Postgres can do windowing
     chunk <- collect(filter(tbl(db_con,tablename), 
               between(row_number(), start, start+lines)))
   }
