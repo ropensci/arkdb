@@ -4,7 +4,8 @@
 \alias{ark}
 \title{Archive tables from a database as flat files}
 \usage{
-ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"))
+ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"),
+  tables = DBI::dbListTables(db_con$con))
 }
 \arguments{
 \item{db_con}{a database connection}
@@ -15,6 +16,9 @@ ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"))
 
 \item{compress}{file compression algorithm. Should be one of "bzip2" (default),
 "gzip" (faster write times, a bit less compression), or "xz".}
+
+\item{tables}{a list of tables from the database that should be
+archived.  By default, will archive all tables.}
 }
 \description{
 Archive tables from a database as flat files

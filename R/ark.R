@@ -6,7 +6,8 @@
 #' @param lines the number of lines to use in each single chunk
 #' @param compress file compression algorithm. Should be one of "bzip2" (default),
 #' "gzip" (faster write times, a bit less compression), or "xz".
-#' 
+#' @param tables a list of tables from the database that should be 
+#' archived.  By default, will archive all tables. 
 #' @details `ark` will archive tables from a database as compressed tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
@@ -34,10 +35,11 @@
 #' 
 #' }
 ark <- function(db_con, dir, lines = 10000L, 
-                compress = c("bzip2", "gzip", "xz")){
+                compress = c("bzip2", "gzip", "xz"),
+                tables = DBI::dbListTables(db_con$con)){
   compress <- match.arg(compress)
   
-  tables <- DBI::dbListTables(db_con$con)
+  #tables <- DBI::dbListTables(db_con$con)
   tables <- tables[!grepl("sqlite_", tables)]
   
   lapply(tables, ark_file, 
