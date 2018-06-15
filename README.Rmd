@@ -6,7 +6,7 @@ output: github_document
 [![Coverage status](https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/cboettig/arkdb?branch=master)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
-
+[![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -69,7 +69,7 @@ Import a list of compressed tabular files (i.e. `*.tsv.bz2`) into a local SQLite
 
 ```{r}
 files <- fs::dir_ls(glob = "*.tsv.bz2")
-new_db <- src_sqlite("local.sqlite")
+new_db <- src_sqlite("local.sqlite", create=TRUE)
 
 unark(files, new_db, lines = 50000)
 
