@@ -131,5 +131,6 @@ compressed_file <- function(path, ...){
          gz = gzfile(path, ...),
          bz2 = bzfile(path, ...),
          xz = xzfile(path, ...),
-         zip = unz(path, ...))
+         zip = unz(path, ...),
+         file(path, ...))
 }

@@ -35,7 +35,7 @@
 #' 
 #' }
 ark <- function(db_con, dir, lines = 10000L, 
-                compress = c("bzip2", "gzip", "xz"),
+                compress = c("bzip2", "gzip", "xz", "none"),
                 tables = DBI::dbListTables(db_con$con)){
   compress <- match.arg(compress)
   
@@ -52,7 +52,7 @@ ark <- function(db_con, dir, lines = 10000L,
 
 #' @importFrom dplyr collect summarise tbl n
 ark_file <- function(tablename, db_con, lines = 10000L, 
-                     dir = ".", compress = c("bzip2", "gzip", "xz")){
+                     dir = ".", compress = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
   d <- dplyr::tbl(db_con, tablename)
@@ -81,7 +81,7 @@ ark_file <- function(tablename, db_con, lines = 10000L,
 #' @importFrom dplyr filter between row_number sql collect tbl  
 ark_chunk <- function(db_con, tablename, start = 1, 
                       lines = 10000L, dir = ".", 
-                      compress  = c("bzip2", "gzip", "xz")){
+                      compress  = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
   
@@ -100,13 +100,14 @@ ark_chunk <- function(db_con, tablename, start = 1,
   append <- start != 1
   
   ext <- switch(compress,
-                "bzip2" = "bz2",
-                "gzip" = "gz",
+                "bzip2" = ".bz2",
+                "gzip" = ".gz",
                 "xz" = ".xz",
-                "bz2")
+                "none" = "",
+                ".bz2")
   
   readr::write_tsv(chunk, 
-                   file.path(dir, paste0(tablename, ".tsv.", ext)), 
+                   file.path(dir, paste0(tablename, ".tsv", ext)), 
                    append = append)
 
 }
