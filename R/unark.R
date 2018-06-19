@@ -7,8 +7,8 @@
 
 #' Unarchive a list of compressed tsv files into a database
 #' @param files vector of filenames to be read in. Must be `tsv`
-#' format compressed using `bzip2`, `gzip`, `zip`, or `xz` format
-#' at present.
+#' format, optionally compressed using `bzip2`, `gzip`, `zip`,
+#' or `xz` format at present.
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param lines number of lines to read in a chunk.
 #' @inheritDotParams readr::read_tsv

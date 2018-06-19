@@ -5,10 +5,11 @@
 #' @param dir a directory where we will write the compressed text files output
 #' @param lines the number of lines to use in each single chunk
 #' @param compress file compression algorithm. Should be one of "bzip2" (default),
-#' "gzip" (faster write times, a bit less compression), or "xz".
+#' "gzip" (faster write times, a bit less compression), "xz", or "none", for
+#' no compression.
 #' @param tables a list of tables from the database that should be 
 #' archived.  By default, will archive all tables. 
-#' @details `ark` will archive tables from a database as compressed tsv files.
+#' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
 #' is probably why you are using a database in the first place!)  Compressed
@@ -51,8 +52,11 @@ ark <- function(db_con, dir, lines = 10000L,
 
 
 #' @importFrom dplyr collect summarise tbl n
-ark_file <- function(tablename, db_con, lines = 10000L, 
-                     dir = ".", compress = c("bzip2", "gzip", "xz", "none")){
+ark_file <- function(tablename, 
+                     db_con, 
+                     lines = 10000L, 
+                     dir = ".", 
+                     compress = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
   d <- dplyr::tbl(db_con, tablename)

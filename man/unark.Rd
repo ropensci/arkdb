@@ -8,8 +8,8 @@ unark(files, db_con, lines = 10000L, ...)
 }
 \arguments{
 \item{files}{vector of filenames to be read in. Must be \code{tsv}
-format compressed using \code{bzip2}, \code{gzip}, \code{zip}, or \code{xz} format
-at present.}
+format, optionally compressed using \code{bzip2}, \code{gzip}, \code{zip},
+or \code{xz} format at present.}
 
 \item{db_con}{a database src (\code{src_dbi} object from \code{dplyr})}
 

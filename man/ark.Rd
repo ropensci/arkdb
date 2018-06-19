@@ -4,8 +4,8 @@
 \alias{ark}
 \title{Archive tables from a database as flat files}
 \usage{
-ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"),
-  tables = DBI::dbListTables(db_con$con))
+ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz",
+  "none"), tables = DBI::dbListTables(db_con$con))
 }
 \arguments{
 \item{db_con}{a database connection}
@@ -15,7 +15,8 @@ ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz"),
 \item{lines}{the number of lines to use in each single chunk}
 
 \item{compress}{file compression algorithm. Should be one of "bzip2" (default),
-"gzip" (faster write times, a bit less compression), or "xz".}
+"gzip" (faster write times, a bit less compression), "xz", or "none", for
+no compression.}
 
 \item{tables}{a list of tables from the database that should be
 archived.  By default, will archive all tables.}
@@ -24,7 +25,7 @@ archived.  By default, will archive all tables.}
 Archive tables from a database as flat files
 }
 \details{
-\code{ark} will archive tables from a database as compressed tsv files.
+\code{ark} will archive tables from a database as (compressed) tsv files.
 \code{ark} does this by reading only chunks at a time into memory, allowing it to
 process tables that would be too large to read into memory all at once (which
 is probably why you are using a database in the first place!)  Compressed
