@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Unarchive a list of <code>*.tsv.bz2</code> files into a databaase — unark • arkdb</title>
+<title>Unarchive a list of compressed tsv files into a database — unark • arkdb</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -28,9 +28,9 @@
 
 
 
-<meta property="og:title" content="Unarchive a list of <code>*.tsv.bz2</code> files into a databaase — unark" />
+<meta property="og:title" content="Unarchive a list of compressed tsv files into a database — unark" />
 
-<meta property="og:description" content="Unarchive a list of *.tsv.bz2 files into a databaase" />
+<meta property="og:description" content="Unarchive a list of compressed tsv files into a database" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -106,41 +106,103 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Unarchive a list of <code>*.tsv.bz2</code> files into a databaase</h1>
+    <h1>Unarchive a list of compressed tsv files into a database</h1>
     <small class="dont-index">Source: <a href='https://github.com/cboettig/arkdb/blob/master/R/unark.R'><code>R/unark.R</code></a></small>
     <div class="hidden name"><code>unark.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Unarchive a list of <code>*.tsv.bz2</code> files into a databaase</p>
+    <p>Unarchive a list of compressed tsv files into a database</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>unark</span>(<span class='no'>files</span>, <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>10000L</span>, <span class='kw'>drv</span> <span class='kw'>=</span> <span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/RSQLite/topics/SQLite'>SQLite</a></span>(), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>db_con</span>, <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>10000L</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>files</th>
-      <td><p>vector of filenames to be read in. Must be <code>*.tsv.bz2</code> format at present.</p></td>
+      <td><p>vector of filenames to be read in. Must be <code>tsv</code>
+format, optionally compressed using <code>bzip2</code>, <code>gzip</code>, <code>zip</code>,
+or <code>xz</code> format at present.</p></td>
+    </tr>
+    <tr>
+      <th>db_con</th>
+      <td><p>a database src (<code>src_dbi</code> object from <code>dplyr</code>)</p></td>
     </tr>
     <tr>
       <th>lines</th>
       <td><p>number of lines to read in a chunk.</p></td>
     </tr>
     <tr>
-      <th>drv</th>
-      <td><p>an object that inherits from DBIDriver,
-or an existing DBIConnection
-object (in order to clone an existing connection).</p></td>
-    </tr>
-    <tr>
       <th>...</th>
-      <td><p>authentication arguments needed by the DBMS instance; these
-typically include <code>user</code>, <code>password</code>, <code>host</code>, <code>port</code>, <code>dbname</code>, etc.
-For details see the appropriate <code>DBIDriver</code>.</p></td>
+      <td><p>Arguments passed on to <code><a href='http://www.rdocumentation.org/packages/readr/topics/read_delim'>readr::read_tsv</a></code></p><dl class='dl-horizontal'>
+  <dt>file</dt><dd><p>Either a path to a file, a connection, or literal data
+(either a single string or a raw vector).
+
+Files ending in <code>.gz</code>, <code>.bz2</code>, <code>.xz</code>, or <code>.zip</code> will
+be automatically uncompressed. Files starting with <code>http://</code>,
+<code>https://</code>, <code>ftp://</code>, or <code>ftps://</code> will be automatically
+downloaded. Remote gz files can also be automatically downloaded and
+decompressed.
+
+Literal data is most useful for examples and tests. It must contain at
+least one new line to be recognised as data (instead of a path).</p></dd>
+  <dt>quote</dt><dd><p>Single character used to quote strings.</p></dd>
+  <dt>col_names</dt><dd><p>Either <code>TRUE</code>, <code>FALSE</code> or a character vector
+of column names.
+
+If <code>TRUE</code>, the first row of the input will be used as the column
+names, and will not be included in the data frame. If <code>FALSE</code>, column
+names will be generated automatically: X1, X2, X3 etc.
+
+If <code>col_names</code> is a character vector, the values will be used as the
+names of the columns, and the first row of the input will be read into
+the first row of the output data frame.
+
+Missing (<code>NA</code>) column names will generate a warning, and be filled
+in with dummy names <code>X1</code>, <code>X2</code> etc. Duplicate column names
+will generate a warning and be made unique with a numeric prefix.</p></dd>
+  <dt>col_types</dt><dd><p>One of <code>NULL</code>, a <code>cols()</code> specification, or
+a string. See <code>vignette("column-types")</code> for more details.
+
+If <code>NULL</code>, all column types will be imputed from the first 1000 rows
+on the input. This is convenient (and fast), but not robust. If the
+imputation fails, you'll need to supply the correct types yourself.
+
+If a column specification created by <code>cols()</code>, it must contain
+one column specification for each column. If you only want to read a
+subset of the columns, use <code>cols_only()</code>.
+
+Alternatively, you can use a compact string representation where each
+character represents one column:
+c = character, i = integer, n = number, d = double,
+l = logical, D = date, T = date time, t = time, ? = guess, or
+<code>_</code>/<code>-</code> to skip the column.</p></dd>
+  <dt>locale</dt><dd><p>The locale controls defaults that vary from place to place.
+The default locale is US-centric (like R), but you can use
+<code>locale()</code> to create your own locale that controls things like
+the default time zone, encoding, decimal mark, big mark, and day/month
+names.</p></dd>
+  <dt>na</dt><dd><p>Character vector of strings to use for missing values. Set this
+option to <code>character()</code> to indicate no missing values.</p></dd>
+  <dt>quoted_na</dt><dd><p>Should missing values inside quotes be treated as missing
+values (the default) or strings.</p></dd>
+  <dt>comment</dt><dd><p>A string used to identify comments. Any text after the
+comment characters will be silently ignored.</p></dd>
+  <dt>trim_ws</dt><dd><p>Should leading and trailing whitespace be trimmed from
+each field before parsing it?</p></dd>
+  <dt>skip</dt><dd><p>Number of lines to skip before reading data.</p></dd>
+  <dt>n_max</dt><dd><p>Maximum number of records to read.</p></dd>
+  <dt>guess_max</dt><dd><p>Maximum number of records to use for guessing column types.</p></dd>
+  <dt>progress</dt><dd><p>Display a progress bar? By default it will only display
+in an interactive session and not while knitting a document. The display
+is updated every 50,000 values and will only display if estimated reading
+time is 5 seconds or more. The automatic progress bar can be disabled by
+setting option <code>readr.show_progress</code> to <code>FALSE</code>.</p></dd>
+</dl></td>
     </tr>
     </table>
     
@@ -148,35 +210,45 @@ For details see the appropriate <code>DBIDriver</code>.</p></td>
 
     <p>a database connection (invisibly)</p>
     
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>unark</code> will read in a files in chunks and
+write them into a database.  This is essential for processing
+large compressed tables which may be too large to read into
+memory before writing into a database.  In general, increasing
+the <code>lines</code> parameter will result in a faster total transfer
+but require more free memory for working with these larger chunks.
+#'</p>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>## Setup: create an archive.</span>
-<span class='no'>sql_path</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='no'>sql_path</span>)
-<span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"nycflights"</span>)
-<span class='fu'>dir.create</span>(<span class='no'>dir</span>)
-<span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.009811878 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.03509688 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.88241 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.09565496 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.2574 secs)</span></div><div class='input'><span class='fu'>rm</span>(<span class='no'>db</span>) <span class='co'># delete the original database, since we have an archive</span>
+    <pre class="examples"><div class='input'><span class='co'>## Setup: create an archive.</span>
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+<span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
+<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())
 
+<span class='co'>## database -&gt; .tsv.bz2 </span>
+<span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.01012182 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.03608203 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.81319 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.09875011 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.3160632 secs)</span></div><div class='input'>
 <span class='co'>## list all files in archive (full paths)</span>
-<span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='no'>dir</span>, <span class='st'>"[.tsv.gz]"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='no'>dir</span>, <span class='st'>"[.]tsv\\.bz2$"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'>## Read archived files into a new database (defaults to sqlite)</span>
-<span class='no'>new_db</span> <span class='kw'>&lt;-</span>  <span class='fu'>unark</span>(<span class='no'>files</span>, <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>"local.sqlite"</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.01347613 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.02809381 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.105134 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.06816196 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.155514 secs)</span></div><div class='input'>
+<span class='no'>new_db</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='fu'>file.path</span>(<span class='no'>dir</span>, <span class='st'>"local.sqlite"</span>), <span class='kw'>create</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
+<span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>new_db</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.02123809 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.04757094 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.143389 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.053689 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.211375 secs)</span></div><div class='input'>
 <span class='co'>## Prove table is returned successfully.</span>
-<span class='fu'>library</span>(<span class='no'>dplyr</span>)
 <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>new_db</span>, <span class='st'>"flights"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;flights&gt; [?? x 19]
-#&gt; # Database: sqlite 3.22.0 [local.sqlite]
+#&gt; # Database: sqlite 3.22.0
+#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/local.sqlite]
 #&gt;     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 #&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
 #&gt;  1  2013     1     1      517            515         2      830            819
@@ -200,6 +272,8 @@ For details see the appropriate <code>DBIDriver</code>.</p></td>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

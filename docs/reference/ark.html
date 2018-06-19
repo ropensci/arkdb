@@ -117,7 +117,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>ark</span>(<span class='no'>db_con</span>, <span class='no'>dir</span>, <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>10000L</span>)</pre>
+    <pre class="usage"><span class='fu'>ark</span>(<span class='no'>db_con</span>, <span class='no'>dir</span>, <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>10000L</span>, <span class='kw'>compress</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"bzip2"</span>, <span class='st'>"gzip"</span>, <span class='st'>"xz"</span>,
+  <span class='st'>"none"</span>), <span class='kw'>tables</span> <span class='kw'>=</span> <span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/DBI/topics/dbListTables'>dbListTables</a></span>(<span class='no'>db_con</span>$<span class='no'>con</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -128,42 +129,52 @@
     </tr>
     <tr>
       <th>dir</th>
-      <td><p>a directory where we will write the compressed text files ouput</p></td>
+      <td><p>a directory where we will write the compressed text files output</p></td>
     </tr>
     <tr>
       <th>lines</th>
       <td><p>the number of lines to use in each single chunk</p></td>
     </tr>
+    <tr>
+      <th>compress</th>
+      <td><p>file compression algorithm. Should be one of "bzip2" (default),
+"gzip" (faster write times, a bit less compression), "xz", or "none", for
+no compression.</p></td>
+    </tr>
+    <tr>
+      <th>tables</th>
+      <td><p>a list of tables from the database that should be
+archived.  By default, will archive all tables.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>ark</code> will archive tables from a database as compressed tsv files.
+    <p><code>ark</code> will archive tables from a database as (compressed) tsv files.
 <code>ark</code> does this by reading only chunks at a time into memory, allowing it to
 process tables that would be too large to read into memory all at once (which
 is probably why you are using a database in the first place!)  Compressed
 text files will likely take up much less space, making them easier to store and
 transfer over networks.  Compressed plain-text files are also more archival
-friendly, as they rely on widely avialable and long-established open source compression
+friendly, as they rely on widely available and long-established open source compression
 algorithms and plain text, making them less vulnerable to loss by changes in
 database technology and formats.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>sql_path</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='no'>sql_path</span>)
-<span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"nycflights"</span>)
-<span class='fu'>dir.create</span>(<span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: '/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpPQJ76l/nycflights' already exists</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='co'># setup</span>
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+<span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
+<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
+<span class='co'>## And here we go:</span>
 <span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.009871006 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.04270792 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.938499 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.1461689 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.357234 secs)</span></div><div class='input'><span class='fu'>list.files</span>(<span class='no'>dir</span>)</div><div class='output co'>#&gt; [1] "airlines.tsv.bz2" "airports.tsv.bz2" "flights.tsv.bz2"  "planes.tsv.bz2"  
-#&gt; [5] "weather.tsv.bz2" </div><div class='input'>
+#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.01229382 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.06999016 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.587371 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.08294392 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.260957 secs)</span></div><div class='input'>
 
-<span class='co'>## clean up</span>
-<span class='fu'>unlink</span>(<span class='no'>dir</span>, <span class='fl'>TRUE</span>)</div></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
