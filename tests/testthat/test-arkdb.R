@@ -35,7 +35,7 @@ testthat::test_that("we can ark and unark a db in plain text", {
   dir <- fs::dir_create("nycflights")
   ark(db, dir, lines = 50000, compress = "none")
   
-  files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
+  files <- fs::dir_ls(dir, glob = "*.tsv")
   testthat::expect_length(files, 5)
   
   ## unark
