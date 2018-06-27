@@ -81,7 +81,7 @@ ark_file <- function(tablename,
   message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
 }
   
-  
+#' @importFrom readr write_tsv  
 #' @importFrom dplyr filter between row_number sql collect tbl  
 ark_chunk <- function(db_con, tablename, start = 1, 
                       lines = 10000L, dir = ".", 

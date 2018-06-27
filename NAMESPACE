@@ -2,7 +2,6 @@
 
 export(ark)
 export(unark)
-importFrom(DBI,dbConnect)
 importFrom(DBI,dbListTables)
 importFrom(DBI,dbWriteTable)
 importFrom(dplyr,between)
@@ -16,4 +15,5 @@ importFrom(dplyr,tbl)
 importFrom(methods,is)
 importFrom(progress,progress_bar)
 importFrom(readr,read_tsv)
+importFrom(readr,write_tsv)
 importFrom(tools,file_ext)
