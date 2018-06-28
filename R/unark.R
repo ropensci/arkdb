@@ -55,17 +55,18 @@ unark <- function(files, db_con, lines = 10000L,  ...){
 unark_file <- function(filename, db_con, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
-    
-  ## guess connection, don't assume bz2!
   con <- compressed_file(filename, "r")
   on.exit(close(con))
   
+  ## Handle case of col_names != TRUE ?
+  ## What about skips and comments?
   header <- readLines(con, n = 1L)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
   }
   reader <- read_chunked(con, lines)
   
+  # May throw an error if we need to read more than 'total' chunks?
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
   message(sprintf("Importing in %d line chunks:\n%s",
                   lines, filename))
