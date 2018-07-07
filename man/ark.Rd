@@ -21,6 +21,9 @@ no compression.}
 \item{tables}{a list of tables from the database that should be
 archived.  By default, will archive all tables.}
 }
+\value{
+the path to \code{dir} where output files are created (invisibly), for piping.
+}
 \description{
 Archive tables from a database as flat files
 }

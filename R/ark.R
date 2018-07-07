@@ -22,7 +22,7 @@
 #' @importFrom DBI dbListTables
 #' @importFrom methods is
 #' @export
-#' 
+#' @return the path to `dir` where output files are created (invisibly), for piping.
 #' @examples 
 #' \donttest{
 #' # setup

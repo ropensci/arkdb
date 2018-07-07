@@ -83,7 +83,7 @@ setting option \code{readr.show_progress} to \code{FALSE}.}
 }}
 }
 \value{
-a database connection (invisibly)
+the database connection (invisibly)
 }
 \description{
 Unarchive a list of compressed tsv files into a database
@@ -110,7 +110,7 @@ ark(db, dir)
 ## list all files in archive (full paths)
 files <- list.files(dir, "[.]tsv\\\\.bz2$", full.names = TRUE)
 
-## Read archived files into a new database (defaults to sqlite)
+## Read archived files into a new database (another sqlite in this case)
 new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
 unark(files, new_db)
 

@@ -19,7 +19,7 @@
 #' the `lines` parameter will result in a faster total transfer
 #' but require more free memory for working with these larger chunks.
 #' #' 
-#' @return a database connection (invisibly)
+#' @return the database connection (invisibly)
 #' 
 #' @examples \donttest{
 #' ## Setup: create an archive.
@@ -33,7 +33,7 @@
 #' ## list all files in archive (full paths)
 #' files <- list.files(dir, "[.]tsv\\.bz2$", full.names = TRUE)
 #' 
-#' ## Read archived files into a new database (defaults to sqlite)
+#' ## Read archived files into a new database (another sqlite in this case)
 #' new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
 #' unark(files, new_db)
 #' 
