@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Unarchive a list of compressed tsv files into a database" />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -71,19 +74,10 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/arkdb.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/arkdb_intro.html">Introduction to arkdb</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
       
@@ -208,7 +202,7 @@ setting option <code>readr.show_progress</code> to <code>FALSE</code>.</p></dd>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a database connection (invisibly)</p>
+    <p>the database connection (invisibly)</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -229,26 +223,26 @@ but require more free memory for working with these larger chunks.
 
 <span class='co'>## database -&gt; .tsv.bz2 </span>
 <span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.01012182 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.03608203 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.81319 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.09875011 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.3160632 secs)</span></div><div class='input'>
+#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.007232189 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.0528121 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 1.866748 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.1073608 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.281486 secs)</span></div><div class='input'>
 <span class='co'>## list all files in archive (full paths)</span>
 <span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='no'>dir</span>, <span class='st'>"[.]tsv\\.bz2$"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='co'>## Read archived files into a new database (defaults to sqlite)</span>
+<span class='co'>## Read archived files into a new database (another sqlite in this case)</span>
 <span class='no'>new_db</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='fu'>file.path</span>(<span class='no'>dir</span>, <span class='st'>"local.sqlite"</span>), <span class='kw'>create</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
 <span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>new_db</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.02123809 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.04757094 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.143389 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.053689 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.211375 secs)</span></div><div class='input'>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpdftyDS/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.05431485 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpdftyDS/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.05062604 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpdftyDS/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.142055 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpdftyDS/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.0612669 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
+#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpdftyDS/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.2589819 secs)</span></div><div class='input'>
 <span class='co'>## Prove table is returned successfully.</span>
 <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>new_db</span>, <span class='st'>"flights"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;flights&gt; [?? x 19]
 #&gt; # Database: sqlite 3.22.0
-#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpUo7oPY/local.sqlite]
+#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpdftyDS/local.sqlite]
 #&gt;     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 #&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
 #&gt;  1  2013     1     1      517            515         2      830            819
