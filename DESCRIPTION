@@ -24,10 +24,10 @@ Imports:
     DBI,
     readr,
     progress,
-    dplyr,
     methods,
     tools
 Suggests: 
+    dplyr,
     dbplyr,
     nycflights13,
     testthat,

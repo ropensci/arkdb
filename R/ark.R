@@ -72,7 +72,7 @@ ark_file <- function(tablename,
   
   start <- 1
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
-  message(sprintf("Importing in %d line chunks:\n%s",
+  message(sprintf("Exporting in %d line chunks:\n%s",
                   lines, tablename))
   t0 <- Sys.time()
   repeat {
@@ -80,8 +80,8 @@ ark_file <- function(tablename,
     ## Do stuff
     ark_chunk(db_con, tablename, start = start, 
               lines = lines, dir = dir, compress = compress)
-    start <- start + lines  
-    if (start > end) {
+    start <- start + 1  
+    if ( (start - 1)*lines > end) {
       break
     }
   }
@@ -89,7 +89,6 @@ ark_file <- function(tablename,
 }
   
 #' @importFrom readr write_tsv  
-#' @importFrom dplyr filter between row_number sql collect tbl  
 ark_chunk <- function(db_con, tablename, start = 1, 
                       lines = 10000L, dir = ".", 
                       compress  = c("bzip2", "gzip", "xz", "none")){
@@ -107,7 +106,9 @@ ark_chunk <- function(db_con, tablename, start = 1,
     query <- paste("SELECT * FROM", 
                    tablename, 
                     "WHERE rownum BETWEEN",
-                   start, "AND", start + lines)
+                   (start - 1) * lines, 
+                   "AND", 
+                   start * lines)
   }
   chunk <- DBI::dbFetch(dbSendQuery(db_con, query))
   
