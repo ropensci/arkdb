@@ -73,7 +73,7 @@ ark_file <- function(tablename,
     ## Do stuff
     ark_chunk(db_con, tablename, start = start, 
               lines = lines, dir = dir, compress = compress)
-    start <- start+lines  
+    start <- start + lines  
     if (start > end) {
       break
     }

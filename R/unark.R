@@ -43,7 +43,16 @@
 #' }
 #' @export
 unark <- function(files, db_con, lines = 10000L,  ...){
-  lapply(files, unark_file, db_con, lines = lines, ...)
+  
+  ## Handle both dplyr and DBI style connections
+  ## Return whichever one we are given.
+  if(is(db_con, "src_dbi")){
+    db <- db_con$con
+  } else {
+    db <- db_con
+  }
+  
+  lapply(files, unark_file, db, lines = lines, ...)
   invisible(db_con)  
 }
 
@@ -76,7 +85,7 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
     chunk <- readr::read_tsv(body, ...)
-    DBI::dbWriteTable(db_con[[1]], tbl_name, chunk, append=TRUE)
+    DBI::dbWriteTable(db_con, tbl_name, chunk, append=TRUE)
     
     if (d$complete) {
       break
