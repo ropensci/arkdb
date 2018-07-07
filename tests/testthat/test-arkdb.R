@@ -13,14 +13,26 @@ testthat::test_that("we can ark and unark a db", {
   files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
   testthat::expect_length(files, 5)
 
+  myflights <- suppressMessages(
+    readr::read_tsv(fs::path(dir, "flights.tsv.bz2")))
+  testthat::expect_equal(dim(myflights), 
+                         dim(nycflights13::flights))
+  
   ## unark
   new_db <- src_sqlite("local.sqlite", create = TRUE)
   unark(files, new_db, lines = 50000)
   
-  flights <- tbl(new_db, "flights")
-  testthat::expect_equal(dim(flights)[[2]], 19)
-  testthat::expect_is(flights, "tbl_dbi")
-
+  myflights <- tbl(new_db, "flights")
+  testthat::expect_is(myflights, "tbl_dbi")
+  
+  myflights <- collect(myflights)
+  testthat::expect_equal(dim(myflights), 
+                         dim(nycflights13::flights))
+  
+ 
+  dim(myflights[[1]])
+  ## Classes not preserved, we get read_tsv guesses on class
+  
   unlink("nycflights", TRUE)
   unlink("local.sqlite")
   unlink("nycflights13.sqlite")

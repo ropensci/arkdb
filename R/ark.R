@@ -65,18 +65,14 @@ ark_file <- function(tablename,
   
   start <- 1
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
-  message(sprintf("Importing in %d line chunks:\n%s",
+  message(sprintf("Exporting in %d line chunks:\n%s",
                   lines, tablename))
   t0 <- Sys.time()
-  repeat {
+  while((start-1) * lines < end) {
     p$tick()
-    ## Do stuff
     ark_chunk(db_con, tablename, start = start, 
               lines = lines, dir = dir, compress = compress)
-    start <- start + lines  
-    if (start > end) {
-      break
-    }
+    start <- start + 1  
   }
   message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
 }
@@ -99,10 +95,9 @@ ark_chunk <- function(db_con, tablename, start = 1,
   } else {
   ## Postgres can do windowing
     chunk <- collect(filter(tbl(db_con,tablename), 
-              between(row_number(), start, start+lines)))
+              between(row_number(), (start-1)*lines, start*lines)))
   }
   append <- start != 1
-  
   ext <- switch(compress,
                 "bzip2" = ".bz2",
                 "gzip" = ".gz",
@@ -110,6 +105,7 @@ ark_chunk <- function(db_con, tablename, start = 1,
                 "none" = "",
                 ".bz2")
   
+
   readr::write_tsv(chunk, 
                    file.path(dir, paste0(tablename, ".tsv", ext)), 
                    append = append)
