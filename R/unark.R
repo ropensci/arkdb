@@ -43,19 +43,20 @@
 #' }
 #' @export
 unark <- function(files, db_con, lines = 10000L,  ...){
-  
-  ## Handle both dplyr and DBI style connections
-  ## Return whichever one we are given.
-  if(is(db_con, "src_dbi")){
-    db <- db_con$con
-  } else {
-    db <- db_con
-  }
-  
+  db <- normalize_con(db_con)
   lapply(files, unark_file, db, lines = lines, ...)
   invisible(db_con)  
 }
 
+normalize_con <- function(db_con){
+  ## Handle both dplyr and DBI style connections
+  ## Return whichever one we are given.
+  if(is(db_con, "src_dbi")){
+    db_con$con
+  } else {
+    db_con
+  }
+}
 
 
 #' @importFrom readr read_tsv

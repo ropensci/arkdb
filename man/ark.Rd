@@ -5,7 +5,7 @@
 \title{Archive tables from a database as flat files}
 \usage{
 ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz",
-  "none"), tables = DBI::dbListTables(db_con$con))
+  "none"), tables = list_tables(db_con))
 }
 \arguments{
 \item{db_con}{a database connection}
