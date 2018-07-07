@@ -17,10 +17,18 @@ testthat::test_that("we can ark and unark a db", {
   new_db <- src_sqlite("local.sqlite", create = TRUE)
   unark(files, new_db, lines = 50000)
   
-  flights <- tbl(new_db, "flights")
-  testthat::expect_equal(dim(flights)[[2]], 19)
-  testthat::expect_is(flights, "tbl_dbi")
+  myflights <- tbl(new_db, "flights")
+  
+  testthat::expect_equal(dim(myflights), 
+                         dim(nycflights13::flights))
+  
+ 
+  testthat::expect_is(myflights, "tbl_dbi")
 
+  myflights <- collect(myflights)
+  dim(myflights[[1]])
+  ## Classes not preserved, we get read_tsv guesses on class
+  
   unlink("nycflights", TRUE)
   unlink("local.sqlite")
   unlink("nycflights13.sqlite")

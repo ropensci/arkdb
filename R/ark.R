@@ -37,21 +37,28 @@
 #' }
 ark <- function(db_con, dir, lines = 10000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
-                tables = DBI::dbListTables(db_con$con)){
+                tables = list_tables(db_con)){
+  
   compress <- match.arg(compress)
   
-  #tables <- DBI::dbListTables(db_con$con)
   tables <- tables[!grepl("sqlite_", tables)]
   
-  lapply(tables, ark_file, 
-         db_con = db_con, lines = lines, 
-         dir = dir, compress = compress)
+  lapply(tables, 
+         ark_file, 
+         db_con = normalize_con(db_con), 
+         lines = lines, 
+         dir = dir, 
+         compress = compress)
   
   invisible(dir)
 }
 
+list_tables <- function(db){
+  db <- normalize_con(db)
+  DBI::dbListTables(db)
+}
 
-#' @importFrom dplyr collect summarise tbl n
+#' @importFrom DBI dbSendQuery dbFetch
 ark_file <- function(tablename, 
                      db_con, 
                      lines = 10000L, 
@@ -59,9 +66,9 @@ ark_file <- function(tablename,
                      compress = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
-  d <- dplyr::tbl(db_con, tablename)
-  n <- dplyr::summarise(d, n())
-  end <- dplyr::collect(n)[[1]] 
+  rs <- DBI::dbSendQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
+  size <- DBI::dbFetch(rs)
+  end <- size[[1]][[1]]
   
   start <- 1
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
@@ -90,17 +97,20 @@ ark_chunk <- function(db_con, tablename, start = 1,
   compress <- match.arg(compress)
   
   
-  if (is(db_con$con, "SQLiteConnection") |
-      is(db_con$con, "MySQLConnection") |
+  if (is(db_con, "SQLiteConnection") |
+      is(db_con, "MySQLConnection") |
       Sys.getenv("arkdb_windowing") == "FALSE") {
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
                    lines, "OFFSET", (start-1)*lines)
-    chunk <- dplyr::collect( dplyr::tbl(db_con, dplyr::sql(query)) )
   } else {
   ## Postgres can do windowing
-    chunk <- collect(filter(tbl(db_con,tablename), 
-              between(row_number(), start, start+lines)))
+    query <- paste("SELECT * FROM", 
+                   tablename, 
+                    "WHERE rownum BETWEEN",
+                   start, "AND", start + lines)
   }
+  chunk <- DBI::dbFetch(dbSendQuery(db_con, query))
+  
   append <- start != 1
   
   ext <- switch(compress,
