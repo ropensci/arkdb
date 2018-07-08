@@ -56,27 +56,53 @@ Consider the `nycflights` database in SQLite:
 ``` r
 db <- dbplyr::nycflights13_sqlite(".")
 #> Caching nycflights db at ./nycflights13.sqlite
+#> Creating table: airlines
+#> Creating table: airports
+#> Creating table: flights
+#> Creating table: planes
+#> Creating table: weather
 ```
 
 Create an archive of the database:
 
 ``` r
 ark(db, ".", lines = 50000)
-#> Importing in 50000 line chunks:
+#> Exporting in 50000 line chunks:
 #> airlines
-#> ...Done! (in 0.01724696 secs)
-#> Importing in 50000 line chunks:
+#> Warning: Closing open result set, pending rows
+#> ...Done! (in 0.007887125 secs)
+#> Warning: Closing open result set, pending rows
+#> Exporting in 50000 line chunks:
 #> airports
-#> ...Done! (in 0.03898597 secs)
-#> Importing in 50000 line chunks:
+#> Warning: Closing open result set, pending rows
+#> ...Done! (in 0.03519011 secs)
+#> Warning: Closing open result set, pending rows
+#> Exporting in 50000 line chunks:
 #> flights
-#> ...Done! (in 0.553968 secs)
-#> Importing in 50000 line chunks:
+#> Warning: Closing open result set, pending rows
+
+#> Warning: Closing open result set, pending rows
+
+#> Warning: Closing open result set, pending rows
+
+#> Warning: Closing open result set, pending rows
+
+#> Warning: Closing open result set, pending rows
+
+#> Warning: Closing open result set, pending rows
+
+#> Warning: Closing open result set, pending rows
+#> ...Done! (in 8.650942 secs)
+#> Warning: Closing open result set, pending rows
+#> Exporting in 50000 line chunks:
 #> planes
-#> ...Done! (in 0.09305 secs)
-#> Importing in 50000 line chunks:
+#> Warning: Closing open result set, pending rows
+#> ...Done! (in 0.06782579 secs)
+#> Warning: Closing open result set, pending rows
+#> Exporting in 50000 line chunks:
 #> weather
-#> ...Done! (in 0.2292418 secs)
+#> Warning: Closing open result set, pending rows
+#> ...Done! (in 0.5270221 secs)
 ```
 
 ## Unarchive
@@ -91,19 +117,19 @@ new_db <- src_sqlite("local.sqlite", create=TRUE)
 unark(files, new_db, lines = 50000)
 #> Importing in 50000 line chunks:
 #> airlines.tsv.bz2
-#> ...Done! (in 0.06284809 secs)
+#> ...Done! (in 0.06034207 secs)
 #> Importing in 50000 line chunks:
 #> airports.tsv.bz2
-#> ...Done! (in 0.0897131 secs)
+#> ...Done! (in 0.02559996 secs)
 #> Importing in 50000 line chunks:
 #> flights.tsv.bz2
-#> ...Done! (in 0.134465 secs)
+#> ...Done! (in 6.464484 secs)
 #> Importing in 50000 line chunks:
 #> planes.tsv.bz2
-#> ...Done! (in 0.055408 secs)
+#> ...Done! (in 0.04460192 secs)
 #> Importing in 50000 line chunks:
 #> weather.tsv.bz2
-#> ...Done! (in 0.168793 secs)
+#> ...Done! (in 0.5441582 secs)
 
 new_db
 #> src:  sqlite 3.22.0 [local.sqlite]
