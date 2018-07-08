@@ -124,12 +124,12 @@
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; airlines</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; ...Done! (in 0.006915092 secs)</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; ...Done! (in 0.006491184 secs)</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
 <a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; airports</span></a>
 <a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.03431201 secs)</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.05866694 secs)</span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; flights</span></a>
@@ -146,17 +146,17 @@
 <a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
 <a class="sourceLine" id="cb4-26" data-line-number="26"></a>
 <a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; ...Done! (in 8.867065 secs)</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; ...Done! (in 11.22096 secs)</span></a>
 <a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
 <a class="sourceLine" id="cb4-30" data-line-number="30"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-31" data-line-number="31"><span class="co">#&gt; planes</span></a>
 <a class="sourceLine" id="cb4-32" data-line-number="32"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="co">#&gt; ...Done! (in 0.08900714 secs)</span></a>
+<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="co">#&gt; ...Done! (in 0.08481097 secs)</span></a>
 <a class="sourceLine" id="cb4-34" data-line-number="34"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
 <a class="sourceLine" id="cb4-35" data-line-number="35"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb4-36" data-line-number="36"><span class="co">#&gt; weather</span></a>
 <a class="sourceLine" id="cb4-37" data-line-number="37"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38"><span class="co">#&gt; ...Done! (in 0.5343661 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-38" data-line-number="38"><span class="co">#&gt; ...Done! (in 0.6844392 secs)</span></a></code></pre></div>
 <p>We can take a look and confirm the files have been written. Note that we can use <code><a href="http://fs.r-lib.org/reference/dir_ls.html">fs::dir_info</a></code> to get a nice snapshot of the file sizes. Compare the compressed sizes to the original database:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_info</a></span>(dir) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(path, size)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 5 x 2</span></a>
@@ -183,19 +183,19 @@
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)  </a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; nycflights/airlines.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.0483489 secs)</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.05305982 secs)</span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; nycflights/airports.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.02760291 secs)</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.05113602 secs)</span></a>
 <a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; nycflights/flights.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 6.605275 secs)</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 7.434932 secs)</span></a>
 <a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; nycflights/planes.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.04008579 secs)</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.06928086 secs)</span></a>
 <a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
 <a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; nycflights/weather.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.2508781 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.4024339 secs)</span></a></code></pre></div>
 <p><code>unark</code> returns a <code>dplyr</code> database connection that we can use in the usual way:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(new_db, <span class="st">"flights"</span>)</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span></a>
