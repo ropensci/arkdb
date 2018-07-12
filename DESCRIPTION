@@ -26,7 +26,8 @@ Imports:
     progress,
     methods,
     tools
-Suggests: 
+Suggests:
+    spelling, 
     dplyr,
     dbplyr,
     nycflights13,
@@ -36,3 +37,4 @@ Suggests:
     fs,
     rmarkdown,
     RSQLite
+Language: en-US
