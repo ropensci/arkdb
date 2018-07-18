@@ -1,10 +1,5 @@
 
 
-
-## FIXMEs: 
-## 1. consider supporting non tsv formats?
-
-
 #' Unarchive a list of compressed tsv files into a database
 #' @param files vector of filenames to be read in. Must be `tsv`
 #' format, optionally compressed using `bzip2`, `gzip`, `zip`,
@@ -42,9 +37,10 @@
 #' 
 #' }
 #' @export
-unark <- function(files, db_con, lines = 10000L,  ...){
+unark <- function(files, db_con, streamable_table = streamable_readr_tsv(),
+                  lines = 10000L, ...){
   db <- normalize_con(db_con)
-  lapply(files, unark_file, db, lines = lines, ...)
+  lapply(files, unark_file, db, streamable_table, lines = lines, ...)
   invisible(db_con)  
 }
 
@@ -59,15 +55,14 @@ normalize_con <- function(db_con){
 }
 
 
-#' @importFrom readr read_tsv
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-unark_file <- function(filename, db_con, lines = 10000L, ...){
+unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
   con <- compressed_file(filename, "r")
   on.exit(close(con))
-  
+
   ## Handle case of col_names != TRUE ?
   ## What about skips and comments?
   header <- readLines(con, n = 1L)
@@ -75,6 +70,9 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
     return(invisible(db_con))
   }
   reader <- read_chunked(con, lines)
+
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
   
   # May throw an error if we need to read more than 'total' chunks?
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
@@ -85,7 +83,9 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
     d <- reader()
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
-    chunk <- readr::read_tsv(body, ...)
+
+    writeLines(body, tmp)
+    chunk <- streamable_table$read(tmp, ...)
     DBI::dbWriteTable(db_con, tbl_name, chunk, append=TRUE)
     
     if (d$complete) {

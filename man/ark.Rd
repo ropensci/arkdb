@@ -4,13 +4,15 @@
 \alias{ark}
 \title{Archive tables from a database as flat files}
 \usage{
-ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz",
-  "none"), tables = list_tables(db_con))
+ark(db_con, dir, streamable_table = streamable_readr_tsv(), lines = 10000L,
+  compress = c("bzip2", "gzip", "xz", "none"), tables = list_tables(db_con))
 }
 \arguments{
 \item{db_con}{a database connection}
 
 \item{dir}{a directory where we will write the compressed text files output}
+
+\item{streamable_table}{interface (WIP) for serialising/deserialising in chunks}
 
 \item{lines}{the number of lines to use in each single chunk}
 

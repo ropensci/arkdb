@@ -3,6 +3,7 @@
 #' 
 #' @param db_con a database connection
 #' @param dir a directory where we will write the compressed text files output
+#' @param streamable_table interface (WIP) for serialising/deserialising in chunks
 #' @param lines the number of lines to use in each single chunk
 #' @param compress file compression algorithm. Should be one of "bzip2" (default),
 #' "gzip" (faster write times, a bit less compression), "xz", or "none", for
@@ -35,17 +36,21 @@
 #' 
 #' 
 #' }
-ark <- function(db_con, dir, lines = 10000L, 
+ark <- function(db_con, dir,
+                streamable_table = streamable_readr_tsv(),
+                lines = 10000L,
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con)){
   
   compress <- match.arg(compress)
+  stopifnot(inherits(streamable_table, "streamable_table"))
   
   tables <- tables[!grepl("sqlite_", tables)]
   
   lapply(tables, 
          ark_file, 
-         db_con = normalize_con(db_con), 
+         db_con = normalize_con(db_con),
+         streamable_table = streamable_table,
          lines = lines, 
          dir = dir, 
          compress = compress)
@@ -60,11 +65,13 @@ list_tables <- function(db){
 
 #' @importFrom DBI dbSendQuery dbFetch
 ark_file <- function(tablename, 
-                     db_con, 
+                     db_con,
+                     streamable_table,
                      lines = 10000L, 
                      dir = ".", 
                      compress = c("bzip2", "gzip", "xz", "none")){
-  
+  ## NOTE(RGF): you are validating your argument multiple times here -
+  ## it has already been checked.
   compress <- match.arg(compress)
   rs <- DBI::dbSendQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   size <- DBI::dbFetch(rs)
@@ -78,7 +85,7 @@ ark_file <- function(tablename,
   repeat {
     p$tick()
     ## Do stuff
-    ark_chunk(db_con, tablename, start = start, 
+    ark_chunk(db_con, tablename, streamable_table, start = start,
               lines = lines, dir = dir, compress = compress)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
@@ -88,9 +95,8 @@ ark_file <- function(tablename,
   message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
 }
   
-#' @importFrom readr write_tsv  
-ark_chunk <- function(db_con, tablename, start = 1, 
-                      lines = 10000L, dir = ".", 
+ark_chunk <- function(db_con, tablename, streamable_table, start = 1,
+                      lines = 10000L, dir = ".",
                       compress  = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
@@ -120,9 +126,7 @@ ark_chunk <- function(db_con, tablename, start = 1,
                 "xz" = ".xz",
                 "none" = "",
                 ".bz2")
-  
-  readr::write_tsv(chunk, 
-                   file.path(dir, paste0(tablename, ".tsv", ext)), 
-                   append = append)
 
+  dest <- sprintf("%s.%s%s", tablename, streamable_table$extension, ext)
+  streamable_table$write(chunk, file.path(dir, dest), append = append)
 }
