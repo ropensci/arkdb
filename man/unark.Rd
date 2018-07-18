@@ -14,6 +14,8 @@ or \code{xz} format at present.}
 
 \item{db_con}{a database src (\code{src_dbi} object from \code{dplyr})}
 
+\item{streamable_table}{interface (WIP) for serialising/deserialising in chunks}
+
 \item{lines}{number of lines to read in a chunk.}
 
 \item{...}{Arguments passed on to \code{readr::read_tsv}

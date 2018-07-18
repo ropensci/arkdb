@@ -7,6 +7,7 @@
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param lines number of lines to read in a chunk.
 #' @inheritDotParams readr::read_tsv
+#' @param streamable_table interface (WIP) for serialising/deserialising in chunks
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
 #' large compressed tables which may be too large to read into
