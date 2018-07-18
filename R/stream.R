@@ -17,10 +17,11 @@ streamable_readr_tsv <- function() {
 
 streamable_base_tsv <- function() {
   read_tsv <- function(file, header) {
-    utils::read.table(..., sep = "\t", header = header)
+    utils::read.table(file, header, sep = "\t", header = header)
   }
   write_tsv <- function(x, path, append) {
-    utils::write.table(..., append = append, sep = "\t", col.names = FALSE)
+    utils::write.table(file, header, append = append, sep = "\t",
+                       col.names = FALSE)
   }
   streamable_table(read_tsv, write_tsv, "tsv")
 }
