@@ -71,8 +71,8 @@ ark_file <- function(tablename,
   
   start <- 1
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
-  message(sprintf("Exporting in %d line chunks:\n%s",
-                  lines, tablename))
+  message(sprintf("Exporting %s in %d line chunks:",
+                  tablename, lines))
   t0 <- Sys.time()
   repeat {
     p$tick()
