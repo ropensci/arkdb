@@ -66,8 +66,7 @@ ark_file <- function(tablename,
                      compress = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
-  rs <- DBI::dbSendQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
-  size <- DBI::dbFetch(rs)
+  size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
   
   start <- 1
