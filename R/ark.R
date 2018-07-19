@@ -66,8 +66,7 @@ ark_file <- function(tablename,
                      compress = c("bzip2", "gzip", "xz", "none")){
   
   compress <- match.arg(compress)
-  rs <- DBI::dbSendQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
-  size <- DBI::dbFetch(rs)
+  size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
   
   start <- 1
@@ -96,8 +95,8 @@ ark_chunk <- function(db_con, tablename, start = 1,
   compress <- match.arg(compress)
   
   
-  if (is(db_con, "SQLiteConnection") |
-      is(db_con, "MySQLConnection") |
+  if (inherits(db_con, "SQLiteConnection") |
+      inherits(db_con, "MySQLConnection") |
       Sys.getenv("arkdb_windowing") == "FALSE") {
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
                    lines, "OFFSET", (start-1)*lines)
@@ -110,7 +109,7 @@ ark_chunk <- function(db_con, tablename, start = 1,
                    "AND", 
                    start * lines)
   }
-  chunk <- DBI::dbFetch(dbSendQuery(db_con, query))
+  chunk <- DBI::dbGetQuery(db_con, query)
   
   append <- start != 1
   
