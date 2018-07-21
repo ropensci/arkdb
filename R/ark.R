@@ -20,7 +20,6 @@
 #' database technology and formats. 
 #' 
 #' @importFrom DBI dbListTables
-#' @importFrom methods is
 #' @export
 #' @return the path to `dir` where output files are created (invisibly), for piping.
 #' @examples 
@@ -84,7 +83,7 @@ ark_file <- function(tablename,
       break
     }
   }
-  message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
+  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
 }
   
 #' @importFrom readr write_tsv  
@@ -95,19 +94,19 @@ ark_chunk <- function(db_con, tablename, start = 1,
   compress <- match.arg(compress)
   
   
-  if (inherits(db_con, "SQLiteConnection") |
-      inherits(db_con, "MySQLConnection") |
-      Sys.getenv("arkdb_windowing") == "FALSE") {
-    query <- paste("SELECT * FROM", tablename, "LIMIT", 
-                   lines, "OFFSET", (start-1)*lines)
-  } else {
-  ## Postgres can do windowing
+  if (has_between()) {
+    ## Windowed queries are faster but not universally supported
     query <- paste("SELECT * FROM", 
                    tablename, 
-                    "WHERE rownum BETWEEN",
+                   "WHERE rownum BETWEEN",
                    (start - 1) * lines, 
                    "AND", 
-                   start * lines)
+                   start * lines)    
+  } else { 
+    ## Any SQL DB can do offset
+    query <- paste("SELECT * FROM", tablename, "LIMIT", 
+                   lines, "OFFSET", (start-1)*lines)
+
   }
   chunk <- DBI::dbGetQuery(db_con, query)
   
@@ -125,3 +124,23 @@ ark_chunk <- function(db_con, tablename, start = 1,
                    append = append)
 
 }
+
+arkdb_cache <- new.env()
+has_between <- function(db_con){
+  cache <- mget("db_supports_between", 
+                ifnotfound = list(db_supports_between = NA), 
+                envir = arkdb_cache)
+  if(is.na(cache[[1]])){
+    db_supports_between <- 
+      tryCatch(DBI::dbGetQuery(db_con, 
+               "SELECT * FROM table WHERE rownum BETWEEN 1 and 2"), 
+               error = function(e) FALSE, 
+               finally = TRUE)
+    
+    assign("db_supports_between", db_supports_between, envir = arkdb_cache)
+    db_supports_between
+  } else {
+    cache[["db_supports_between"]]
+  }
+}
+

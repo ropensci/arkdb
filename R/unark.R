@@ -51,7 +51,7 @@ unark <- function(files, db_con, lines = 10000L,  ...){
 normalize_con <- function(db_con){
   ## Handle both dplyr and DBI style connections
   ## Return whichever one we are given.
-  if(is(db_con, "src_dbi")){
+  if(inherits(db_con, "src_dbi")){
     db_con$con
   } else {
     db_con
@@ -92,7 +92,7 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
       break
     }
   }
-  message(sprintf("...Done! (in %s)", format(Sys.time() - t0)))
+  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
   
   invisible(db_con)
 }
