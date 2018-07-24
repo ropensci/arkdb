@@ -99,7 +99,8 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
 
 
 # Adapted from @richfitz, MIT licensed
-# https://github.com/vimc/montagu-r/blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
+# https://github.com/vimc/montagu-r
+# /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
 
 
 

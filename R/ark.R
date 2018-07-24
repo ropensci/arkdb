@@ -57,22 +57,64 @@ list_tables <- function(db){
   DBI::dbListTables(db)
 }
 
-#' @importFrom DBI dbSendQuery dbFetch
+#' @importFrom DBI dbSendQuery dbFetch dbClearResult dbGetQuery
 ark_file <- function(tablename, 
                      db_con, 
                      lines = 10000L, 
                      dir = ".", 
                      compress = c("bzip2", "gzip", "xz", "none")){
   
+  ## Set up compressed connection
   compress <- match.arg(compress)
+  ext <- switch(compress,
+                "bzip2" = ".bz2",
+                "gzip" = ".gz",
+                "xz" = ".xz",
+                "none" = "",
+                ".bz2")
+  filename <- file.path(dir, paste0(tablename, ".tsv", ext))
+  con <- compressed_file(filename, "w")
+  on.exit(close(con))
+  
+  ## Progress reporting
+  message(sprintf("Exporting %s in %d line chunks:", tablename, lines))
+  p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
+  t0 <- Sys.time()
+ 
+  if(FALSE){
+    alternate_method(db_con, lines, dir, compress)
+    return(invisible(TRUE))
+  }
+  
+  
+  ## Create header to avoid duplicate column names
+  query <- paste("SELECT * FROM", tablename, "LIMIT 0")
+  header <- DBI::dbGetQuery(db_con, query)
+  readr::write_tsv(header, con, append = FALSE)
+
+  ## 
+  res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
+  while (TRUE) {
+    p$tick()
+    data <- dbFetch(res, n = lines)
+    if (nrow(data) == 0) break
+    readr::write_tsv(data, con, append = TRUE)
+  }
+  DBI::dbClearResult(res)
+  
+  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
+  
+}
+
+
+## Fallback method, If a dbSendQuery() immediately transfers every thing to the
+## client, the below solution works better. But we're not aware of DBI backends
+## that do that.  This may later be deprecated.
+
+alternate_method <- function(db_con, lines, dir, compress){
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
-  
   start <- 1
-  p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
-  message(sprintf("Exporting %s in %d line chunks:",
-                  tablename, lines))
-  t0 <- Sys.time()
   repeat {
     p$tick()
     ## Do stuff
@@ -84,6 +126,7 @@ ark_file <- function(tablename,
     }
   }
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
+  
 }
   
 #' @importFrom readr write_tsv  
