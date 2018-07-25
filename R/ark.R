@@ -44,6 +44,7 @@ ark <- function(db_con, dir, lines = 10000L,
                 use_alternate = FALSE){
   
   compress <- match.arg(compress)
+  lines <- as.integer(lines)
   
   tables <- tables[!grepl("sqlite_", tables)]
   
@@ -153,13 +154,15 @@ ark_chunk <- function(db_con, tablename, start = 1,
     query <- paste("SELECT * FROM", 
                    tablename, 
                    "WHERE rownum BETWEEN",
-                   (start - 1) * lines, 
+                   sql_integer((start - 1) * lines), 
                    "AND", 
-                   start * lines)    
+                   sql_integer(start * lines))    
   } else { 
     ## Any SQL DB can do offset
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
-                   lines, "OFFSET", (start-1)*lines)
+                   sql_integer(lines), 
+                   "OFFSET", 
+                   sql_integer((start-1)*lines))
 
   }
   chunk <- DBI::dbGetQuery(db_con, query)
@@ -170,6 +173,17 @@ ark_chunk <- function(db_con, tablename, start = 1,
                    append = append)
 
 }
+
+## need to convert large integers to characters
+sql_integer <- function(x){
+  orig <- getOption("scipen")
+  options(scipen = 100)
+  out <- paste(x)
+  options(scipen = orig)
+  out
+}
+
+
 
 arkdb_cache <- new.env()
 has_between <- function(db_con){
