@@ -124,6 +124,11 @@ kirill_method <- function(db_con, lines, p, tablename, con){
 ## that do that.  This may later be deprecated.
 
 alternate_method <- function(db_con, lines, dir, compress, p, tablename, con){
+  
+  ## Clean cache re db type
+  assign("db_supports_between", NA, envir = arkdb_cache)
+  
+  
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
   start <- 1
@@ -149,7 +154,7 @@ ark_chunk <- function(db_con, tablename, start = 1,
   compress <- match.arg(compress)
   
   
-  if (has_between()) {
+  if (has_between(db_con, tablename)) {
     ## Windowed queries are faster but not universally supported
     query <- paste("SELECT * FROM", 
                    tablename, 
@@ -186,14 +191,14 @@ sql_integer <- function(x){
 
 
 arkdb_cache <- new.env()
-has_between <- function(db_con){
+has_between <- function(db_con, tablename){
   cache <- mget("db_supports_between", 
                 ifnotfound = list(db_supports_between = NA), 
                 envir = arkdb_cache)
   if(is.na(cache[[1]])){
     db_supports_between <- 
       tryCatch(DBI::dbGetQuery(db_con, 
-               "SELECT * FROM table WHERE rownum BETWEEN 1 and 2"), 
+               paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN 1 and 2")), 
                error = function(e) FALSE, 
                finally = TRUE)
     
