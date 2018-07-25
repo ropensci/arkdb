@@ -110,16 +110,14 @@ testthat::test_that("alternate method for ark", {
 testthat::context("MonetDB")
 testthat::test_that("try with MonetDB & alternate method", {
   
-  testthat::skip_on_travis()
-  
   ## SETUP, with text files:
   dir <- fs::dir_create("nycflights")
   data <-  list(airlines = nycflights13::airlines, 
                 airports = nycflights13::airports, 
                 flights = nycflights13::flights)
   tmp <- lapply(names(data), function(x) 
-    readr::write_tsv(data[[x]], fs::path(dir, paste0(x, ".tsv.gz"))))
-  files <- fs::dir_ls(dir, glob = "*.tsv.gz")
+    readr::write_tsv(data[[x]], fs::path(dir, paste0(x, ".tsv"))))
+  files <- fs::dir_ls(dir, glob = "*.tsv")
   testthat::expect_length(files, 3)
 
   # test unark on alternate DB
@@ -138,7 +136,10 @@ testthat::test_that("try with MonetDB & alternate method", {
   ## Test has_between
   testthat::expect_false( has_between(new_db, "airlines") )
   
-  ## Test ark
+  
+  
+  
+  #### Test ark ######
   ark(new_db, dir, lines = 50000L, method = "window")
   
   ## test ark results
