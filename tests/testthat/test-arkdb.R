@@ -104,6 +104,9 @@ testthat::test_that("alternate method for ark", {
   
 })
 
+testthat::context("MonetDB")
+
+
 testthat::test_that("try with MonetDB & alternate method", {
   
   ## SETUP, with text files:
@@ -113,34 +116,27 @@ testthat::test_that("try with MonetDB & alternate method", {
                 flights = nycflights13::flights)
   tmp <- lapply(names(data), function(x) 
     readr::write_tsv(data[[x]], fs::path(dir, paste0(x, ".tsv.gz"))))
- 
   files <- fs::dir_ls(dir, glob = "*.tsv.gz")
   testthat::expect_length(files, 3)
-  ## Classes not preserved, we get read_tsv guesses on class
- 
-# test alternate DB
+
+  # test alternate DB
   monet_dir <- fs::dir_create("monet")
   new_db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), monet_dir)
-
-  ## unark into a new db
   unark(files, new_db, lines = 50000)
   
   flights <- dplyr::tbl(new_db, "flights")
   testthat::expect_equal(dim(flights)[[2]], 19)
   testthat::expect_is(flights, "tbl_dbi")
   
-  
-  #### ark a monet-db #######
-  
-  ## start clean
+  ## clean out the text files
   unlink(dir, TRUE) # ark'd text files
   dir <- fs::dir_create("nycflights")
   
   ark(new_db, dir, lines = 50000L, use_alternate = TRUE)
   
-  ## test
+  ## test ark results
   files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
-  testthat::expect_length(files, 5)
+  testthat::expect_length(files, 3)
   
   myflights <- suppressMessages(
     readr::read_tsv(fs::path(dir, "flights.tsv.bz2")))
