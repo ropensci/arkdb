@@ -38,7 +38,8 @@ testthat::test_that("we can ark and unark a db", {
   ## Classes not preserved, we get read_tsv guesses on class
   
   unlink(dir, TRUE)
-
+  unlink("local.sqlite")
+  
 })
 
 
@@ -64,6 +65,7 @@ testthat::test_that("we can ark and unark a db in plain text", {
   testthat::expect_equal(dim(flights)[[2]], 19)
   testthat::expect_is(flights, "tbl_dbi")
   
+  unlink("local.sqlite")
   unlink(dir, TRUE)
 
 })
@@ -98,6 +100,7 @@ testthat::test_that("alternate method for ark", {
                          dim(nycflights13::flights))
   
   unlink(dir, TRUE)
+  unlink("local.sqlite")
   
 })
 
@@ -175,11 +178,11 @@ testthat::test_that("we can test for windowing", {
   
   
   unlink(dir, TRUE) # ark'd text files
-
+  unlink("local.sqlite")
+  
   
 })
 
-unlink("local.sqlite")
 
 
 
