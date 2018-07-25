@@ -188,23 +188,11 @@ sql_window <- windowing(TRUE)
 
 
 ## Deprecated
-arkdb_cache <- new.env()
 has_between <- function(db_con, tablename){
-  #cache <- mget("db_supports_between", 
-  #              ifnotfound = list(db_supports_between = NA), 
-  #              envir = arkdb_cache)
-  #if(is.na(cache[[1]])){
-    db_supports_between <- 
       tryCatch(DBI::dbGetQuery(normalize_con(db_con), 
                paste("SELECT * FROM", tablename, "WHERE ROWNUM BETWEEN 1 and 2")), 
                error = function(e) FALSE, 
                finally = TRUE)
-    
-   # assign("db_supports_between", db_supports_between, envir = arkdb_cache)
-    
-    db_supports_between
-  #} else {
-  #  cache[["db_supports_between"]]
-  #}
+
 }
 

@@ -130,6 +130,10 @@ testthat::test_that("try with MonetDB & alternate method", {
   unlink(dir, TRUE) # ark'd text files
   dir <- fs::dir_create("nycflights")
   
+  
+  testthat::expect_false( has_between(new_db, "airlines") )
+  
+  
   ark(new_db, dir, lines = 50000L, method = "window")
   
   ## test ark results
@@ -147,46 +151,4 @@ testthat::test_that("try with MonetDB & alternate method", {
   
 })
 
-
-
-testthat::context("has_windowing")
-testthat::test_that("we can test for windowing", {
-  
-  ## SETUP, with text files:
-  dir <- fs::dir_create("nycflights")
-  data <-  list(airlines = nycflights13::airlines, 
-                airports = nycflights13::airports)
-  tmp <- lapply(names(data), function(x) 
-    readr::write_tsv(data[[x]], fs::path(dir, paste0(x, ".tsv.gz"))))
-  files <- fs::dir_ls(dir, glob = "*.tsv.gz")
-  testthat::expect_length(files, 2)
-  
-  
-  # set up db
-  ## MonetDB LITE has BETWEEN but not ROWNUM
-  
-  # db_dir <- fs::dir_create("monet")
-  # new_db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), db_dir)
-  # unark(files, new_db, lines = 50000)
-  # unlink(db_dir, TRUE)
-  
-  
-  new_db <- dplyr::src_sqlite("local.sqlite", create = TRUE)
-  unark(files, new_db, lines = 50000)
-  
-  testthat::expect_false( has_between(new_db, "airlines") )
-  
-  
-  unlink(dir, TRUE) # ark'd text files
-  unlink("local.sqlite")
-  
-  
-})
-
-
-
-
-## dbplyr handles this automatically
-#DBI::dbDisconnect(db[[1]])
-#DBI::dbDisconnect(new_db[[1]])
 
