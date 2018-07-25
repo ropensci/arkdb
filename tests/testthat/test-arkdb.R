@@ -87,6 +87,7 @@ testthat::test_that("alternate method for ark", {
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
+  
   ## unark
   new_db <- dplyr::src_sqlite("local.sqlite", create = TRUE)
   unark(files, new_db, lines = 50000)
@@ -98,7 +99,23 @@ testthat::test_that("alternate method for ark", {
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
+  unlink(dir, TRUE)
+  unlink("local.sqlite")
   
+})
+
+testthat::test_that("try with MonetDB & alternate method", {
+  
+  ## SETUP, with text files:
+  dir <- fs::dir_create("nycflights")
+  data <-  list(airlines = nycflights13::airlines, 
+                airports = nycflights13::airports, 
+                flights = nycflights13::flights)
+  tmp <- lapply(names(data), function(x) 
+    readr::write_tsv(data[[x]], fs::path(dir, paste0(x, ".tsv.gz"))))
+ 
+  files <- fs::dir_ls(dir, glob = "*.tsv.gz")
+  testthat::expect_length(files, 3)
   ## Classes not preserved, we get read_tsv guesses on class
  
 # test alternate DB
@@ -133,7 +150,8 @@ testthat::test_that("alternate method for ark", {
   
   unlink(monet_dir, TRUE)
   unlink("local.sqlite")     # unarked db
-
+  unlink(dir, TRUE) # ark'd text files
+  
 })
 
 
