@@ -75,6 +75,11 @@ testthat::context("alternate method")
 
 testthat::test_that("alternate method for ark", {
   
+  ## force clean start for appveyor
+  unlink("local.sqlite")
+  unlink("nycflights", TRUE)
+  
+  
   db <- dbplyr::nycflights13_sqlite(".")
   dir <- fs::dir_create("nycflights")
   ark(db, dir, lines = 50000, method = "window")

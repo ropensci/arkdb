@@ -153,18 +153,14 @@ ark_chunk <- function(db_con,
   
   if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
-    query <- paste("SELECT * FROM", 
-                   tablename, 
-                   "WHERE rownum BETWEEN",
-                   sql_integer((start - 1) * lines), 
-                   "AND", 
-                   sql_integer(start * lines))    
+    query <- paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN",
+             sql_int((start - 1) * lines), "AND", sql_int(start * lines))
   } else { 
     ## Any SQL DB can do offset
     query <- paste("SELECT * FROM", tablename, "LIMIT", 
-                   sql_integer(lines), 
+                   sql_int(lines), 
                    "OFFSET", 
-                   sql_integer((start-1)*lines))
+                   sql_int((start-1)*lines))
 
   }
   chunk <- DBI::dbGetQuery(db_con, query)
@@ -177,7 +173,7 @@ ark_chunk <- function(db_con,
 }
 
 ## need to convert large integers to characters
-sql_integer <- function(x){
+sql_int <- function(x){
   sprintf("%.0f", x)
 }
 
