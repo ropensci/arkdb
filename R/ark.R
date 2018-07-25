@@ -82,7 +82,7 @@ ark_file <- function(tablename,
   t0 <- Sys.time()
  
   if(FALSE){
-    alternate_method(db_con, lines, dir, compress)
+    alternate_method(db_con, lines, dir, compress, p, t0, tablename)
     return(invisible(TRUE))
   }
   
@@ -111,7 +111,7 @@ ark_file <- function(tablename,
 ## client, the below solution works better. But we're not aware of DBI backends
 ## that do that.  This may later be deprecated.
 
-alternate_method <- function(db_con, lines, dir, compress){
+alternate_method <- function(db_con, lines, dir, compress, p, t0, tablename){
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
   start <- 1
