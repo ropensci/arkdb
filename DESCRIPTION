@@ -36,5 +36,6 @@ Suggests:
     covr,
     fs,
     rmarkdown,
-    RSQLite
+    RSQLite,
+    MonetDBLite
 Language: en-US

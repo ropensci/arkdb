@@ -9,6 +9,10 @@
 #' no compression.
 #' @param tables a list of tables from the database that should be 
 #' archived.  By default, will archive all tables. 
+#' @param use_alternate Use a fallback method to query the database. Only useful
+#' if the [DBI::dbSendQuery()] implementation for your database platform returns the
+#' full results to the client immediately rather than supporting chunking with `n`
+#' parameter.
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
@@ -36,7 +40,8 @@
 #' }
 ark <- function(db_con, dir, lines = 10000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
-                tables = list_tables(db_con)){
+                tables = list_tables(db_con),
+                use_alternate = FALSE){
   
   compress <- match.arg(compress)
   
@@ -47,7 +52,8 @@ ark <- function(db_con, dir, lines = 10000L,
          db_con = normalize_con(db_con), 
          lines = lines, 
          dir = dir, 
-         compress = compress)
+         compress = compress,
+         use_alternate = use_alternate)
   
   invisible(dir)
 }
@@ -62,7 +68,8 @@ ark_file <- function(tablename,
                      db_con, 
                      lines = 10000L, 
                      dir = ".", 
-                     compress = c("bzip2", "gzip", "xz", "none")){
+                     compress = c("bzip2", "gzip", "xz", "none"),
+                     use_alternate = FALSE){
   
   ## Set up compressed connection
   compress <- match.arg(compress)
@@ -81,17 +88,25 @@ ark_file <- function(tablename,
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
   t0 <- Sys.time()
  
-  if(FALSE){
-    alternate_method(db_con, lines, dir, compress, p, t0, tablename)
-    return(invisible(TRUE))
+  if(use_alternate){
+    alternate_method(db_con, lines, dir, compress, p, tablename, con)
+  } else {
+    kirill_method(db_con, lines, p, tablename, con)
   }
   
   
+  
+  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
+  
+}
+
+
+kirill_method <- function(db_con, lines, p, tablename, con){
   ## Create header to avoid duplicate column names
   query <- paste("SELECT * FROM", tablename, "LIMIT 0")
   header <- DBI::dbGetQuery(db_con, query)
   readr::write_tsv(header, con, append = FALSE)
-
+  
   ## 
   res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
   while (TRUE) {
@@ -101,17 +116,13 @@ ark_file <- function(tablename,
     readr::write_tsv(data, con, append = TRUE)
   }
   DBI::dbClearResult(res)
-  
-  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
-  
 }
-
 
 ## Fallback method, If a dbSendQuery() immediately transfers every thing to the
 ## client, the below solution works better. But we're not aware of DBI backends
 ## that do that.  This may later be deprecated.
 
-alternate_method <- function(db_con, lines, dir, compress, p, t0, tablename){
+alternate_method <- function(db_con, lines, dir, compress, p, tablename, con){
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
   start <- 1
@@ -119,20 +130,20 @@ alternate_method <- function(db_con, lines, dir, compress, p, t0, tablename){
     p$tick()
     ## Do stuff
     ark_chunk(db_con, tablename, start = start, 
-              lines = lines, dir = dir, compress = compress)
+              lines = lines, dir = dir, compress = compress, con = con)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
       break
     }
   }
-  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
-  
+
 }
   
 #' @importFrom readr write_tsv  
 ark_chunk <- function(db_con, tablename, start = 1, 
                       lines = 10000L, dir = ".", 
-                      compress  = c("bzip2", "gzip", "xz", "none")){
+                      compress  = c("bzip2", "gzip", "xz", "none"),
+                      con){
   
   compress <- match.arg(compress)
   
@@ -154,16 +165,8 @@ ark_chunk <- function(db_con, tablename, start = 1,
   chunk <- DBI::dbGetQuery(db_con, query)
   
   append <- start != 1
-  
-  ext <- switch(compress,
-                "bzip2" = ".bz2",
-                "gzip" = ".gz",
-                "xz" = ".xz",
-                "none" = "",
-                ".bz2")
-  
   readr::write_tsv(chunk, 
-                   file.path(dir, paste0(tablename, ".tsv", ext)), 
+                   con, 
                    append = append)
 
 }
