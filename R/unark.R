@@ -115,8 +115,8 @@ read_chunked <- function(con, n) {
   assert_connection(con)
   next_chunk <- readLines(con, n)
   if (length(next_chunk) == 0L) {
-    # if we don't stop, we will hit an error!
-    stop("connection has already been completely read")
+    warning("connection has already been completely read")
+    return(list(data = data.frame(), complete = TRUE))
   }
   function() {
     data <- next_chunk

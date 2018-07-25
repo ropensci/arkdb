@@ -5,7 +5,8 @@
 \title{Archive tables from a database as flat files}
 \usage{
 ark(db_con, dir, lines = 10000L, compress = c("bzip2", "gzip", "xz",
-  "none"), tables = list_tables(db_con), use_alternate = FALSE)
+  "none"), tables = list_tables(db_con), method = c("keep-open", "window",
+  "sql-window"))
 }
 \arguments{
 \item{db_con}{a database connection}
@@ -21,10 +22,7 @@ no compression.}
 \item{tables}{a list of tables from the database that should be
 archived.  By default, will archive all tables.}
 
-\item{use_alternate}{Use a fallback method to query the database. Only useful
-if the \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} implementation for your database platform returns the
-full results to the client immediately rather than supporting chunking with \code{n}
-parameter.}
+\item{method}{method to use to query the database, see details.}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.
@@ -42,6 +40,13 @@ transfer over networks.  Compressed plain-text files are also more archival
 friendly, as they rely on widely available and long-established open source compression
 algorithms and plain text, making them less vulnerable to loss by changes in
 database technology and formats.
+
+In almost all cases, the default method should be the best choice.
+If the \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} implementation for your database platform returns the
+full results to the client immediately rather than supporting chunking with \code{n}
+parameter, you may want to use "window" method, which is the most generic.  The
+"sql-window" method provides a faster alternative for databases like PostgreSQL that
+support windowing natively (i.e. \code{BETWEEN} queries).
 }
 \examples{
 \donttest{

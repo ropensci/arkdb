@@ -9,10 +9,8 @@
 #' no compression.
 #' @param tables a list of tables from the database that should be 
 #' archived.  By default, will archive all tables. 
-#' @param use_alternate Use a fallback method to query the database. Only useful
-#' if the [DBI::dbSendQuery()] implementation for your database platform returns the
-#' full results to the client immediately rather than supporting chunking with `n`
-#' parameter.
+#' @param method method to use to query the database, see details. 
+
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
@@ -22,7 +20,14 @@
 #' friendly, as they rely on widely available and long-established open source compression
 #' algorithms and plain text, making them less vulnerable to loss by changes in 
 #' database technology and formats. 
-#' 
+#'
+#' In almost all cases, the default method should be the best choice.
+#' If the [DBI::dbSendQuery()] implementation for your database platform returns the
+#' full results to the client immediately rather than supporting chunking with `n`
+#' parameter, you may want to use "window" method, which is the most generic.  The
+#' "sql-window" method provides a faster alternative for databases like PostgreSQL that
+#' support windowing natively (i.e. `BETWEEN` queries).  
+#'
 #' @importFrom DBI dbListTables
 #' @export
 #' @return the path to `dir` where output files are created (invisibly), for piping.
@@ -41,8 +46,9 @@
 ark <- function(db_con, dir, lines = 10000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
-                use_alternate = FALSE){
+                method = c("keep-open", "window", "sql-window")){
   
+  method <- match.arg(method)
   compress <- match.arg(compress)
   lines <- as.integer(lines)
   
@@ -54,7 +60,7 @@ ark <- function(db_con, dir, lines = 10000L,
          lines = lines, 
          dir = dir, 
          compress = compress,
-         use_alternate = use_alternate)
+         method = method)
   
   invisible(dir)
 }
@@ -67,13 +73,12 @@ list_tables <- function(db){
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult dbGetQuery
 ark_file <- function(tablename, 
                      db_con, 
-                     lines = 10000L, 
-                     dir = ".", 
-                     compress = c("bzip2", "gzip", "xz", "none"),
-                     use_alternate = FALSE){
+                     lines, 
+                     dir, 
+                     compress,
+                     method){
   
   ## Set up compressed connection
-  compress <- match.arg(compress)
   ext <- switch(compress,
                 "bzip2" = ".bz2",
                 "gzip" = ".gz",
@@ -89,20 +94,19 @@ ark_file <- function(tablename,
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
   t0 <- Sys.time()
  
-  if(use_alternate){
-    alternate_method(db_con, lines, dir, compress, p, tablename, con)
-  } else {
-    kirill_method(db_con, lines, p, tablename, con)
-  }
-  
-  
+  switch(method,
+         "keep-open" = keep_open(db_con, lines, p, tablename, con),
+         "window" = window(db_con, lines, dir, compress, p, tablename, con),
+         "sql-window" = sql_window(db_con, lines, dir, compress, p, tablename, con),
+         keep_open(db_con, lines, p, tablename, con)
+  )
   
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
   
 }
 
 
-kirill_method <- function(db_con, lines, p, tablename, con){
+keep_open <- function(db_con, lines, p, tablename, con){
   ## Create header to avoid duplicate column names
   query <- paste("SELECT * FROM", tablename, "LIMIT 0")
   header <- DBI::dbGetQuery(db_con, query)
@@ -119,15 +123,8 @@ kirill_method <- function(db_con, lines, p, tablename, con){
   DBI::dbClearResult(res)
 }
 
-## Fallback method, If a dbSendQuery() immediately transfers every thing to the
-## client, the below solution works better. But we're not aware of DBI backends
-## that do that.  This may later be deprecated.
-
-alternate_method <- function(db_con, lines, dir, compress, p, tablename, con){
-  
-  ## Clean cache re db type
-  assign("db_supports_between", NA, envir = arkdb_cache)
-  
+windowing <- function(sql_supports_windows)
+  function(db_con, lines, dir, compress, p, tablename, con){
   
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
@@ -135,26 +132,26 @@ alternate_method <- function(db_con, lines, dir, compress, p, tablename, con){
   repeat {
     p$tick()
     ## Do stuff
-    ark_chunk(db_con, tablename, start = start, 
-              lines = lines, dir = dir, compress = compress, con = con)
+    ark_chunk(db_con, tablename, start = start, lines = lines, dir = dir,
+              compress = compress, con = con, sql_supports_windows)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
       break
     }
   }
-
 }
   
 #' @importFrom readr write_tsv  
-ark_chunk <- function(db_con, tablename, start = 1, 
-                      lines = 10000L, dir = ".", 
-                      compress  = c("bzip2", "gzip", "xz", "none"),
-                      con){
+ark_chunk <- function(db_con, 
+                      tablename, 
+                      start, 
+                      lines, 
+                      dir, 
+                      compress,
+                      con,
+                      sql_supports_windows){
   
-  compress <- match.arg(compress)
-  
-  
-  if (has_between(db_con, tablename)) {
+  if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
     query <- paste("SELECT * FROM", 
                    tablename, 
@@ -181,31 +178,33 @@ ark_chunk <- function(db_con, tablename, start = 1,
 
 ## need to convert large integers to characters
 sql_integer <- function(x){
-  orig <- getOption("scipen")
-  options(scipen = 100)
-  out <- paste(x)
-  options(scipen = orig)
-  out
+  sprintf("%.0f", x)
 }
 
 
 
+window <- windowing(FALSE)
+sql_window <- windowing(TRUE)
+
+
+## Deprecated
 arkdb_cache <- new.env()
 has_between <- function(db_con, tablename){
-  cache <- mget("db_supports_between", 
-                ifnotfound = list(db_supports_between = NA), 
-                envir = arkdb_cache)
-  if(is.na(cache[[1]])){
+  #cache <- mget("db_supports_between", 
+  #              ifnotfound = list(db_supports_between = NA), 
+  #              envir = arkdb_cache)
+  #if(is.na(cache[[1]])){
     db_supports_between <- 
-      tryCatch(DBI::dbGetQuery(db_con, 
-               paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN 1 and 2")), 
+      tryCatch(DBI::dbGetQuery(normalize_con(db_con), 
+               paste("SELECT * FROM", tablename, "WHERE ROWNUM BETWEEN 1 and 2")), 
                error = function(e) FALSE, 
                finally = TRUE)
     
-    assign("db_supports_between", db_supports_between, envir = arkdb_cache)
+   # assign("db_supports_between", db_supports_between, envir = arkdb_cache)
+    
     db_supports_between
-  } else {
-    cache[["db_supports_between"]]
-  }
+  #} else {
+  #  cache[["db_supports_between"]]
+  #}
 }
 
