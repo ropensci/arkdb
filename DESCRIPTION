@@ -37,5 +37,5 @@ Suggests:
     fs,
     rmarkdown,
     RSQLite,
-    MonetDBLite
+    MonetDBLite (>= 0.5.0)
 Language: en-US

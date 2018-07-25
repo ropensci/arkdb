@@ -96,8 +96,8 @@ ark_file <- function(tablename,
  
   switch(method,
          "keep-open" = keep_open(db_con, lines, p, tablename, con),
-         "window" = window(db_con, lines, dir, compress, p, tablename, con),
-         "sql-window" = sql_window(db_con, lines, dir, compress, p, tablename, con),
+         "window" = window(db_con, lines, compress, p, tablename, con),
+         "sql-window" = sql_window(db_con, lines, compress, p, tablename, con),
          keep_open(db_con, lines, p, tablename, con)
   )
   
@@ -124,7 +124,7 @@ keep_open <- function(db_con, lines, p, tablename, con){
 }
 
 windowing <- function(sql_supports_windows)
-  function(db_con, lines, dir, compress, p, tablename, con){
+  function(db_con, lines, compress, p, tablename, con){
   
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
@@ -132,7 +132,7 @@ windowing <- function(sql_supports_windows)
   repeat {
     p$tick()
     ## Do stuff
-    ark_chunk(db_con, tablename, start = start, lines = lines, dir = dir,
+    ark_chunk(db_con, tablename, start = start, lines = lines,
               compress = compress, con = con, sql_supports_windows)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
@@ -146,7 +146,6 @@ ark_chunk <- function(db_con,
                       tablename, 
                       start, 
                       lines, 
-                      dir, 
                       compress,
                       con,
                       sql_supports_windows){
