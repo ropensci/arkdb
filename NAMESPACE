@@ -2,7 +2,9 @@
 
 export(ark)
 export(unark)
+importFrom(DBI,dbClearResult)
 importFrom(DBI,dbFetch)
+importFrom(DBI,dbGetQuery)
 importFrom(DBI,dbListTables)
 importFrom(DBI,dbSendQuery)
 importFrom(DBI,dbWriteTable)
