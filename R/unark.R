@@ -42,7 +42,7 @@
 #' 
 #' }
 #' @export
-unark <- function(files, db_con, lines = 10000L,  ...){
+unark <- function(files, db_con, lines = 50000L,  ...){
   db <- normalize_con(db_con)
   lapply(files, unark_file, db, lines = lines, ...)
   invisible(db_con)  

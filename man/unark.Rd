@@ -4,7 +4,7 @@
 \alias{unark}
 \title{Unarchive a list of compressed tsv files into a database}
 \usage{
-unark(files, db_con, lines = 10000L, ...)
+unark(files, db_con, lines = 50000L, ...)
 }
 \arguments{
 \item{files}{vector of filenames to be read in. Must be \code{tsv}
