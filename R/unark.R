@@ -19,7 +19,11 @@
 #' memory before writing into a database.  In general, increasing
 #' the `lines` parameter will result in a faster total transfer
 #' but require more free memory for working with these larger chunks.
-#' #' 
+#' 
+#' If using `readr`-based streamable-table, you can suppress the progress bar
+#' by using `options(readr.show_progress = FALSE)` when reading in large 
+#' files.
+#'
 #' @return the database connection (invisibly)
 #' 
 #' @examples \donttest{
@@ -74,11 +78,11 @@ normalize_con <- function(db_con){
 unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
+  ## FIXME 
   con <- compressed_file(filename, "r")
   on.exit(close(con))
   
-  ## Handle case of col_names != TRUE ?
-  ## What about skips and comments?
+  ## Handle case of `col_names != TRUE`?
   header <- readLines(con, n = 1L)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
@@ -125,7 +129,7 @@ read_chunked <- function(con, n) {
   next_chunk <- readLines(con, n)
   if (length(next_chunk) == 0L) {
     warning("connection has already been completely read")
-    return(function() list(data = data.frame(), complete = TRUE))
+    return(function() list(data = character(0), complete = TRUE))
   }
   function() {
     data <- next_chunk

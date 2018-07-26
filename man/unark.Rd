@@ -33,7 +33,10 @@ large compressed tables which may be too large to read into
 memory before writing into a database.  In general, increasing
 the \code{lines} parameter will result in a faster total transfer
 but require more free memory for working with these larger chunks.
-#'
+
+If using \code{readr}-based streamable-table, you can suppress the progress bar
+by using \code{options(readr.show_progress = FALSE)} when reading in large
+files.
 }
 \examples{
 \donttest{

@@ -1,6 +1,7 @@
 Boettiger
 bzip
 citable
+csv
 dbplyr
 deserializing
 FitzJohn
@@ -14,6 +15,7 @@ rmarkdown
 sql
 SQLite
 src
+streamable
 tsv
 TSV
 Unarchive
