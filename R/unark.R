@@ -10,15 +10,20 @@
 #' format, optionally compressed using `bzip2`, `gzip`, `zip`,
 #' or `xz` format at present.
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
+#' @param streamable_table interface for serializing/deserializing in chunks
 #' @param lines number of lines to read in a chunk.
-#' @inheritDotParams readr::read_tsv
+#' @param ... additional arguments to `streamable_table$read` method.
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
 #' large compressed tables which may be too large to read into
 #' memory before writing into a database.  In general, increasing
 #' the `lines` parameter will result in a faster total transfer
 #' but require more free memory for working with these larger chunks.
-#' #' 
+#' 
+#' If using `readr`-based streamable-table, you can suppress the progress bar
+#' by using `options(readr.show_progress = FALSE)` when reading in large 
+#' files.
+#'
 #' @return the database connection (invisibly)
 #' 
 #' @examples \donttest{
@@ -42,9 +47,24 @@
 #' 
 #' }
 #' @export
-unark <- function(files, db_con, lines = 10000L,  ...){
+unark <- function(files, 
+                  db_con,
+                  streamable_table =  streamable_base_tsv(), 
+                  lines = 50000L,  
+                  ...){
+  
+  assert_files_exist(files)
+  assert_dbi(db_con)
+  assert_streamable(streamable_table)
+
+  
   db <- normalize_con(db_con)
-  lapply(files, unark_file, db, lines = lines, ...)
+  lapply(files, 
+         unark_file, 
+         db, 
+         streamable_table = streamable_table, 
+         lines = lines, 
+         ...)
   invisible(db_con)  
 }
 
@@ -59,17 +79,16 @@ normalize_con <- function(db_con){
 }
 
 
-#' @importFrom readr read_tsv
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-unark_file <- function(filename, db_con, lines = 10000L, ...){
+unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
+  ## FIXME 
   con <- compressed_file(filename, "r")
   on.exit(close(con))
   
-  ## Handle case of col_names != TRUE ?
-  ## What about skips and comments?
+  ## Handle case of `col_names != TRUE`?
   header <- readLines(con, n = 1L)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
@@ -85,7 +104,7 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
     d <- reader()
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
-    chunk <- readr::read_tsv(body, ...)
+    chunk <- streamable_table$read(body, ...)
     DBI::dbWriteTable(db_con, tbl_name, chunk, append=TRUE)
     
     if (d$complete) {
@@ -102,7 +121,27 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
 # https://github.com/vimc/montagu-r
 # /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
 
+assert_files_exist <- function(files){
+  if(length(files) < 1){
+    if(!file.exists(files))
+      stop(sprintf("files not found"), call. = FALSE)
+  }
+  lapply(files, function(f) 
+    if(!file.exists(f)) 
+      stop(sprintf("'%s' not found", f), call. = FALSE))
+}
 
+assert_dir_exists <- function(dir){
+  if(!dir.exists(dir)) 
+    stop(sprintf("'%s' not found", dir), call. = FALSE)
+}
+
+assert_dbi <- function(x, name = deparse(substitute(x))) {
+  if (! (inherits(x, "DBIConnection") || inherits(x, "src_dbi"))) {
+    stop(sprintf("'%s' must be a DBIConnection or src_dbi object", name),
+         call. = FALSE)
+  }
+}
 
 assert_connection <- function(x, name = deparse(substitute(x))) {
   if (!inherits(x, "connection")) {
@@ -116,7 +155,7 @@ read_chunked <- function(con, n) {
   next_chunk <- readLines(con, n)
   if (length(next_chunk) == 0L) {
     warning("connection has already been completely read")
-    return(function() list(data = data.frame(), complete = TRUE))
+    return(function() list(data = character(0), complete = TRUE))
   }
   function() {
     data <- next_chunk

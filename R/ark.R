@@ -3,6 +3,7 @@
 #' 
 #' @param db_con a database connection
 #' @param dir a directory where we will write the compressed text files output
+#' @param streamable_table interface for serializing/deserializing in chunks
 #' @param lines the number of lines to use in each single chunk
 #' @param compress file compression algorithm. Should be one of "bzip2" (default),
 #' "gzip" (faster write times, a bit less compression), "xz", or "none", for
@@ -43,20 +44,32 @@
 #' 
 #' 
 #' }
-ark <- function(db_con, dir, lines = 10000L, 
+ark <- function(db_con, 
+                dir, 
+                streamable_table = streamable_base_tsv(),
+                lines = 50000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window")){
+  
+  assert_dbi(db_con)
+  assert_dir_exists(dir)
+  assert_streamable(streamable_table)
+
   
   method <- match.arg(method)
   compress <- match.arg(compress)
   lines <- as.integer(lines)
   
+  stopifnot(inherits(streamable_table, "streamable_table"))
+  
+  ## exclude sqlite's internal tables
   tables <- tables[!grepl("sqlite_", tables)]
   
   lapply(tables, 
          ark_file, 
-         db_con = normalize_con(db_con), 
+         db_con = normalize_con(db_con),
+         streamable_table = streamable_table,
          lines = lines, 
          dir = dir, 
          compress = compress,
@@ -73,6 +86,7 @@ list_tables <- function(db){
 #' @importFrom DBI dbSendQuery dbFetch dbClearResult dbGetQuery
 ark_file <- function(tablename, 
                      db_con, 
+                     streamable_table,
                      lines, 
                      dir, 
                      compress,
@@ -85,7 +99,9 @@ ark_file <- function(tablename,
                 "xz" = ".xz",
                 "none" = "",
                 ".bz2")
-  filename <- file.path(dir, paste0(tablename, ".tsv", ext))
+  
+  dest <- sprintf("%s.%s%s", tablename, streamable_table$extension, ext)
+  filename <- file.path(dir, dest)
   con <- compressed_file(filename, "w")
   on.exit(close(con))
   
@@ -95,10 +111,13 @@ ark_file <- function(tablename,
   t0 <- Sys.time()
  
   switch(method,
-         "keep-open" = keep_open(db_con, lines, p, tablename, con),
-         "window" = window(db_con, lines, compress, p, tablename, con),
-         "sql-window" = sql_window(db_con, lines, compress, p, tablename, con),
-         keep_open(db_con, lines, p, tablename, con)
+          "keep-open" = keep_open(db_con, streamable_table, lines, 
+                                  p, tablename, con),
+             "window" = window(db_con, streamable_table, lines, 
+                               compress, p, tablename, con),
+         "sql-window" = sql_window(db_con, streamable_table, lines, 
+                                   compress, p, tablename, con),
+         keep_open(db_con, streamable_table, lines, p, tablename, con)
   )
   
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
@@ -106,11 +125,11 @@ ark_file <- function(tablename,
 }
 
 
-keep_open <- function(db_con, lines, p, tablename, con){
+keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
   ## Create header to avoid duplicate column names
   query <- paste("SELECT * FROM", tablename, "LIMIT 0")
   header <- DBI::dbGetQuery(db_con, query)
-  readr::write_tsv(header, con, append = FALSE)
+  streamable_table$write(header, con, append = FALSE)
   
   ## 
   res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
@@ -118,13 +137,17 @@ keep_open <- function(db_con, lines, p, tablename, con){
     p$tick()
     data <- dbFetch(res, n = lines)
     if (nrow(data) == 0) break
-    readr::write_tsv(data, con, append = TRUE)
+    streamable_table$write(data, con, append = TRUE)
   }
   DBI::dbClearResult(res)
 }
 
+
+
+
+
 windowing <- function(sql_supports_windows)
-  function(db_con, lines, compress, p, tablename, con){
+  function(db_con, streamable_table, lines, compress, p, tablename, con){
   
   size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
   end <- size[[1]][[1]]
@@ -132,8 +155,14 @@ windowing <- function(sql_supports_windows)
   repeat {
     p$tick()
     ## Do stuff
-    ark_chunk(db_con, tablename, start = start, lines = lines,
-              compress = compress, con = con, sql_supports_windows)
+    ark_chunk(db_con, 
+              streamable_table = streamable_table,
+              tablename = tablename, 
+              start = start, 
+              lines = lines,
+              compress = compress, 
+              con = con, 
+              sql_supports_windows = sql_supports_windows)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
       break
@@ -141,8 +170,8 @@ windowing <- function(sql_supports_windows)
   }
 }
   
-#' @importFrom readr write_tsv  
-ark_chunk <- function(db_con, 
+ark_chunk <- function(db_con,
+                      streamable_table,
                       tablename, 
                       start, 
                       lines, 
@@ -162,13 +191,11 @@ ark_chunk <- function(db_con,
                    sql_int((start-1)*lines))
 
   }
-  chunk <- DBI::dbGetQuery(db_con, query)
+  data <- DBI::dbGetQuery(db_con, query)
   
   append <- start != 1
-  readr::write_tsv(chunk, 
-                   con, 
-                   append = append)
-
+  streamable_table$write(data, con, append = append)
+  
 }
 
 ## need to convert large integers to characters
@@ -182,7 +209,6 @@ window <- windowing(FALSE)
 sql_window <- windowing(TRUE)
 
 
-## Deprecated
 has_between <- function(db_con, tablename){
       tryCatch(DBI::dbGetQuery(normalize_con(db_con), 
                paste("SELECT * FROM", tablename, "WHERE ROWNUM BETWEEN 1 and 2")), 

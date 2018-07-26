@@ -68,7 +68,7 @@ Import a list of compressed tabular files (i.e. `*.tsv.bz2`) into a local SQLite
 
 
 ```{r}
-files <- fs::dir_ls(glob = "*.tsv.bz2")
+files <- fs::dir_ls(glob = "*.csv.bz2")
 new_db <- src_sqlite("local.sqlite", create=TRUE)
 
 unark(files, new_db, lines = 50000)
