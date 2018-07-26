@@ -12,8 +12,8 @@ streamable_table(read, write, extension)
 additional arguments.}
 
 \item{write}{write function. Arguments should be "\code{data}" (a data.frame),
-\code{file} (must be able to take a \code{\link[=connection]{connection()}} object), and "\code{append}" logical,
-append to existing file or create new?}
+\code{file} (must be able to take a \code{\link[=connection]{connection()}} object), and "\code{append}"
+logical, append to existing file or create new?}
 
 \item{extension}{file extension to use (e.g. "tsv", "csv")}
 }
@@ -22,6 +22,16 @@ a \code{streamable_table} object (S3)
 }
 \description{
 streamable table
+}
+\details{
+Note several constraints on this design. The write method must be able
+to take a generic R \code{connection} object (which will allow it to handle
+the compression methods used, if any), and the read method must be able
+to take a \code{textConnection} object.  \code{readr} functions handle these cases
+out of the box, so the above method is easy to write.  Also note that
+the write method must be able to \code{append}, i.e. it should use a header
+if \code{append=TRUE}, but omit when it is \code{FALSE}.  See the built-in methods
+for more examples.
 }
 \examples{
 

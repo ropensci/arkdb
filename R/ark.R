@@ -46,11 +46,16 @@
 #' }
 ark <- function(db_con, 
                 dir, 
-                streamable_table = streamable_readr_tsv(),
+                streamable_table = streamable_base_tsv(),
                 lines = 50000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window")){
+  
+  assert_dbi(db_con)
+  assert_dir_exists(dir)
+  assert_streamable(streamable_table)
+
   
   method <- match.arg(method)
   compress <- match.arg(compress)
@@ -165,7 +170,6 @@ windowing <- function(sql_supports_windows)
   }
 }
   
-#' @importFrom readr write_tsv  
 ark_chunk <- function(db_con,
                       streamable_table,
                       tablename, 

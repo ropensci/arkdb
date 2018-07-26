@@ -4,7 +4,7 @@
 \alias{unark}
 \title{Unarchive a list of compressed tsv files into a database}
 \usage{
-unark(files, db_con, streamable_table = streamable_readr_tsv(),
+unark(files, db_con, streamable_table = streamable_base_tsv(),
   lines = 50000L, ...)
 }
 \arguments{

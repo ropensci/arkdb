@@ -22,11 +22,11 @@ RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
 Imports: 
     DBI,
-    readr,
     progress,
-    methods,
-    tools
+    tools,
+    utils
 Suggests:
+    readr,
     spelling, 
     dplyr,
     dbplyr,

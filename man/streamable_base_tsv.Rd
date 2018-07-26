@@ -17,3 +17,6 @@ Follows the tab-separate-values standard using \code{\link[utils:read.table]{uti
 see IANA specification at:
 \url{https://www.iana.org/assignments/media-types/text/tab-separated-values}
 }
+\seealso{
+\code{\link[utils:read.table]{utils::read.table()}}, \code{\link[utils:write.table]{utils::write.table()}}
+}

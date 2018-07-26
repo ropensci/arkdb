@@ -49,9 +49,15 @@
 #' @export
 unark <- function(files, 
                   db_con,
-                  streamable_table =  streamable_readr_tsv(), 
+                  streamable_table =  streamable_base_tsv(), 
                   lines = 50000L,  
                   ...){
+  
+  assert_files_exist(files)
+  assert_dbi(db_con)
+  assert_streamable(streamable_table)
+
+  
   db <- normalize_con(db_con)
   lapply(files, 
          unark_file, 
@@ -115,7 +121,26 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
 # https://github.com/vimc/montagu-r
 # /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
 
+assert_files_exist <- function(files){
+  if(length(files) < 1)
+    stop(sprintf("files not found"), call. = FALSE)
+  
+  lapply(files, function(f) 
+    if(!file.exists(f)) 
+      stop(sprintf("'%s' not found", f), call. = FALSE))
+}
 
+assert_dir_exists <- function(dir){
+  if(!dir.exists(dir)) 
+    stop(sprintf("'%s' not found", dir), call. = FALSE)
+}
+
+assert_dbi <- function(x, name = deparse(substitute(x))) {
+  if (! (inherits(x, "DBIConnection") || inherits(x, "src_dbi"))) {
+    stop(sprintf("'%s' must be a DBIConnection or src_dbi object", name),
+         call. = FALSE)
+  }
+}
 
 assert_connection <- function(x, name = deparse(substitute(x))) {
   if (!inherits(x, "connection")) {

@@ -15,3 +15,6 @@ streamable csv using base R functions
 \details{
 Follows the comma-separate-values standard using \code{\link[utils:read.table]{utils::read.table()}}
 }
+\seealso{
+\code{\link[utils:read.table]{utils::read.table()}}, \code{\link[utils:write.table]{utils::write.table()}}
+}

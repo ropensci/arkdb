@@ -2,13 +2,14 @@ Boettiger
 bzip
 citable
 csv
-dbplyr
 deserializing
 FitzJohn
 gzip
 IANA
 knitr
 natively
+pluggable
+Pluggable
 PostgreSQL
 repo
 rmarkdown
