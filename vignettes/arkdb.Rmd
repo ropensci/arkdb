@@ -129,7 +129,7 @@ ark(db, dir,
 
 
 ```{r}
-files <- fs::dir_ls(glob = "*.csv.bz2")
+files <- fs::dir_ls(dir, glob = "*.csv.bz2")
 new_db <- src_sqlite("local.sqlite", create=TRUE)
 
 unark(files, new_db,
