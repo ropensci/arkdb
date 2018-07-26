@@ -26,16 +26,13 @@ test_stream <- function(stream) {
   testthat::expect_equivalent(df, rbind(data,data))
 }
 
-
 testthat::test_that("streamable_base_csv",{
   test_stream( streamable_base_csv() )
 })
 
-
 testthat::test_that("streamable_base_tsv",{
   test_stream( streamable_base_tsv() )
 })
-
 
 testthat::test_that("streamable_readr_csv",{
   test_stream( streamable_readr_csv() )
@@ -43,8 +40,6 @@ testthat::test_that("streamable_readr_csv",{
 testthat::test_that("streamable_readr_tsv",{
   test_stream( streamable_readr_tsv() )
 })
-
-
 
 testthat::test_that("internal closure constructor", {
   window <- windowing(FALSE)
