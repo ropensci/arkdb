@@ -10,8 +10,9 @@
 #' format, optionally compressed using `bzip2`, `gzip`, `zip`,
 #' or `xz` format at present.
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
+#' @param streamable_table interface for serializing/deserializing in chunks
 #' @param lines number of lines to read in a chunk.
-#' @inheritDotParams readr::read_tsv
+#' @param ... additional arguments to `streamable_table$read` method.
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
 #' large compressed tables which may be too large to read into
@@ -42,9 +43,18 @@
 #' 
 #' }
 #' @export
-unark <- function(files, db_con, lines = 50000L,  ...){
+unark <- function(files, 
+                  db_con,
+                  streamable_table =  streamable_readr_tsv(), 
+                  lines = 50000L,  
+                  ...){
   db <- normalize_con(db_con)
-  lapply(files, unark_file, db, lines = lines, ...)
+  lapply(files, 
+         unark_file, 
+         db, 
+         streamable_table = streamable_table, 
+         lines = lines, 
+         ...)
   invisible(db_con)  
 }
 
@@ -59,10 +69,9 @@ normalize_con <- function(db_con){
 }
 
 
-#' @importFrom readr read_tsv
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-unark_file <- function(filename, db_con, lines = 10000L, ...){
+unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
   con <- compressed_file(filename, "r")
@@ -85,7 +94,7 @@ unark_file <- function(filename, db_con, lines = 10000L, ...){
     d <- reader()
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
-    chunk <- readr::read_tsv(body, ...)
+    chunk <- streamable_table$read(body, ...)
     DBI::dbWriteTable(db_con, tbl_name, chunk, append=TRUE)
     
     if (d$complete) {

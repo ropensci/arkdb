@@ -9,7 +9,7 @@ streamable_table <- function(read, write, extension) {
   ret
 }
 
-
+#' @importFrom readr write_tsv read_tsv
 streamable_readr_tsv <- function() {
   
     read_tsv <- function(file, ...) {
