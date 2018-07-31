@@ -1,10 +1,3 @@
-
-
-
-## FIXMEs: 
-## 1. consider supporting non tsv formats?
-
-
 #' Unarchive a list of compressed tsv files into a database
 #' @param files vector of filenames to be read in. Must be `tsv`
 #' format, optionally compressed using `bzip2`, `gzip`, `zip`,
@@ -120,35 +113,6 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
 # Adapted from @richfitz, MIT licensed
 # https://github.com/vimc/montagu-r
 # /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
-
-assert_files_exist <- function(files){
-  if(length(files) < 1){
-    if(!file.exists(files))
-      stop(sprintf("files not found"), call. = FALSE)
-  }
-  lapply(files, function(f) 
-    if(!file.exists(f)) 
-      stop(sprintf("'%s' not found", f), call. = FALSE))
-}
-
-assert_dir_exists <- function(dir){
-  if(!dir.exists(dir)) 
-    stop(sprintf("'%s' not found", dir), call. = FALSE)
-}
-
-assert_dbi <- function(x, name = deparse(substitute(x))) {
-  if (! (inherits(x, "DBIConnection") || inherits(x, "src_dbi"))) {
-    stop(sprintf("'%s' must be a DBIConnection or src_dbi object", name),
-         call. = FALSE)
-  }
-}
-
-assert_connection <- function(x, name = deparse(substitute(x))) {
-  if (!inherits(x, "connection")) {
-    stop(sprintf("'%s' must be a connection object", name), call. = FALSE)
-  }
-}
-
 
 read_chunked <- function(con, n) {
   assert_connection(con)

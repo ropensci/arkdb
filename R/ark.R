@@ -203,17 +203,7 @@ sql_int <- function(x){
   sprintf("%.0f", x)
 }
 
-
-
 window <- windowing(FALSE)
 sql_window <- windowing(TRUE)
 
-
-has_between <- function(db_con, tablename){
-      tryCatch(DBI::dbGetQuery(normalize_con(db_con), 
-               paste("SELECT * FROM", tablename, "WHERE ROWNUM BETWEEN 1 and 2")), 
-               error = function(e) FALSE, 
-               finally = TRUE)
-
-}
 
