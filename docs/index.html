@@ -51,6 +51,9 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -119,70 +122,30 @@
 <a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; Creating table: weather</span></a></code></pre></div>
 <p>Create an archive of the database:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/ark.html">ark</a></span>(db, <span class="st">"."</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; airlines</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; ...Done! (in 0.005059004 secs)</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; airports</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.03283 secs)</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; flights</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; ...Done! (in 9.76933 secs)</span></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-30" data-line-number="30"><span class="co">#&gt; planes</span></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32"><span class="co">#&gt; ...Done! (in 0.1707289 secs)</span></a>
-<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-34" data-line-number="34"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-35" data-line-number="35"><span class="co">#&gt; weather</span></a>
-<a class="sourceLine" id="cb4-36" data-line-number="36"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37"><span class="co">#&gt; ...Done! (in 0.791743 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.05521083 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.07368612 secs)</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 17.24277 secs)</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.03630185 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.8016601 secs)</span></a></code></pre></div>
 </div>
 <div id="unarchive" class="section level2">
 <h2 class="hasAnchor">
 <a href="#unarchive" class="anchor"></a>Unarchive</h2>
 <p>Import a list of compressed tabular files (i.e. <code>*.tsv.bz2</code>) into a local SQLite database:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(<span class="dt">glob =</span> <span class="st">"*.tsv.bz2"</span>)</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(<span class="dt">glob =</span> <span class="st">"*.csv.bz2"</span>)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(<span class="st">"local.sqlite"</span>, <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw"><a href="reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; airlines.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.04342985 secs)</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; airports.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 0.03314114 secs)</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; flights.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 9.122809 secs)</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; planes.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.06281185 secs)</span></a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; weather.tsv.bz2</span></a>
-<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; ...Done! (in 0.5054801 secs)</span></a>
-<a class="sourceLine" id="cb5-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb5-21" data-line-number="21">new_db</a>
-<a class="sourceLine" id="cb5-22" data-line-number="22"><span class="co">#&gt; src:  sqlite 3.22.0 [local.sqlite]</span></a>
-<a class="sourceLine" id="cb5-23" data-line-number="23"><span class="co">#&gt; tbls: airlines, airports, flights, planes, weather</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Warning in assert_files_exist(files): no file specified</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">new_db</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; src:  sqlite 3.22.0 [local.sqlite]</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; tbls:</span></a></code></pre></div>
 <hr>
 <p>Please note that this project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
 </div>

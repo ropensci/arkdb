@@ -79,6 +79,9 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -111,8 +114,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>ark</span>(<span class='no'>db_con</span>, <span class='no'>dir</span>, <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>10000L</span>, <span class='kw'>compress</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"bzip2"</span>, <span class='st'>"gzip"</span>, <span class='st'>"xz"</span>,
-  <span class='st'>"none"</span>), <span class='kw'>tables</span> <span class='kw'>=</span> <span class='fu'>list_tables</span>(<span class='no'>db_con</span>))</pre>
+    <pre class="usage"><span class='fu'>ark</span>(<span class='no'>db_con</span>, <span class='no'>dir</span>, <span class='kw'>streamable_table</span> <span class='kw'>=</span> <span class='fu'><a href='streamable_base_tsv.html'>streamable_base_tsv</a></span>(), <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>50000L</span>,
+  <span class='kw'>compress</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"bzip2"</span>, <span class='st'>"gzip"</span>, <span class='st'>"xz"</span>, <span class='st'>"none"</span>), <span class='kw'>tables</span> <span class='kw'>=</span> <span class='fu'>list_tables</span>(<span class='no'>db_con</span>),
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"keep-open"</span>, <span class='st'>"window"</span>, <span class='st'>"sql-window"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -124,6 +128,10 @@
     <tr>
       <th>dir</th>
       <td><p>a directory where we will write the compressed text files output</p></td>
+    </tr>
+    <tr>
+      <th>streamable_table</th>
+      <td><p>interface for serializing/deserializing in chunks</p></td>
     </tr>
     <tr>
       <th>lines</th>
@@ -139,6 +147,10 @@ no compression.</p></td>
       <th>tables</th>
       <td><p>a list of tables from the database that should be
 archived.  By default, will archive all tables.</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>method to use to query the database, see details.</p></td>
     </tr>
     </table>
     
@@ -157,6 +169,12 @@ transfer over networks.  Compressed plain-text files are also more archival
 friendly, as they rely on widely available and long-established open source compression
 algorithms and plain text, making them less vulnerable to loss by changes in
 database technology and formats.</p>
+<p>In almost all cases, the default method should be the best choice.
+If the <code><a href='http://www.rdocumentation.org/packages/DBI/topics/dbSendQuery'>DBI::dbSendQuery()</a></code> implementation for your database platform returns the
+full results to the client immediately rather than supporting chunking with <code>n</code>
+parameter, you may want to use "window" method, which is the most generic.  The
+"sql-window" method provides a faster alternative for databases like PostgreSQL that
+support windowing natively (i.e. <code>BETWEEN</code> queries).</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -167,14 +185,9 @@ database technology and formats.</p>
 #&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'><span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
+<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
 <span class='co'>## And here we go:</span>
-<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.008651972 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.04698086 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 14.68577 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.106858 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.679158 secs)</span></div><div class='input'>
+<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.004944801 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.03156805 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 14.64792 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.0481801 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 1.017851 secs)</span></div><div class='input'>
 
 </div></pre>
   </div>

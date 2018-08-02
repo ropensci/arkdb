@@ -47,6 +47,9 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -70,7 +73,7 @@
       <h1>Introduction to arkdb</h1>
                         <h4 class="author">Carl Boettiger</h4>
             
-            <h4 class="date">2018-07-07</h4>
+            <h4 class="date">2018-08-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/cboettig/arkdb/blob/master/vignettes/arkdb.Rmd"><code>vignettes/arkdb.Rmd</code></a></small>
       <div class="hidden name"><code>arkdb.Rmd</code></div>
@@ -85,14 +88,14 @@
 <div id="package-rationale" class="section level2">
 <h2 class="hasAnchor">
 <a href="#package-rationale" class="anchor"></a>Package rationale</h2>
-<p>Increasing data sizes create challenges for the fundamental tasks of publishing, distributing, and preserving data. Despite (or perhaps because of) the diverse and ever-expanding number of database and file formats, the humble plain text file such as comma or tab-separated-values <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> (<code>.tsv</code> files) remains the gold standard for data archiving and distribution. These files can read on almost any platform or tool and can be efficiently compressed using long-standing and widely available standard open source libraries like <code>gzip</code> or <code>bzip2</code>. In contrast, database storage formats and dumps are usually particular to the database platform used to generate them, and will likely not be compatible between different database engines (e.g. PostgreSQL -&gt; SQLite) or even between different versions of the same engine. Researchers unfamiliar with these databases will have difficulty accessing such data, and these dumps may also be in formats that are less efficient to compress.</p>
+<p>Increasing data sizes create challenges for the fundamental tasks of publishing, distributing, and preserving data. Despite (or perhaps because of) the diverse and ever-expanding number of database and file formats, the humble plain text file such as comma or tab-separated-values (e.g. <code>.csv</code> or <code>.tsv</code> files) remains the gold standard for data archiving and distribution. These files can read on almost any platform or tool and can be efficiently compressed using long-standing and widely available standard open source libraries like <code>gzip</code> or <code>bzip2</code>. In contrast, database storage formats and dumps are usually particular to the database platform used to generate them, and will likely not be compatible between different database engines (e.g. PostgreSQL -&gt; SQLite) or even between different versions of the same engine. Researchers unfamiliar with these databases will have difficulty accessing such data, and these dumps may also be in formats that are less efficient to compress.</p>
 <p>Working with tables that are too large for working memory on most machines by using external relational database stores is now a common R practice, thanks to ever-rising availability of data and increasing support and popularity of packages such as <code>DBI</code>, <code>dplyr</code>, and <code>dbplyr</code>. Working with plain text files becomes increasingly difficult in this context. Many R users will not have sufficient RAM to simply read in a 10 GB <code>.tsv</code> file into R. Similarly, moving a 10 GB database out of a relational data file and into a plain text file for archiving and distribution is similarly challenging from R. While most relational database back-ends implement some form of <code>COPY</code> or <code>IMPORT</code> that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface. Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client. <code>arkdb</code> provides a simple solution to these two tasks.</p>
 <p>The goal of <code>arkdb</code> is to provide a convenient way to move data from large compressed text files (e.g. <code>*.tsv.bz2</code>) into any DBI-compliant database connection (see <a href="https://db.rstudio.com/dbi/">DBI</a>), and move tables out of such databases into text files. The key feature of <code>arkdb</code> is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once. This will be slower than reading the file into memory at one go, but can be scaled to larger data and larger data with no additional memory requirement.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install arkdb from GitHub with:</p>
+<p>You can install <code>arkdb</code> from GitHub with:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cboettig/arkdb"</span>)</a></code></pre></div>
 </div>
@@ -110,7 +113,7 @@
 <div id="creating-an-archive-of-an-existing-database" class="section level2">
 <h2 class="hasAnchor">
 <a href="#creating-an-archive-of-an-existing-database" class="anchor"></a>Creating an archive of an existing database</h2>
-<p>First, we’ll need an example database to work with. Conveniently, there is a nice example using the NYC flights data built into the dbplyr package.</p>
+<p>First, we’ll need an example database to work with. Conveniently, there is a nice example using the NYC flights data built into the <code>dbplyr</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">db &lt;-<span class="st"> </span>dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13">nycflights13_sqlite</a></span>(<span class="st">"."</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; Caching nycflights db at ./nycflights13.sqlite</span></a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Creating table: airlines</span></a>
@@ -121,52 +124,26 @@
 <p>To create an archive, we just give <code>ark</code> the connection to the database and tell it where we want the <code>*.tsv.bz2</code> files to be archived. We can also set the chunk size as the number of <code>lines</code> read in a single chunk. More lines per chunk usually means faster run time at the cost of higher memory requirements.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(<span class="st">"nycflights"</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; airlines</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; ...Done! (in 0.006491184 secs)</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; airports</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; ...Done! (in 0.05866694 secs)</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; flights</span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26"></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; ...Done! (in 11.22096 secs)</span></a>
-<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-30" data-line-number="30"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-31" data-line-number="31"><span class="co">#&gt; planes</span></a>
-<a class="sourceLine" id="cb4-32" data-line-number="32"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-33" data-line-number="33"><span class="co">#&gt; ...Done! (in 0.08481097 secs)</span></a>
-<a class="sourceLine" id="cb4-34" data-line-number="34"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-35" data-line-number="35"><span class="co">#&gt; Exporting in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-36" data-line-number="36"><span class="co">#&gt; weather</span></a>
-<a class="sourceLine" id="cb4-37" data-line-number="37"><span class="co">#&gt; Warning: Closing open result set, pending rows</span></a>
-<a class="sourceLine" id="cb4-38" data-line-number="38"><span class="co">#&gt; ...Done! (in 0.6844392 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.01035309 secs)</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02430105 secs)</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 16.13848 secs)</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.04625702 secs)</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 1.024263 secs)</span></a></code></pre></div>
 <p>We can take a look and confirm the files have been written. Note that we can use <code><a href="http://fs.r-lib.org/reference/dir_ls.html">fs::dir_info</a></code> to get a nice snapshot of the file sizes. Compare the compressed sizes to the original database:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_info</a></span>(dir) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(path, size)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 5 x 2</span></a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt;   path                               size</span></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;   &lt;fs::path&gt;                  &lt;fs::bytes&gt;</span></a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; 1 nycflights/airlines.tsv.bz2         260</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; 2 nycflights/airports.tsv.bz2      28.17K</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; 3 nycflights/flights.tsv.bz2        4.88M</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; 2 nycflights/airports.tsv.bz2      28.13K</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; 3 nycflights/flights.tsv.bz2        4.85M</span></a>
 <a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; 4 nycflights/planes.tsv.bz2        11.96K</span></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; 5 nycflights/weather.tsv.bz2      283.15K</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; 5 nycflights/weather.tsv.bz2      278.84K</span></a>
 <a class="sourceLine" id="cb5-10" data-line-number="10">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/file_info.html">file_info</a></span>(<span class="st">"nycflights13.sqlite"</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(path, size)</a>
 <a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; # A tibble: 1 x 2</span></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt;   path                       size</span></a>
@@ -181,21 +158,16 @@
 <a class="sourceLine" id="cb6-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(<span class="st">"local.sqlite"</span>, <span class="dt">create=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <p>As with <code>ark</code>, we can set the chunk size to control the memory footprint required:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)  </a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; nycflights/airlines.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; ...Done! (in 0.05305982 secs)</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; nycflights/airports.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; ...Done! (in 0.05113602 secs)</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; nycflights/flights.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; ...Done! (in 7.434932 secs)</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; nycflights/planes.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; ...Done! (in 0.06928086 secs)</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; Importing in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; nycflights/weather.tsv.bz2</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; ...Done! (in 0.4024339 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Importing nycflights/airlines.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.02176595 secs)</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; Importing nycflights/airports.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.02894998 secs)</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; Importing nycflights/flights.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 10.92068 secs)</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Importing nycflights/planes.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.06286097 secs)</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; Importing nycflights/weather.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.4813709 secs)</span></a></code></pre></div>
 <p><code>unark</code> returns a <code>dplyr</code> database connection that we can use in the usual way:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(new_db, <span class="st">"flights"</span>)</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span></a>
@@ -217,22 +189,72 @@
 <a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;int&gt;, distance &lt;int&gt;, hour &lt;int&gt;,</span></a>
 <a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt; #   minute &lt;int&gt;, time_hour &lt;dbl&gt;</span></a></code></pre></div>
 </div>
+<div id="pluggable-text-formats" class="section level2">
+<h2 class="hasAnchor">
+<a href="#pluggable-text-formats" class="anchor"></a>Pluggable text formats</h2>
+<p>By default, <code>arkdb</code> uses <code>tsv</code> format, implemented in base tools, as the text-based serialization. The <code>tsv</code> standard is particularly attractive because it side-steps some of the ambiguities present in the CSV format due to string quoting. The <a href="https://www.iana.org/assignments/media-types/text/tab-separated-values">IANA Standard for TSV</a> neatly avoids this for tab-separated values by insisting that a tab can only ever be a separator.</p>
+<p><code>arkdb</code> provides a pluggable mechanism for changing the back end utility used to write text files. For instance, if we need to read in or export in <code>.csv</code> format, we can simply swap in a <code>csv</code> based reader in both <code><a href="../reference/ark.html">ark()</a></code> and <code><a href="../reference/unark.html">unark()</a></code> methods, as illustrated here:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(<span class="st">"nycflights"</span>)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, </a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">    <span class="dt">streamable_table =</span> <span class="kw"><a href="../reference/streamable_base_csv.html">streamable_base_csv</a></span>())</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.00432992 secs)</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.033324 secs)</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 18.64692 secs)</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.07077098 secs)</span></a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 1.371301 secs)</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(dir, <span class="dt">glob =</span> <span class="st">"*.csv.bz2"</span>)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(<span class="st">"local.sqlite"</span>, <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db,</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">      <span class="dt">streamable_table =</span> <span class="kw"><a href="../reference/streamable_base_csv.html">streamable_base_csv</a></span>())</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; Importing nycflights/airlines.csv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 0.03727198 secs)</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; Importing nycflights/airports.csv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.08952212 secs)</span></a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt; Importing nycflights/flights.csv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 11.79949 secs)</span></a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; Importing nycflights/planes.csv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb10-13" data-line-number="13"><span class="co">#&gt;  ...Done! (in 0.04947805 secs)</span></a>
+<a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt; Importing nycflights/weather.csv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb10-15" data-line-number="15"><span class="co">#&gt;  ...Done! (in 0.432034 secs)</span></a></code></pre></div>
+<p><code>arkdb</code> also provides the function <code><a href="../reference/streamable_table.html">streamable_table()</a></code> to facilitate users creating their own streaming table interfaces. For instance, if you would prefer to use <code>readr</code> methods to read and write <code>tsv</code> files, we could construct the table as follows (<code><a href="../reference/streamable_readr_tsv.html">streamable_readr_tsv()</a></code> and <code><a href="../reference/streamable_readr_csv.html">streamable_readr_csv()</a></code> are also shipped inside <code>arkdb</code> for convenience):</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">stream &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">   </span><span class="kw"><a href="../reference/streamable_table.html">streamable_table</a></span>(</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">     <span class="cf">function</span>(file, ...) readr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/readr/topics/read_delim">read_tsv</a></span>(file, ...),</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">     <span class="cf">function</span>(x, path, append)</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">       readr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/readr/topics/write_delim">write_tsv</a></span>(<span class="dt">x =</span> x, <span class="dt">path =</span> path, <span class="dt">append =</span> append),</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6">     <span class="st">"tsv"</span>)</a></code></pre></div>
+<p>and we can then pass such a streamable table directly to <code><a href="../reference/ark.html">ark()</a></code> and <code><a href="../reference/unark.html">unark()</a></code>, like so:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, </a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">    <span class="dt">streamable_table =</span> stream)</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02650809 secs)</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.0243988 secs)</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 10.79034 secs)</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.04019284 secs)</span></a>
+<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb12-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.943682 secs)</span></a></code></pre></div>
+<p>Note several constraints on this design. The write method must be able to take a generic R <code>connection</code> object (which will allow it to handle the compression methods used, if any), and the read method must be able to take a <code>textConnection</code> object. <code>readr</code> functions handle these cases out of the box, so the above method is easy to write. Also note that the write method must be able to <code>append</code>, i.e. it should use a header if <code>append=TRUE</code>, but omit when it is <code>FALSE</code>. See the built-in methods for more examples.</p>
+</div>
 <div id="a-note-on-compression" class="section level2">
 <h2 class="hasAnchor">
 <a href="#a-note-on-compression" class="anchor"></a>A note on compression</h2>
-<p><code>unark</code> can read from a variety of compression formats recognized by base R: <code>bzip2</code>, <code>gzip</code>, <code>zip</code>, and <code>xz</code>, and <code>ark</code> can choose any of these as the compression algorithm. Note that there is some trade-off between speed of compression and efficiency (i.e. the final file size). <code>ark</code> uses the <code>bz2</code> compression algorithm by default, supported in base R, to compress <code>tsv</code> files. The <code>bz2</code> offers excellent compression levels, but is considerably slower to compress than <code>gzip</code> or <code>zip</code>. It is comparably fast to uncompress. For faster archiving when maximum file size reduction is not critical, <code>gzip</code> will give nearly as effective compression in significantly less time.</p>
+<p><code>unark</code> can read from a variety of compression formats recognized by base R: <code>bzip2</code>, <code>gzip</code>, <code>zip</code>, and <code>xz</code>, and <code>ark</code> can choose any of these as the compression algorithm. Note that there is some trade-off between speed of compression and efficiency (i.e. the final file size). <code>ark</code> uses the <code>bz2</code> compression algorithm by default, supported in base R, to compress <code>tsv</code> files. The <code>bz2</code> offers excellent compression levels, but is considerably slower to compress than <code>gzip</code> or <code>zip</code>. It is comparably fast to uncompress. For faster archiving when maximum file size reduction is not critical, <code>gzip</code> will give nearly as effective compression in significantly less time. Compression can also be turned off, e.g. by using <code><a href="../reference/ark.html">ark()</a></code> with <code>compress="none"</code> and <code><a href="../reference/unark.html">unark()</a></code> with files that have no compression suffix (e.g. <code>*.tsv</code> instead of <code>*.tsv.gz</code>).</p>
 </div>
 <div id="distributing-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#distributing-data" class="anchor"></a>Distributing data</h2>
 <p>Once you have archived your database files with <code>ark</code>, consider sharing them privately or publicly as part of your project GitHub repo using the <a href="https://github.com/cboettig/piggyback"><code>piggyback</code> R package</a>. For more permanent, versioned, and citable data archiving, upload your <code>*.tsv.bz2</code> files to a data repository like <a href="https://zenodo.org">Zenodo.org</a>.</p>
 </div>
-</div>
-<div class="footnotes">
-<hr>
-<ol>
-<li id="fn1"><p>The <code>tsv</code> standard is particularly attractive because it side-steps some of the ambiguities present in the CSV format due to string quoting. That is: “when should a comma be a literal part of a text string and when is it the column separator”. The convention that a comma inside quotations is a literal creates a new problem about when is a quote a literal and when is it just quoting a string. The <a href="https://www.iana.org/assignments/media-types/text/tab-separated-values">IANA Standard for TSV</a> neatly avoids this for tab-separated values by insisting that a tab can only ever be a separator. Therefore, quotes are always literal and you never need to worry about escaping them.<a href="#fnref1" class="footnote-back">↩</a></p></li>
-</ol>
 </div>
   </div>
 
@@ -251,6 +273,7 @@
 <a href="#tutorial">Tutorial</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#creating-an-archive-of-an-existing-database">Creating an archive of an existing database</a></li>
       <li><a href="#unarchive">Unarchive</a></li>
+      <li><a href="#pluggable-text-formats">Pluggable text formats</a></li>
       <li><a href="#a-note-on-compression">A note on compression</a></li>
       <li><a href="#distributing-data">Distributing data</a></li>
       </ul>

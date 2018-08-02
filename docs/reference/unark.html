@@ -79,6 +79,9 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -111,7 +114,8 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>db_con</span>, <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>10000L</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>db_con</span>, <span class='kw'>streamable_table</span> <span class='kw'>=</span> <span class='fu'><a href='streamable_base_tsv.html'>streamable_base_tsv</a></span>(),
+  <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>50000L</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -127,76 +131,16 @@ or <code>xz</code> format at present.</p></td>
       <td><p>a database src (<code>src_dbi</code> object from <code>dplyr</code>)</p></td>
     </tr>
     <tr>
+      <th>streamable_table</th>
+      <td><p>interface for serializing/deserializing in chunks</p></td>
+    </tr>
+    <tr>
       <th>lines</th>
       <td><p>number of lines to read in a chunk.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed on to <code><a href='http://www.rdocumentation.org/packages/readr/topics/read_delim'>readr::read_tsv</a></code></p><dl class='dl-horizontal'>
-  <dt>file</dt><dd><p>Either a path to a file, a connection, or literal data
-(either a single string or a raw vector).
-
-Files ending in <code>.gz</code>, <code>.bz2</code>, <code>.xz</code>, or <code>.zip</code> will
-be automatically uncompressed. Files starting with <code>http://</code>,
-<code>https://</code>, <code>ftp://</code>, or <code>ftps://</code> will be automatically
-downloaded. Remote gz files can also be automatically downloaded and
-decompressed.
-
-Literal data is most useful for examples and tests. It must contain at
-least one new line to be recognised as data (instead of a path).</p></dd>
-  <dt>quote</dt><dd><p>Single character used to quote strings.</p></dd>
-  <dt>col_names</dt><dd><p>Either <code>TRUE</code>, <code>FALSE</code> or a character vector
-of column names.
-
-If <code>TRUE</code>, the first row of the input will be used as the column
-names, and will not be included in the data frame. If <code>FALSE</code>, column
-names will be generated automatically: X1, X2, X3 etc.
-
-If <code>col_names</code> is a character vector, the values will be used as the
-names of the columns, and the first row of the input will be read into
-the first row of the output data frame.
-
-Missing (<code>NA</code>) column names will generate a warning, and be filled
-in with dummy names <code>X1</code>, <code>X2</code> etc. Duplicate column names
-will generate a warning and be made unique with a numeric prefix.</p></dd>
-  <dt>col_types</dt><dd><p>One of <code>NULL</code>, a <code>cols()</code> specification, or
-a string. See <code>vignette("column-types")</code> for more details.
-
-If <code>NULL</code>, all column types will be imputed from the first 1000 rows
-on the input. This is convenient (and fast), but not robust. If the
-imputation fails, you'll need to supply the correct types yourself.
-
-If a column specification created by <code>cols()</code>, it must contain
-one column specification for each column. If you only want to read a
-subset of the columns, use <code>cols_only()</code>.
-
-Alternatively, you can use a compact string representation where each
-character represents one column:
-c = character, i = integer, n = number, d = double,
-l = logical, D = date, T = date time, t = time, ? = guess, or
-<code>_</code>/<code>-</code> to skip the column.</p></dd>
-  <dt>locale</dt><dd><p>The locale controls defaults that vary from place to place.
-The default locale is US-centric (like R), but you can use
-<code>locale()</code> to create your own locale that controls things like
-the default time zone, encoding, decimal mark, big mark, and day/month
-names.</p></dd>
-  <dt>na</dt><dd><p>Character vector of strings to use for missing values. Set this
-option to <code>character()</code> to indicate no missing values.</p></dd>
-  <dt>quoted_na</dt><dd><p>Should missing values inside quotes be treated as missing
-values (the default) or strings.</p></dd>
-  <dt>comment</dt><dd><p>A string used to identify comments. Any text after the
-comment characters will be silently ignored.</p></dd>
-  <dt>trim_ws</dt><dd><p>Should leading and trailing whitespace be trimmed from
-each field before parsing it?</p></dd>
-  <dt>skip</dt><dd><p>Number of lines to skip before reading data.</p></dd>
-  <dt>n_max</dt><dd><p>Maximum number of records to read.</p></dd>
-  <dt>guess_max</dt><dd><p>Maximum number of records to use for guessing column types.</p></dd>
-  <dt>progress</dt><dd><p>Display a progress bar? By default it will only display
-in an interactive session and not while knitting a document. The display
-is updated every 50,000 values and will only display if estimated reading
-time is 5 seconds or more. The automatic progress bar can be disabled by
-setting option <code>readr.show_progress</code> to <code>FALSE</code>.</p></dd>
-</dl></td>
+      <td><p>additional arguments to <code>streamable_table$read</code> method.</p></td>
     </tr>
     </table>
     
@@ -211,8 +155,10 @@ write them into a database.  This is essential for processing
 large compressed tables which may be too large to read into
 memory before writing into a database.  In general, increasing
 the <code>lines</code> parameter will result in a faster total transfer
-but require more free memory for working with these larger chunks.
-#'</p>
+but require more free memory for working with these larger chunks.</p>
+<p>If using <code>readr</code>-based streamable-table, you can suppress the progress bar
+by using <code>options(readr.show_progress = FALSE)</code> when reading in large
+files.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -222,27 +168,17 @@ but require more free memory for working with these larger chunks.
 <span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())
 
 <span class='co'>## database -&gt; .tsv.bz2 </span>
-<span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>airlines</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.01042795 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>airports</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.03674603 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>flights</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 12.29331 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>planes</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.08438206 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>Exporting in 10000 line chunks:</span>
-#&gt; <span class='message'>weather</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Closing open result set, pending rows</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.672559 secs)</span></div><div class='input'>
+<span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.003448009 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.0296731 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 15.28031 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.04754806 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 1.08531 secs)</span></div><div class='input'>
 <span class='co'>## list all files in archive (full paths)</span>
 <span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='no'>dir</span>, <span class='st'>"[.]tsv\\.bz2$"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'>## Read archived files into a new database (another sqlite in this case)</span>
 <span class='no'>new_db</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='fu'>file.path</span>(<span class='no'>dir</span>, <span class='st'>"local.sqlite"</span>), <span class='kw'>create</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
-<span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>new_db</span>)</div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.03802705 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.0363431 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 9.01262 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.05085492 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing in 10000 line chunks:</span>
-#&gt; <span class='message'>/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>...Done! (in 0.3927159 secs)</span></div><div class='input'>
+<span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>new_db</span>)</div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/airlines.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.01465607 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/airports.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.02954197 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/flights.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 12.60039 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/planes.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.06137896 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/weather.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.5557802 secs)</span></div><div class='input'>
 <span class='co'>## Prove table is returned successfully.</span>
 <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>new_db</span>, <span class='st'>"flights"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;flights&gt; [?? x 19]
 #&gt; # Database: sqlite 3.22.0
-#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmptt27wI/local.sqlite]
+#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/local.sqlite]
 #&gt;     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 #&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
 #&gt;  1  2013     1     1      517            515         2      830            819
