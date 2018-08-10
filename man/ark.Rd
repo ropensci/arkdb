@@ -22,7 +22,8 @@ ark(db_con, dir, streamable_table = streamable_base_tsv(), lines = 50000L,
 no compression.}
 
 \item{tables}{a list of tables from the database that should be
-archived.  By default, will archive all tables.}
+archived.  By default, will archive all tables. Table list should specify
+schema if appropriate, see examples.}
 
 \item{method}{method to use to query the database, see details.}
 }
@@ -59,7 +60,16 @@ db <- dbplyr::nycflights13_sqlite(tempdir())
 
 ## And here we go:
 ark(db, dir)
+} 
+\dontrun{
 
+## For a Postgres DB with schema, we can append schema names first
+## to each of the table names, like so: 
+schema_tables <- dbGetQuery(db, sqlInterpolate(db,
+"SELECT table_name FROM information_schema.tables 
+WHERE table_schema = ?schema", schema = "schema_name"))
 
+ark(db, dir, tables = paste0("schema_name",".", schema_tables$table_name))
 }
+
 }

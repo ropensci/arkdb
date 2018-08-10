@@ -9,7 +9,8 @@
 #' "gzip" (faster write times, a bit less compression), "xz", or "none", for
 #' no compression.
 #' @param tables a list of tables from the database that should be 
-#' archived.  By default, will archive all tables. 
+#' archived.  By default, will archive all tables. Table list should specify
+#' schema if appropriate, see examples. 
 #' @param method method to use to query the database, see details. 
 
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
@@ -41,9 +42,18 @@
 #' 
 #' ## And here we go:
 #' ark(db, dir)
+#' } 
+#' \dontrun{
 #' 
+#' ## For a Postgres DB with schema, we can append schema names first
+#' ## to each of the table names, like so: 
+#' schema_tables <- dbGetQuery(db, sqlInterpolate(db,
+#' "SELECT table_name FROM information_schema.tables 
+#' WHERE table_schema = ?schema", schema = "schema_name"))
 #' 
+#' ark(db, dir, tables = paste0("schema_name",".", schema_tables$table_name))
 #' }
+#' 
 ark <- function(db_con, 
                 dir, 
                 streamable_table = streamable_base_tsv(),
