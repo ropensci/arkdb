@@ -1,12 +1,13 @@
 
 [![Travis build
-status](https://travis-ci.org/cboettig/arkdb.svg?branch=master)](https://travis-ci.org/cboettig/arkdb)
+status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
 [![Coverage
-status](https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/cboettig/arkdb?branch=master)
+status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -25,9 +26,9 @@ large to read into memory all at once.
 
   - A more detailed introduction to package design and use can be found
     in the package
-    [Vignette](https://cboettig.github.io/arkdb/articles/arkdb_intro.html)
+    [Vignette](https://ropensci.github.io/arkdb/articles/arkdb_intro.html)
   - [Online versions of package
-    documentation](https://cboettig.github.io/arkdb)
+    documentation](https://ropensci.github.io/arkdb)
 
 ## Installation
 
@@ -68,15 +69,15 @@ Create an archive of the database:
 ``` r
 ark(db, ".", lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.02275705 secs)
+#>  ...Done! (in 0.02494812 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.03441596 secs)
+#>  ...Done! (in 0.03492808 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 16.112 secs)
+#>  ...Done! (in 11.74483 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.05053592 secs)
+#>  ...Done! (in 0.03923202 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 1.261925 secs)
+#>  ...Done! (in 0.8512921 secs)
 ```
 
 ## Unarchive
