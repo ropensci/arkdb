@@ -237,7 +237,7 @@
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/arkdb/blob/master/README.md",
-  "fileSize": "14.615KB",
+  "fileSize": "14.617KB",
   "contIntegration": [
     "https://travis-ci.org/cboettig/arkdb",
     "https://codecov.io/github/cboettig/arkdb?branch=master",
@@ -249,5 +249,6 @@
     "r",
     "rstats",
     "dbi"
-  ]
+  ],
+  "developmentStatus": "https://www.tidyverse.org/lifecycle/#stable"
 }

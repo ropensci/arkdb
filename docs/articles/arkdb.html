@@ -53,7 +53,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/cboettig/arkdb">
+  <a href="https://github.com/ropensci/arkdb">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -73,9 +73,9 @@
       <h1>Introduction to arkdb</h1>
                         <h4 class="author">Carl Boettiger</h4>
             
-            <h4 class="date">2018-08-02</h4>
+            <h4 class="date">2018-08-11</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/cboettig/arkdb/blob/master/vignettes/arkdb.Rmd"><code>vignettes/arkdb.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ropensci/arkdb/blob/master/vignettes/arkdb.Rmd"><code>vignettes/arkdb.Rmd</code></a></small>
       <div class="hidden name"><code>arkdb.Rmd</code></div>
 
     </div>
@@ -125,15 +125,15 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(<span class="st">"nycflights"</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.01035309 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.04322219 secs)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02430105 secs)</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.05589318 secs)</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 16.13848 secs)</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 25.6638 secs)</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.04625702 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.06507802 secs)</span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 1.024263 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 1.354161 secs)</span></a></code></pre></div>
 <p>We can take a look and confirm the files have been written. Note that we can use <code><a href="http://fs.r-lib.org/reference/dir_ls.html">fs::dir_info</a></code> to get a nice snapshot of the file sizes. Compare the compressed sizes to the original database:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_info</a></span>(dir) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(path, size)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 5 x 2</span></a>
@@ -159,15 +159,15 @@
 <p>As with <code>ark</code>, we can set the chunk size to control the memory footprint required:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)  </a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Importing nycflights/airlines.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.02176595 secs)</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.02951598 secs)</span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; Importing nycflights/airports.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.02894998 secs)</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.05099392 secs)</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; Importing nycflights/flights.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 10.92068 secs)</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 13.6909 secs)</span></a>
 <a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Importing nycflights/planes.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.06286097 secs)</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.05514789 secs)</span></a>
 <a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; Importing nycflights/weather.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.4813709 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.6168602 secs)</span></a></code></pre></div>
 <p><code>unark</code> returns a <code>dplyr</code> database connection that we can use in the usual way:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(new_db, <span class="st">"flights"</span>)</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span></a>
@@ -199,30 +199,30 @@
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, </a>
 <a class="sourceLine" id="cb9-4" data-line-number="4">    <span class="dt">streamable_table =</span> <span class="kw"><a href="../reference/streamable_base_csv.html">streamable_base_csv</a></span>())</a>
 <a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.00432992 secs)</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.00510788 secs)</span></a>
 <a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.033324 secs)</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.04540706 secs)</span></a>
 <a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 18.64692 secs)</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 22.51607 secs)</span></a>
 <a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.07077098 secs)</span></a>
+<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.0715239 secs)</span></a>
 <a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 1.371301 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 2.004797 secs)</span></a></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(dir, <span class="dt">glob =</span> <span class="st">"*.csv.bz2"</span>)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(<span class="st">"local.sqlite"</span>, <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb10-4" data-line-number="4"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db,</a>
 <a class="sourceLine" id="cb10-5" data-line-number="5">      <span class="dt">streamable_table =</span> <span class="kw"><a href="../reference/streamable_base_csv.html">streamable_base_csv</a></span>())</a>
 <a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; Importing nycflights/airlines.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 0.03727198 secs)</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 0.02426982 secs)</span></a>
 <a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; Importing nycflights/airports.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.08952212 secs)</span></a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.05387115 secs)</span></a>
 <a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt; Importing nycflights/flights.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 11.79949 secs)</span></a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 15.39904 secs)</span></a>
 <a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; Importing nycflights/planes.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-13" data-line-number="13"><span class="co">#&gt;  ...Done! (in 0.04947805 secs)</span></a>
+<a class="sourceLine" id="cb10-13" data-line-number="13"><span class="co">#&gt;  ...Done! (in 0.06653714 secs)</span></a>
 <a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt; Importing nycflights/weather.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-15" data-line-number="15"><span class="co">#&gt;  ...Done! (in 0.432034 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-15" data-line-number="15"><span class="co">#&gt;  ...Done! (in 0.599474 secs)</span></a></code></pre></div>
 <p><code>arkdb</code> also provides the function <code><a href="../reference/streamable_table.html">streamable_table()</a></code> to facilitate users creating their own streaming table interfaces. For instance, if you would prefer to use <code>readr</code> methods to read and write <code>tsv</code> files, we could construct the table as follows (<code><a href="../reference/streamable_readr_tsv.html">streamable_readr_tsv()</a></code> and <code><a href="../reference/streamable_readr_csv.html">streamable_readr_csv()</a></code> are also shipped inside <code>arkdb</code> for convenience):</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">stream &lt;-<span class="st"> </span></a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="st">   </span><span class="kw"><a href="../reference/streamable_table.html">streamable_table</a></span>(</a>
@@ -234,15 +234,15 @@
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, </a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">    <span class="dt">streamable_table =</span> stream)</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02650809 secs)</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.030689 secs)</span></a>
 <a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.0243988 secs)</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02731895 secs)</span></a>
 <a class="sourceLine" id="cb12-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 10.79034 secs)</span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 15.73546 secs)</span></a>
 <a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.04019284 secs)</span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.04425597 secs)</span></a>
 <a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb12-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.943682 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb12-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.8847339 secs)</span></a></code></pre></div>
 <p>Note several constraints on this design. The write method must be able to take a generic R <code>connection</code> object (which will allow it to handle the compression methods used, if any), and the read method must be able to take a <code>textConnection</code> object. <code>readr</code> functions handle these cases out of the box, so the above method is easy to write. Also note that the write method must be able to <code>append</code>, i.e. it should use a header if <code>append=TRUE</code>, but omit when it is <code>FALSE</code>. See the built-in methods for more examples.</p>
 </div>
 <div id="a-note-on-compression" class="section level2">

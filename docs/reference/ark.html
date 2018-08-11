@@ -86,7 +86,7 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/cboettig/arkdb">
+  <a href="https://github.com/ropensci/arkdb">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -104,7 +104,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Archive tables from a database as flat files</h1>
-    <small class="dont-index">Source: <a href='https://github.com/cboettig/arkdb/blob/master/R/ark.R'><code>R/ark.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/ropensci/arkdb/blob/master/R/ark.R'><code>R/ark.R</code></a></small>
     <div class="hidden name"><code>ark.Rd</code></div>
     </div>
 
@@ -146,7 +146,8 @@ no compression.</p></td>
     <tr>
       <th>tables</th>
       <td><p>a list of tables from the database that should be
-archived.  By default, will archive all tables.</p></td>
+archived.  By default, will archive all tables. Table list should specify
+schema if appropriate, see examples.</p></td>
     </tr>
     <tr>
       <th>method</th>
@@ -185,10 +186,17 @@ support windowing natively (i.e. <code>BETWEEN</code> queries).</p>
 #&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'><span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7mDbZl/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
+<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
 <span class='co'>## And here we go:</span>
-<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.004944801 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.03156805 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 14.64792 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.0481801 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 1.017851 secs)</span></div><div class='input'>
+<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.009032011 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.101505 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 22.84585 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.07309508 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 1.459867 secs)</span></div><span class='co'># NOT RUN {</span>
+<span class='co'>## For a Postgres DB with schema, we can append schema names first</span>
+<span class='co'>## to each of the table names, like so: </span>
+<span class='no'>schema_tables</span> <span class='kw'>&lt;-</span> <span class='fu'>dbGetQuery</span>(<span class='no'>db</span>, <span class='fu'>sqlInterpolate</span>(<span class='no'>db</span>,
+<span class='st'>"SELECT table_name FROM information_schema.tables 
+WHERE table_schema = ?schema"</span>, <span class='kw'>schema</span> <span class='kw'>=</span> <span class='st'>"schema_name"</span>))
 
+<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>, <span class='kw'>tables</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"schema_name"</span>,<span class='st'>"."</span>, <span class='no'>schema_tables</span>$<span class='no'>table_name</span>))
+<span class='co'># }</span><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

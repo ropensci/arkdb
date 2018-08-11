@@ -57,7 +57,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/cboettig/arkdb">
+  <a href="https://github.com/ropensci/arkdb">
     <span class="fa fa-github fa-lg"></span>
      
   </a>
@@ -123,15 +123,15 @@
 <p>Create an archive of the database:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/ark.html">ark</a></span>(db, <span class="st">"."</span>, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.05521083 secs)</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.01282597 secs)</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.07368612 secs)</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.03462815 secs)</span></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 17.24277 secs)</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 47.6787 secs)</span></a>
 <a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.03630185 secs)</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.126704 secs)</span></a>
 <a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.8016601 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 2.474544 secs)</span></a></code></pre></div>
 </div>
 <div id="unarchive" class="section level2">
 <h2 class="hasAnchor">
@@ -148,6 +148,7 @@
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; tbls:</span></a></code></pre></div>
 <hr>
 <p>Please note that this project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
+<p><a href="https://ropensci.org"><img src="https://ropensci.org/public_images/ropensci_footer.png" alt="ropensci_footer"></a></p>
 </div>
 </div>
   </div>
@@ -156,9 +157,9 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/cboettig/arkdb">https://​github.com/​cboettig/​arkdb</a>
+<li>Browse source code at <br><a href="https://github.com/ropensci/arkdb">https://​github.com/​ropensci/​arkdb</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/cboettig/arkdb/issues">https://​github.com/​cboettig/​arkdb/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/ropensci/arkdb/issues">https://​github.com/​ropensci/​arkdb/​issues</a>
 </li>
 </ul>
 </div>
@@ -180,11 +181,12 @@
       <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/cboettig/arkdb"><img src="https://travis-ci.org/cboettig/arkdb.svg?branch=master" alt="Travis build status"></a></li>
-<li><a href="https://codecov.io/github/cboettig/arkdb?branch=master"><img src="https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
+<li><a href="https://travis-ci.org/ropensci/arkdb"><img src="https://travis-ci.org/ropensci/arkdb.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://codecov.io/github/ropensci/arkdb?branch=master"><img src="https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
 <li><a href="https://ci.appveyor.com/project/cboettig/arkdb"><img src="https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
 <li><a href="https://cran.r-project.org/package=arkdb"><img src="http://www.r-pkg.org/badges/version/arkdb" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://github.com/ropensci/onboarding/issues/224"><img src="https://badges.ropensci.org/224_status.svg"></a></li>
+<li><a href="https://www.tidyverse.org/lifecycle/#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="lifecycle"></a></li>
 </ul>
 </div>
 </div>
