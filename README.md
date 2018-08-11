@@ -68,15 +68,15 @@ Create an archive of the database:
 ``` r
 ark(db, ".", lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>      ...Done! (in 0.007392168 secs)
+#>  ...Done! (in 0.02275705 secs)
 #> Exporting airports in 50000 line chunks:
-#>      ...Done! (in 0.05036807 secs)
+#>  ...Done! (in 0.03441596 secs)
 #> Exporting flights in 50000 line chunks:
-#>      ...Done! (in 9.745059 secs)
+#>  ...Done! (in 16.112 secs)
 #> Exporting planes in 50000 line chunks:
-#>      ...Done! (in 0.07155395 secs)
+#>  ...Done! (in 0.05053592 secs)
 #> Exporting weather in 50000 line chunks:
-#>      ...Done! (in 0.561712 secs)
+#>  ...Done! (in 1.261925 secs)
 ```
 
 ## Unarchive
@@ -85,28 +85,22 @@ Import a list of compressed tabular files (i.e. `*.tsv.bz2`) into a
 local SQLite database:
 
 ``` r
-files <- fs::dir_ls(glob = "*.tsv.bz2")
+files <- fs::dir_ls(glob = "*.csv.bz2")
 new_db <- src_sqlite("local.sqlite", create=TRUE)
 
 unark(files, new_db, lines = 50000)
-#> Importing airlines.tsv.bz2 in 50000 line chunks:
-#>      ...Done! (in 0.04375601 secs)
-#> Importing airports.tsv.bz2 in 50000 line chunks:
-#>      ...Done! (in 0.04032397 secs)
-#> Importing flights.tsv.bz2 in 50000 line chunks:
-#>      ...Done! (in 7.048341 secs)
-#> Importing planes.tsv.bz2 in 50000 line chunks:
-#>      ...Done! (in 0.05605316 secs)
-#> Importing weather.tsv.bz2 in 50000 line chunks:
-#>      ...Done! (in 0.28914 secs)
+#> Warning in assert_files_exist(files): no file specified
 
 new_db
 #> src:  sqlite 3.22.0 [local.sqlite]
-#> tbls: airlines, airports, flights, planes, weather
+#> tbls:
 ```
 
 -----
 
 Please note that this project is released with a [Contributor Code of
 Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
-to abide by its terms.
+to abide by its
+terms.
+
+[![ropensci\_footer](https://ropensci.org/public_images/ropensci_footer.png)](https://ropensci.org)

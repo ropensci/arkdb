@@ -2,11 +2,12 @@
 output: github_document
 ---
 
-[![Travis build status](https://travis-ci.org/cboettig/arkdb.svg?branch=master)](https://travis-ci.org/cboettig/arkdb)
-[![Coverage status](https://codecov.io/gh/cboettig/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/cboettig/arkdb?branch=master)
+[![Travis build status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
+[![Coverage status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -86,9 +87,15 @@ unlink("nycflights13.sqlite")
 ## dbplyr handles this automatically
 #DBI::dbDisconnect(db[[1]])
 #DBI::dbDisconnect(new_db[[1]])
+
+codemetar::write_codemeta()
 ```
 
 -----
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
 By participating in this project you agree to abide by its terms.
+
+
+[![ropensci_footer](https://ropensci.org/public_images/ropensci_footer.png)](https://ropensci.org)
+
