@@ -33,13 +33,13 @@ assert_connection <- function(x, name = deparse(substitute(x))) {
 assert_overwrite <- function(filename){
   if(file.exists(filename)){
     if(interactive()){
-      continue <- readline(prompt = paste("a file named", filename, 
+      continue <- readline(prompt = paste("a file named", basename(filename), 
                  "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
       if(as.numeric(continue) != 1){
         return(NULL)
       }
     } else {
-      warning(paste("overwriting", filename))
+      warning(paste("overwriting", basename(filename)))
     }
     file.remove(filename)
   }

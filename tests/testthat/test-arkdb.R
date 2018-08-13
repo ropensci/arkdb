@@ -75,7 +75,7 @@ testthat::context("alternate method")
 
 testthat::test_that("alternate method for ark", {
   
-  testthat::skip_on_appveyor()  ## FIXME. No Ideas....
+  #testthat::skip_on_appveyor()  ## FIXME. No Ideas....
   
   
   db <- dbplyr::nycflights13_sqlite(".")

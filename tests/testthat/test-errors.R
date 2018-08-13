@@ -23,7 +23,7 @@ testthat::test_that("we can handle cases overwriting a file, with a warning",{
   testthat::expect_silent(assert_overwrite(filename))
   write.table(data, filename)
   if(!interactive()){
-    testthat::expect_warning(assert_overwrite(filename), filename)
+    testthat::expect_warning(assert_overwrite(filename), basename(filename))
   }
   
   unlink(filename)
