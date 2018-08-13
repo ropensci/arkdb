@@ -5,8 +5,9 @@
 #' (must be able to take a [connection()] object) and "`...`" (for)
 #' additional arguments.
 #' @param write write function. Arguments should be "`data`" (a data.frame),
-#' `file` (must be able to take a [connection()] object), and "`append`"
-#'  logical, append to existing file or create new?
+#' `file` (must be able to take a [connection()] object), and "`omit_header`"
+#'  logical, include header (initial write) or not (for appending subsequent
+#'  chunks)
 #' @param extension file extension to use (e.g. "tsv", "csv")
 #' @details 
 #' Note several constraints on this design. The write method must be able
@@ -14,8 +15,7 @@
 #' the compression methods used, if any), and the read method must be able
 #' to take a `textConnection` object.  `readr` functions handle these cases
 #' out of the box, so the above method is easy to write.  Also note that
-#' the write method must be able to `append`, i.e. it should use a header
-#' if `append=TRUE`, but omit when it is `FALSE`.  See the built-in methods
+#' the write method must be able to `omit_header`. See the built-in methods
 #' for more examples.
 #' @return a `streamable_table` object (S3)
 #' @export
@@ -25,8 +25,8 @@
 #' streamable_readr_tsv <- function() {
 #'   streamable_table(
 #'     function(file, ...) readr::read_tsv(file, ...),
-#'     function(x, path, append)
-#'       readr::write_tsv(x = x, path = path, append = append),
+#'     function(x, path, omit_header)
+#'       readr::write_tsv(x = x, path = path, omit_header = omit_header),
 #'     "tsv")
 #' }
 #' 
@@ -36,6 +36,8 @@ streamable_table <- function(read, write, extension) {
             is.character(extension), 
             length(extension) == 1L, 
             !is.na(extension))
+  ## FIXME Assert argument number / names for read/write functions?
+  
   ret <- list(read = read,
               write = write,
               extension = extension)
@@ -71,8 +73,8 @@ streamable_readr_tsv <- function() {
     read <- function(file, ...) {
       read_tsv(file, ...)
     }
-    write <- function(x, path, append = FALSE) {
-      write_tsv(x = x, path = path, append = append)
+    write <- function(x, path, omit_header = FALSE) {
+      write_tsv(x = x, path = path, append = omit_header)
     }
     
   streamable_table(read, write, "tsv")
@@ -97,8 +99,8 @@ streamable_readr_csv <- function() {
   read <- function(file, ...) {
     read_csv(file, ...)
   }
-  write <- function(x, path, append = FALSE) {
-    write_csv(x = x, path = path, append = append)
+  write <- function(x, path, omit_header = FALSE) {
+    write_csv(x = x, path = path, append = omit_header)
   }
   
   streamable_table(read, write, "csv")
@@ -126,14 +128,14 @@ streamable_base_tsv <- function() {
                       stringsAsFactors = FALSE,
                       ...)
   }
-  write_tsv <- function(x, path, append) {
+  write_tsv <- function(x, path, omit_header) {
     utils::write.table(x,
                        file = path, 
-                       append = append, 
+                       append = omit_header, 
                        sep = "\t",
                        quote = FALSE,
                        row.names = FALSE,
-                       col.names = !append)
+                       col.names = !omit_header)
   }
   streamable_table(read_tsv, write_tsv, "tsv")
 }
@@ -163,16 +165,16 @@ streamable_base_csv <- function() {
                       ...)
   }
   ## NOTE: write.csv does not permit setting 
-  ## `col.names = FALSE``, so cannot append
-  write_csv <- function(x, path, append) {
+  ## `col.names = FALSE``, so cannot omit_header
+  write_csv <- function(x, path, omit_header) {
       utils::write.table(x,
                        file = path, 
                        sep = ",", 
                        quote = TRUE,
                        qmethod = "double",
                        row.names = FALSE,
-                       col.names = !append,
-                       append = append
+                       col.names = !omit_header,
+                       append = omit_header
       )
   }
   streamable_table(read_csv, write_csv, "csv")

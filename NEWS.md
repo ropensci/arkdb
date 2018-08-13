@@ -1,7 +1,13 @@
+# arkdb 0.0.1
+
+* overwrite existing tables of same name (with warning and
+  interactive proceed) in both DB and text-files to avoid
+  appending.
+
 # arkdb 0.0.0.9000
 
 * Added a `NEWS.md` file to track changes to the package.
 * Log messages improved as suggested by @richfitz
-* Better handling of when to use or not use window method for chunking
-* Avoid warnings by properly closing connections using `dbGetQuery`
+* Improved mechanism for windowing in most DBs, from @krlmlr [#8](https://github.com/ropensci/arkdb/pull/8)
+* Support pluggable I/O, based on @richfitz suggestions [#3](https://github.com/ropensci/arkdb/issues/3), [#10](https://github.com/ropensci/arkdb/pull/10)
 

@@ -30,6 +30,31 @@ assert_connection <- function(x, name = deparse(substitute(x))) {
   }
 }
 
+assert_overwrite <- function(filename){
+  if(file.exists(filename)){
+    if(interactive()){
+      continue = readline(prompt = paste("a file named", filename, 
+                          "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
+      if(as.numeric(continue) != 1){
+        return(NULL)
+      }
+    } else {
+      warning(paste("overwriting", filename))
+    }
+    file.remove(filename)
+  }
+}
+
+
+
+assert_overwrite_db <- function(db_con, tbl_name){
+  con <- normalize_con(db_con)
+  if(DBI::dbExistsTable(con, tbl_name)){
+    DBI::dbRemoveTable(con, tbl_name)
+  }
+}
+
+
 
 has_between <- function(db_con, tablename){
   tryCatch(DBI::dbGetQuery(normalize_con(db_con), 

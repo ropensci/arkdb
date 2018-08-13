@@ -13,3 +13,17 @@ testthat::test_that("we can detect errors on types", {
   testthat::expect_error(assert_streamable(x), "streamable")
   
 })
+
+testthat::test_that("we can handle cases overwriting a file, with a warning",{
+  
+  
+  filename <- tempfile(fileext = ".txt")
+  data <- datasets::iris
+  
+  testthat::expect_silent(assert_overwrite(filename))
+  write.table(data, filename)
+  if(!interactive()){
+    testthat::expect_warning(assert_overwrite(filename), filename)
+  }
+  
+})
