@@ -47,6 +47,6 @@ testthat::test_that("we can handle cases overwriting a table, with a warning",{
     testthat::expect_warning(assert_overwrite_db(db, tbl), tbl)
   }
   
-  DBI::dbDisconnect(db)
+  DBI::dbDisconnect(db$con)
   
 })
