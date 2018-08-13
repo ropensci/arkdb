@@ -26,4 +26,27 @@ testthat::test_that("we can handle cases overwriting a file, with a warning",{
     testthat::expect_warning(assert_overwrite(filename), filename)
   }
   
+  unlink(filename)
+  
+})
+
+
+
+
+testthat::test_that("we can handle cases overwriting a table, with a warning",{
+  dir <- tempdir()
+  data <- datasets::iris
+  db <- dplyr::src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
+  tbl <- "iris"
+  
+  testthat::expect_silent(assert_overwrite_db(db, tbl))
+  
+  DBI::dbWriteTable(db$con, tbl, data)
+  
+  if(!interactive()){
+    testthat::expect_warning(assert_overwrite_db(db, tbl), tbl)
+  }
+  
+  DBI::dbDisconnect(db)
+  
 })

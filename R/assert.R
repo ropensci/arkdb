@@ -33,8 +33,8 @@ assert_connection <- function(x, name = deparse(substitute(x))) {
 assert_overwrite <- function(filename){
   if(file.exists(filename)){
     if(interactive()){
-      continue = readline(prompt = paste("a file named", filename, 
-                          "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
+      continue <- readline(prompt = paste("a file named", filename, 
+                 "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
       if(as.numeric(continue) != 1){
         return(NULL)
       }
@@ -50,6 +50,15 @@ assert_overwrite <- function(filename){
 assert_overwrite_db <- function(db_con, tbl_name){
   con <- normalize_con(db_con)
   if(DBI::dbExistsTable(con, tbl_name)){
+    if(interactive()){
+      continue <- readline(prompt = paste("a table named", tbl_name, 
+                 "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
+      if(as.numeric(continue) != 1){
+        return(NULL)
+      }
+    } else {
+      warning(paste("overwriting", tbl_name))
+    }
     DBI::dbRemoveTable(con, tbl_name)
   }
 }
