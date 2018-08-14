@@ -148,6 +148,18 @@ compressed_file <- function(path, ...){
          gz = gzfile(path, ...),
          bz2 = bzfile(path, ...),
          xz = xzfile(path, ...),
-         zip = unz(path, ...),
+         zip = zipfile(path, ...),
          file(path, ...))
+}
+
+# Taken from the `readr` package
+zipfile <- function(path, open = "r") {
+  files <- utils::unzip(path, list = TRUE)
+  file <- files$Name[[1]]
+  
+  if (nrow(files) > 1) {
+    message("Multiple files in zip: reading '", file, "'")
+  }
+  
+  unz(path, file, open = open)
 }
