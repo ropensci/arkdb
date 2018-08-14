@@ -10,8 +10,8 @@ test_stream <- function(stream) {
   
   data <- datasets::iris
   data$Species <- as.character(data$Species)
-  stream$write(data, con, append = FALSE)
-  stream$write(data, con, append = TRUE)
+  stream$write(data, con, omit_header = FALSE)
+  stream$write(data, con, omit_header = TRUE)
   
   close(con)
   

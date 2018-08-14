@@ -112,6 +112,10 @@ ark_file <- function(tablename,
   
   dest <- sprintf("%s.%s%s", tablename, streamable_table$extension, ext)
   filename <- file.path(dir, dest)
+  
+  ## Handle case in which file already exists. Otherwise, we'll append to it
+  assert_overwrite(filename)
+  
   con <- compressed_file(filename, "w")
   on.exit(close(con))
   
@@ -139,7 +143,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
   ## Create header to avoid duplicate column names
   query <- paste("SELECT * FROM", tablename, "LIMIT 0")
   header <- DBI::dbGetQuery(db_con, query)
-  streamable_table$write(header, con, append = FALSE)
+  streamable_table$write(header, con, omit_header = FALSE)
   
   ## 
   res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
@@ -147,7 +151,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
     p$tick()
     data <- dbFetch(res, n = lines)
     if (nrow(data) == 0) break
-    streamable_table$write(data, con, append = TRUE)
+    streamable_table$write(data, con, omit_header = TRUE)
   }
   DBI::dbClearResult(res)
 }
@@ -203,8 +207,8 @@ ark_chunk <- function(db_con,
   }
   data <- DBI::dbGetQuery(db_con, query)
   
-  append <- start != 1
-  streamable_table$write(data, con, append = append)
+  omit_header <- start != 1
+  streamable_table$write(data, con, omit_header = omit_header)
   
 }
 

@@ -77,7 +77,10 @@ normalize_con <- function(db_con){
 unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
     
   tbl_name <- base_name(filename)
-  ## FIXME 
+  
+  assert_overwrite_db(db_con, tbl_name)
+  
+  
   con <- compressed_file(filename, "r")
   on.exit(close(con))
   

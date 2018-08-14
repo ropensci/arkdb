@@ -12,8 +12,9 @@ streamable_table(read, write, extension)
 additional arguments.}
 
 \item{write}{write function. Arguments should be "\code{data}" (a data.frame),
-\code{file} (must be able to take a \code{\link[=connection]{connection()}} object), and "\code{append}"
-logical, append to existing file or create new?}
+\code{file} (must be able to take a \code{\link[=connection]{connection()}} object), and "\code{omit_header}"
+logical, include header (initial write) or not (for appending subsequent
+chunks)}
 
 \item{extension}{file extension to use (e.g. "tsv", "csv")}
 }
@@ -29,8 +30,7 @@ to take a generic R \code{connection} object (which will allow it to handle
 the compression methods used, if any), and the read method must be able
 to take a \code{textConnection} object.  \code{readr} functions handle these cases
 out of the box, so the above method is easy to write.  Also note that
-the write method must be able to \code{append}, i.e. it should use a header
-if \code{append=TRUE}, but omit when it is \code{FALSE}.  See the built-in methods
+the write method must be able to \code{omit_header}. See the built-in methods
 for more examples.
 }
 \examples{
@@ -38,8 +38,8 @@ for more examples.
 streamable_readr_tsv <- function() {
   streamable_table(
     function(file, ...) readr::read_tsv(file, ...),
-    function(x, path, append)
-      readr::write_tsv(x = x, path = path, append = append),
+    function(x, path, omit_header)
+      readr::write_tsv(x = x, path = path, omit_header = omit_header),
     "tsv")
 }
 
