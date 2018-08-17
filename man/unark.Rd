@@ -5,7 +5,7 @@
 \title{Unarchive a list of compressed tsv files into a database}
 \usage{
 unark(files, db_con, streamable_table = streamable_base_tsv(),
-  lines = 50000L, ...)
+  lines = 50000L, overwrite = "ask", ...)
 }
 \arguments{
 \item{files}{vector of filenames to be read in. Must be \code{tsv}
@@ -17,6 +17,11 @@ or \code{xz} format at present.}
 \item{streamable_table}{interface for serializing/deserializing in chunks}
 
 \item{lines}{number of lines to read in a chunk.}
+
+\item{overwrite}{should any existing text files of the same name be overwritten?
+default is "ask", which will ask for confirmation in an interactive session, and
+overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
+always skip such tables.}
 
 \item{...}{additional arguments to \code{streamable_table$read} method.}
 }

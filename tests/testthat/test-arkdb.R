@@ -6,13 +6,14 @@ library(arkdb)
 #library(RSQLite)
 #library(MonetDBLite)
 
+tmp <- tempdir()
 
 testthat::context("basic")
 testthat::test_that("we can ark and unark a db", {
 
-  db <- dbplyr::nycflights13_sqlite(".")
-  dir <- fs::dir_create("nycflights")
-  ark(db, dir, lines = 50000)
+  db <- dbplyr::nycflights13_sqlite(tmp)
+  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
+  ark(db, dir, lines = 50000, overwrite = TRUE)
   
   files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
   testthat::expect_length(files, 5)
@@ -23,8 +24,8 @@ testthat::test_that("we can ark and unark a db", {
                          dim(nycflights13::flights))
   
   ## unark
-  new_db <- dplyr::src_sqlite("local.sqlite", create = TRUE)
-  unark(files, new_db, lines = 50000)
+  new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
+  unark(files, new_db, lines = 50000, overwrite = TRUE)
   
   myflights <- dplyr::tbl(new_db, "flights")
   testthat::expect_is(myflights, "tbl_dbi")
@@ -37,37 +38,35 @@ testthat::test_that("we can ark and unark a db", {
   dim(myflights[[1]])
   ## Classes not preserved, we get read_tsv guesses on class
   
+  DBI::dbDisconnect(new_db$con)
   unlink(dir, TRUE)
-  unlink("local.sqlite")
-  
+  unlink(fs::path(tmp, "local.sqlite"))
+
 })
 
 
 testthat::context("plain-txt")
 
 testthat::test_that("we can ark and unark a db in plain text", {
+  db <- dbplyr::nycflights13_sqlite(tmp)
+  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
   
-  db <- dbplyr::nycflights13_sqlite(".")
-  dir <- fs::dir_create("nycflights")
-  
-  db <- dbplyr::nycflights13_sqlite(".")
-  dir <- fs::dir_create("nycflights")
-  ark(db, dir, lines = 50000, compress = "none")
+  ark(db, dir, lines = 50000, compress = "none", overwrite = TRUE)
   
   files <- fs::dir_ls(dir, glob = "*.tsv")
   testthat::expect_length(files, 5)
   
   ## unark
-  new_db <- dplyr::src_sqlite("local.sqlite", create = TRUE)
-  unark(files, new_db, lines = 50000)
+  new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
+  unark(files, new_db, lines = 50000, overwrite = TRUE)
   
   flights <- dplyr::tbl(new_db, "flights")
   testthat::expect_equal(dim(flights)[[2]], 19)
   testthat::expect_is(flights, "tbl_dbi")
   
-  unlink("local.sqlite")
+  DBI::dbDisconnect(new_db$con)
   unlink(dir, TRUE)
-
+  unlink(fs::path(tmp, "local.sqlite"))
 })
 
 
@@ -75,12 +74,10 @@ testthat::context("alternate method")
 
 testthat::test_that("alternate method for ark", {
   
-  #testthat::skip_on_appveyor()  ## FIXME. No Ideas....
+  db <- dbplyr::nycflights13_sqlite(tmp)
+  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
   
-  
-  db <- dbplyr::nycflights13_sqlite(".")
-  dir <- fs::dir_create("nycflights")
-  ark(db, dir, lines = 50000, method = "window")
+  ark(db, dir, lines = 50000, method = "window", overwrite = TRUE)
   
   files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
   testthat::expect_length(files, 5)
@@ -92,8 +89,8 @@ testthat::test_that("alternate method for ark", {
   
   
   ## unark
-  new_db <- dplyr::src_sqlite("local.sqlite", create = TRUE)
-  unark(files, new_db, lines = 50000)
+  new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
+  unark(files, new_db, lines = 50000, overwrite = TRUE)
   
   myflights <- dplyr::tbl(new_db, "flights")
   testthat::expect_is(myflights, "tbl_dbi")
@@ -102,16 +99,16 @@ testthat::test_that("alternate method for ark", {
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
+  DBI::dbDisconnect(new_db$con)
   unlink(dir, TRUE)
-  unlink("local.sqlite")
-  
+  unlink(fs::path(tmp, "local.sqlite"))
 })
 
 testthat::context("MonetDB")
 testthat::test_that("try with MonetDB & alternate method", {
   
   ## SETUP, with text files:
-  dir <- fs::dir_create("nycflights")
+  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
   data <-  list(airlines = nycflights13::airlines, 
                 airports = nycflights13::airports, 
                 flights = nycflights13::flights)
@@ -121,9 +118,9 @@ testthat::test_that("try with MonetDB & alternate method", {
   testthat::expect_length(files, 3)
 
   # test unark on alternate DB
-  monet_dir <- fs::dir_create("monet")
+  monet_dir <- fs::dir_create(fs::path(tmp, "monet"))
   new_db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), monet_dir)
-  unark(files, new_db, lines = 50000)
+  unark(files, new_db, lines = 50000, overwrite = TRUE)
   
   flights <- dplyr::tbl(new_db, "flights")
   testthat::expect_equal(dim(flights)[[2]], 19)
@@ -131,7 +128,7 @@ testthat::test_that("try with MonetDB & alternate method", {
   
   ## clean out the text files
   unlink(dir, TRUE) # ark'd text files
-  dir <- fs::dir_create("nycflights")
+  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
   
   ## Test has_between
   testthat::expect_false( has_between(new_db, "airlines") )
@@ -140,7 +137,7 @@ testthat::test_that("try with MonetDB & alternate method", {
   
   
   #### Test ark ######
-  ark(new_db, dir, lines = 50000L, method = "window")
+  ark(new_db, dir, lines = 50000L, method = "window", overwrite = TRUE)
   
   ## test ark results
   files <- fs::dir_ls(dir, glob = "*.tsv.bz2")

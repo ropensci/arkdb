@@ -5,6 +5,10 @@
 #' @param db_con a database src (`src_dbi` object from `dplyr`)
 #' @param streamable_table interface for serializing/deserializing in chunks
 #' @param lines number of lines to read in a chunk.
+#' @param overwrite should any existing text files of the same name be overwritten?
+#' default is "ask", which will ask for confirmation in an interactive session, and
+#' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
+#' always skip such tables.
 #' @param ... additional arguments to `streamable_table$read` method.
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
@@ -43,7 +47,8 @@
 unark <- function(files, 
                   db_con,
                   streamable_table =  streamable_base_tsv(), 
-                  lines = 50000L,  
+                  lines = 50000L, 
+                  overwrite = "ask",
                   ...){
   
   assert_files_exist(files)
@@ -57,6 +62,7 @@ unark <- function(files,
          db, 
          streamable_table = streamable_table, 
          lines = lines, 
+         overwrite = overwrite,
          ...)
   invisible(db_con)  
 }
@@ -74,11 +80,14 @@ normalize_con <- function(db_con){
 
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-unark_file <- function(filename, db_con, streamable_table, lines = 10000L, ...){
+unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overwrite, ...){
     
   tbl_name <- base_name(filename)
   
-  assert_overwrite_db(db_con, tbl_name)
+  if(!assert_overwrite_db(db_con, tbl_name, overwrite)){
+    return(NULL)
+  }
+    
   
   
   con <- compressed_file(filename, "r")

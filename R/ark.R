@@ -12,6 +12,10 @@
 #' archived.  By default, will archive all tables. Table list should specify
 #' schema if appropriate, see examples. 
 #' @param method method to use to query the database, see details. 
+#' @param overwrite should any existing text files of the same name be overwritten?
+#' default is "ask", which will ask for confirmation in an interactive session, and
+#' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
+#' always skip such tables.
 
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
@@ -60,7 +64,8 @@ ark <- function(db_con,
                 lines = 50000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
-                method = c("keep-open", "window", "sql-window")){
+                method = c("keep-open", "window", "sql-window"),
+                overwrite = "ask"){
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
@@ -83,7 +88,8 @@ ark <- function(db_con,
          lines = lines, 
          dir = dir, 
          compress = compress,
-         method = method)
+         method = method,
+         overwrite = overwrite)
   
   invisible(dir)
 }
@@ -100,7 +106,8 @@ ark_file <- function(tablename,
                      lines, 
                      dir, 
                      compress,
-                     method){
+                     method,
+                     overwrite){
   
   ## Set up compressed connection
   ext <- switch(compress,
@@ -114,7 +121,9 @@ ark_file <- function(tablename,
   filename <- file.path(dir, dest)
   
   ## Handle case in which file already exists. Otherwise, we'll append to it
-  assert_overwrite(filename)
+  if(!assert_overwrite(filename, overwrite)){
+    return(NULL)
+  }
   
   con <- compressed_file(filename, "w")
   on.exit(close(con))

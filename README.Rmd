@@ -54,23 +54,25 @@ library(fs)
 Consider the `nycflights` database in SQLite:
 
 ```{r example}
-db <- dbplyr::nycflights13_sqlite(".")
+tmp <- tempdir() # Or can be your working directory, "."
+db <- dbplyr::nycflights13_sqlite(tmp)
 ```
 
 Create an archive of the database: 
 
 ```{r}
-ark(db, ".", lines = 50000)
+dir <- fs::dir_create(fs::path(tmp, "nycflights"))
+ark(db, dir, lines = 50000)
 ```
 
 ## Unarchive
 
-Import a list of compressed tabular files (i.e. `*.tsv.bz2`) into a local SQLite database:
+Import a list of compressed tabular files (i.e. `*.csv.bz2`) into a local SQLite database:
 
 
 ```{r}
-files <- fs::dir_ls(glob = "*.csv.bz2")
-new_db <- src_sqlite("local.sqlite", create=TRUE)
+files <- fs::dir_ls(dir)
+new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
 
@@ -80,13 +82,8 @@ new_db
 
 
 ```{r include=FALSE}
-fs::file_delete(fs::dir_ls(glob = "*.tsv.bz2"))
-unlink("local.sqlite")
-unlink("nycflights13.sqlite")
-
-## dbplyr handles this automatically
-#DBI::dbDisconnect(db[[1]])
-#DBI::dbDisconnect(new_db[[1]])
+DBI::dbDisconnect(db$con)
+DBI::dbDisconnect(new_db$con)
 
 codemetar::write_codemeta()
 ```
