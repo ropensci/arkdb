@@ -143,8 +143,8 @@ testthat::test_that("try with MonetDB & alternate method", {
 })
 
 ## Cleanup 
-DBI::dbDisconnect(db)
-DBI::dbDisconnect(new_db)
+DBI::dbDisconnect(db$con)
+DBI::dbDisconnect(new_db$con)
 DBI::dbDisconnect(monet_db)
 unlink(monet_dir, TRUE)
 unlink(dir, TRUE) # ark'd text files
