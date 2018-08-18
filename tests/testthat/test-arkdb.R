@@ -20,16 +20,17 @@ testthat::test_that("we can ark and unark a db", {
 
   ark(db, dir, lines = 50000, overwrite = TRUE)
   
-  #files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
-  files <- list.files(dir, pattern = "[.]tsv.bz2$", full.names = TRUE)
-  testthat::expect_length(files, 5)
 
-  myflights <- suppressMessages(
-    readr::read_tsv(file.path(dir, "flights.tsv.bz2")))
+  suppressWarnings(
+    myflights <- readr::read_tsv(file.path(dir, "flights.tsv.bz2"))
+  )
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
   ## unark
+  #files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
+  files <- list.files(dir, pattern = "[.]tsv.bz2$", full.names = TRUE)
+  testthat::expect_length(files, 5)
   unark(files, new_db, lines = 50000, overwrite = TRUE)
   
   myflights <- dplyr::tbl(new_db, "flights")
@@ -55,8 +56,9 @@ testthat::test_that("we can ark and unark a db in plain text", {
   files <- list.files(dir, pattern = "[.]tsv.bz2$", full.names = TRUE)
   testthat::expect_length(files, 5)
  
-   myflights <- suppressMessages(
-    readr::read_tsv(file.path(dir, "flights.tsv.bz2")))
+  suppressWarnings(
+    myflights <- readr::read_tsv(file.path(dir, "flights.tsv.bz2"))
+  )
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
@@ -79,15 +81,19 @@ testthat::context("alternate method")
 
 testthat::test_that("alternate method for ark", {
   
-  ark(db, dir, lines = 50000, method = "window", overwrite = TRUE)
+  testthat::expect_warning( 
+    ark(db, dir, lines = 50000, method = "window", overwrite = TRUE),
+  "overwriting")
   
-  myflights <- suppressMessages(
-    readr::read_tsv(file.path(dir, "flights.tsv.bz2")))
+  suppressWarnings(
+    myflights <- readr::read_tsv(file.path(dir, "flights.tsv.bz2"))
+  )
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
   
   ## unark
+  files <- list.files(dir, pattern = "[.]tsv.bz2$", full.names = TRUE)
   testthat::expect_warning(
     unark(files, new_db, lines = 50000, overwrite = TRUE), 
   "overwriting")
@@ -134,10 +140,14 @@ testthat::test_that("try with MonetDB & alternate method", {
   ark(monet_db, dir, lines = 50000L, method = "window", overwrite = TRUE)
   
   ## test ark results
-  myflights <- suppressMessages(
-    readr::read_tsv(fs::path(dir, "flights.tsv.bz2")))
+  suppressWarnings(
+    myflights <- readr::read_tsv(fs::path(dir, "flights.tsv.bz2"))
+  )
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
+  
+  DBI::dbDisconnect(monet_db)
+  unlink(monet_dir, TRUE)
   
   
 })
@@ -145,6 +155,4 @@ testthat::test_that("try with MonetDB & alternate method", {
 ## Cleanup 
 DBI::dbDisconnect(db$con)
 DBI::dbDisconnect(new_db$con)
-DBI::dbDisconnect(monet_db)
-unlink(monet_dir, TRUE)
 unlink(dir, TRUE) # ark'd text files
