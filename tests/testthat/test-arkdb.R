@@ -94,6 +94,7 @@ testthat::test_that("alternate method for ark", {
   
   myflights <- dplyr::tbl(new_db, "flights")
   testthat::expect_is(myflights, "tbl_dbi")
+  myflights <- dplyr::collect(myflights)
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
@@ -104,19 +105,19 @@ testthat::test_that("alternate method for ark", {
 testthat::context("MonetDB")
 testthat::test_that("try with MonetDB & alternate method", {
   
-  ## SETUP, with text files:
+  ## SETUP, with text files. (Could skip as these now exist from above tests)
   data <-  list(airlines = nycflights13::airlines, 
                 airports = nycflights13::airports, 
                 flights = nycflights13::flights)
   sink <- lapply(names(data), function(x) 
     readr::write_tsv(data[[x]], fs::path(dir, paste0(x, ".tsv"))))
-  files <- fs::dir_ls(dir, glob = "*.tsv")
-  testthat::expect_length(files, 3)
 
+  files <- fs::dir_ls(dir, glob = "*.tsv")
+  
   # test unark on alternate DB
   monet_dir <- fs::dir_create(fs::path(tmp, "monet"))
   monet_db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), monet_dir)
-  unark(files, new_db, lines = 50000, overwrite = TRUE)
+  unark(files, monet_db, lines = 50000, overwrite = TRUE)
   
   flights <- dplyr::tbl(monet_db, "flights")
   testthat::expect_equal(dim(flights)[[2]], 19)
@@ -127,20 +128,16 @@ testthat::test_that("try with MonetDB & alternate method", {
   dir <- fs::dir_create(fs::path(tmp, "nycflights"))
   
   ## Test has_between
-  testthat::expect_false( has_between(monet_db, "airlines") )
+  testthat::expect_false( arkdb:::has_between(monet_db, "airlines") )
   
   #### Test ark ######
   ark(monet_db, dir, lines = 50000L, method = "window", overwrite = TRUE)
   
   ## test ark results
-  files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
-  testthat::expect_length(files, 3)
   myflights <- suppressMessages(
     readr::read_tsv(fs::path(dir, "flights.tsv.bz2")))
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
-  
-  
   
   
 })
@@ -148,5 +145,6 @@ testthat::test_that("try with MonetDB & alternate method", {
 ## Cleanup 
 DBI::dbDisconnect(db)
 DBI::dbDisconnect(new_db)
+DBI::dbDisconnect(monet_db)
 unlink(monet_dir, TRUE)
 unlink(dir, TRUE) # ark'd text files
