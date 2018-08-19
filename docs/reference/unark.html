@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">arkdb</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.1</span>
       </span>
     </div>
 
@@ -115,7 +115,7 @@
     </div>
 
     <pre class="usage"><span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>db_con</span>, <span class='kw'>streamable_table</span> <span class='kw'>=</span> <span class='fu'><a href='streamable_base_tsv.html'>streamable_base_tsv</a></span>(),
-  <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>50000L</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>50000L</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='st'>"ask"</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -137,6 +137,13 @@ or <code>xz</code> format at present.</p></td>
     <tr>
       <th>lines</th>
       <td><p>number of lines to read in a chunk.</p></td>
+    </tr>
+    <tr>
+      <th>overwrite</th>
+      <td><p>should any existing text files of the same name be overwritten?
+default is "ask", which will ask for confirmation in an interactive session, and
+overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
+always skip such tables.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -168,17 +175,17 @@ files.</p>
 <span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())
 
 <span class='co'>## database -&gt; .tsv.bz2 </span>
-<span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.01375699 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.04025102 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 23.19436 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.07748699 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 1.639434 secs)</span></div><div class='input'>
+<span class='fu'><a href='ark.html'>ark</a></span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: overwriting airlines.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.0125761 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: overwriting airports.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.02013779 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: overwriting flights.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 12.81005 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: overwriting planes.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.03487301 secs)</span></div><div class='output co'>#&gt; <span class='warning'>Warning: overwriting weather.tsv.bz2</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.842515 secs)</span></div><div class='input'>
 <span class='co'>## list all files in archive (full paths)</span>
 <span class='no'>files</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='no'>dir</span>, <span class='st'>"[.]tsv\\.bz2$"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'>## Read archived files into a new database (another sqlite in this case)</span>
 <span class='no'>new_db</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='fu'>file.path</span>(<span class='no'>dir</span>, <span class='st'>"local.sqlite"</span>), <span class='kw'>create</span><span class='kw'>=</span><span class='fl'>TRUE</span>)
-<span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>new_db</span>)</div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/airlines.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.02489185 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/airports.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.05354404 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/flights.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 15.64245 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/planes.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.07404113 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/weather.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.7251449 secs)</span></div><div class='input'>
+<span class='fu'>unark</span>(<span class='no'>files</span>, <span class='no'>new_db</span>)</div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/airlines.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.01252389 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/airports.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.02489305 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/flights.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 8.254018 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/planes.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.03917003 secs)</span></div><div class='output co'>#&gt; <span class='message'>Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/weather.tsv.bz2 in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.4666841 secs)</span></div><div class='input'>
 <span class='co'>## Prove table is returned successfully.</span>
 <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>new_db</span>, <span class='st'>"flights"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;flights&gt; [?? x 19]
 #&gt; # Database: sqlite 3.22.0
-#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/local.sqlite]
+#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/local.sqlite]
 #&gt;     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
 #&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;int&gt;    &lt;int&gt;          &lt;int&gt;
 #&gt;  1  2013     1     1      517            515         2      830            819

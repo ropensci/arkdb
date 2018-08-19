@@ -58,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">arkdb</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.1</span>
       </span>
     </div>
 
@@ -104,14 +104,22 @@
       <small>Source: <a href='https://github.com/ropensci/arkdb/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="arkdb-0-0-1" class="section level1">
+<h1 class="page-header">
+<a href="#arkdb-0-0-1" class="anchor"></a>arkdb 0.0.1</h1>
+<ul>
+<li>overwrite existing tables of same name (with warning and interactive proceed) in both DB and text-files to avoid appending.</li>
+</ul>
+</div>
     <div id="arkdb-0-0-0-9000" class="section level1">
 <h1 class="page-header">
 <a href="#arkdb-0-0-0-9000" class="anchor"></a>arkdb 0.0.0.9000</h1>
 <ul>
 <li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
 <li>Log messages improved as suggested by <a href='http://github.com/richfitz'>@richfitz</a></li>
-<li>Better handling of when to use or not use window method for chunking</li>
-<li>Avoid warnings by properly closing connections using <code>dbGetQuery</code>
+<li>Improved mechanism for windowing in most DBs, from <a href='http://github.com/krlmlr'>@krlmlr</a> <a href="https://github.com/ropensci/arkdb/pull/8"><a href='https://github.com/ropensci/arkdb/issues/8'>#8</a></a>
+</li>
+<li>Support pluggable I/O, based on <a href='http://github.com/richfitz'>@richfitz</a> suggestions <a href="https://github.com/ropensci/arkdb/issues/3"><a href='https://github.com/ropensci/arkdb/issues/3'>#3</a></a>, <a href="https://github.com/ropensci/arkdb/pull/10"><a href='https://github.com/ropensci/arkdb/issues/10'>#10</a></a>
 </li>
 </ul>
 </div>
@@ -121,6 +129,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#arkdb-0-0-1">0.0.1</a></li>
         <li><a href="#arkdb-0-0-0-9000">0.0.0.9000</a></li>
       </ul>
     </div>

@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">arkdb</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.1</span>
       </span>
     </div>
 
@@ -116,7 +116,7 @@
 
     <pre class="usage"><span class='fu'>ark</span>(<span class='no'>db_con</span>, <span class='no'>dir</span>, <span class='kw'>streamable_table</span> <span class='kw'>=</span> <span class='fu'><a href='streamable_base_tsv.html'>streamable_base_tsv</a></span>(), <span class='kw'>lines</span> <span class='kw'>=</span> <span class='fl'>50000L</span>,
   <span class='kw'>compress</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"bzip2"</span>, <span class='st'>"gzip"</span>, <span class='st'>"xz"</span>, <span class='st'>"none"</span>), <span class='kw'>tables</span> <span class='kw'>=</span> <span class='fu'>list_tables</span>(<span class='no'>db_con</span>),
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"keep-open"</span>, <span class='st'>"window"</span>, <span class='st'>"sql-window"</span>))</pre>
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"keep-open"</span>, <span class='st'>"window"</span>, <span class='st'>"sql-window"</span>), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='st'>"ask"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,6 +153,13 @@ schema if appropriate, see examples.</p></td>
       <th>method</th>
       <td><p>method to use to query the database, see details.</p></td>
     </tr>
+    <tr>
+      <th>overwrite</th>
+      <td><p>should any existing text files of the same name be overwritten?
+default is "ask", which will ask for confirmation in an interactive session, and
+overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
+always skip such tables.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -186,9 +193,9 @@ support windowing natively (i.e. <code>BETWEEN</code> queries).</p>
 #&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'><span class='no'>dir</span> <span class='kw'>&lt;-</span> <span class='fu'>tempdir</span>()
-<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSSxdbJ/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
+<span class='no'>db</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13'>nycflights13_sqlite</a></span>(<span class='fu'>tempdir</span>())</div><div class='output co'>#&gt; <span class='message'>Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvBHNUi/nycflights13.sqlite</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airlines</span></div><div class='output co'>#&gt; <span class='message'>Creating table: airports</span></div><div class='output co'>#&gt; <span class='message'>Creating table: flights</span></div><div class='output co'>#&gt; <span class='message'>Creating table: planes</span></div><div class='output co'>#&gt; <span class='message'>Creating table: weather</span></div><div class='input'>
 <span class='co'>## And here we go:</span>
-<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.009032011 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.101505 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 22.84585 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.07309508 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 1.459867 secs)</span></div><span class='co'># NOT RUN {</span>
+<span class='fu'>ark</span>(<span class='no'>db</span>, <span class='no'>dir</span>)</div><div class='output co'>#&gt; <span class='message'>Exporting airlines in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.006545067 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting airports in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.03043699 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting flights in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 11.88815 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting planes in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.03484702 secs)</span></div><div class='output co'>#&gt; <span class='message'>Exporting weather in 50000 line chunks:</span></div><div class='output co'>#&gt; <span class='message'>	...Done! (in 0.8445001 secs)</span></div><span class='co'># NOT RUN {</span>
 <span class='co'>## For a Postgres DB with schema, we can append schema names first</span>
 <span class='co'>## to each of the table names, like so: </span>
 <span class='no'>schema_tables</span> <span class='kw'>&lt;-</span> <span class='fu'>dbGetQuery</span>(<span class='no'>db</span>, <span class='fu'>sqlInterpolate</span>(<span class='no'>db</span>,
