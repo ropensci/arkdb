@@ -56,22 +56,29 @@ library(fs)
 First, we'll need an example database to work with.  Conveniently, there is a nice example using the NYC flights data built into the `dbplyr` package.
 
 ```{r example}
-db <- dbplyr::nycflights13_sqlite(".")
+tmp <- tempdir() # Or can be your working directory, "."
+db <- dbplyr::nycflights13_sqlite(tmp)
 ```
 
 To create an archive, we just give `ark` the connection to the database and tell it where we want the `*.tsv.bz2` files to be archived.   We can also set the chunk size as the number of `lines` read in a single chunk.  More lines per chunk usually means faster run time at the cost of higher memory requirements. 
 
 ```{r}
-dir <- fs::dir_create("nycflights")
+dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
+
 
 ```
 
 We can take a look and confirm the files have been written. Note that we can use `fs::dir_info` to get a nice snapshot of the file sizes.  Compare the compressed sizes to the original database:
 
 ```{r}
-fs::dir_info(dir) %>% select(path, size)
-fs::file_info("nycflights13.sqlite") %>% select(path, size)
+fs::dir_info(dir) %>% 
+  select(path, size) %>%
+  mutate(path = fs::path_file(path))
+
+fs::file_info(fs::path(tmp,"nycflights13.sqlite")) %>% 
+  pull(size)
+
 
 ```
 
@@ -83,7 +90,7 @@ Now that we've gotten all the database into (compressed) plain text files, let's
 
 ```{r}
 files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
-new_db <- src_sqlite("local.sqlite", create=TRUE)
+new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 ```
 
@@ -101,10 +108,11 @@ tbl(new_db, "flights")
 
 
 
-```{r include=FALSE}
-unlink("nycflights", TRUE)
-unlink("local.sqlite")
-DBI::dbDisconnect(new_db[[1]])
+```{r}
+# Remove example files we created.
+DBI::dbDisconnect(new_db$con)
+unlink(dir, TRUE)
+unlink(fs::path(tmp, "local.sqlite"))
 ```
 
 
@@ -119,7 +127,7 @@ By default, `arkdb` uses `tsv` format, implemented in base tools, as the text-ba
 `arkdb` provides a pluggable mechanism for changing the back end utility used to write text files. For instance, if we need to read in or export in `.csv` format, we can simply swap in a `csv` based reader in both `ark()` and `unark()` methods, as illustrated here:
 
 ```{r}
-dir <- fs::dir_create("nycflights")
+dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 
 ark(db, dir, 
     streamable_table = streamable_base_csv())
@@ -130,7 +138,7 @@ ark(db, dir,
 
 ```{r}
 files <- fs::dir_ls(dir, glob = "*.csv.bz2")
-new_db <- src_sqlite("local.sqlite", create=TRUE)
+new_db <- src_sqlite(fs::path(tmp,"local.sqlite"), create=TRUE)
 
 unark(files, new_db,
       streamable_table = streamable_base_csv())
@@ -173,11 +181,7 @@ Once you have archived your database files with `ark`, consider sharing them pri
 
 
 ```{r include=FALSE}
-unlink("nycflights", TRUE)
-unlink("local.sqlite")
-unlink("nycflights13.sqlite")
-
-## dbplyr handles this automatically
-DBI::dbDisconnect(db[[1]])
-DBI::dbDisconnect(new_db[[1]])
+DBI::dbDisconnect(db$con)
+DBI::dbDisconnect(new_db$con)
+unlink(dir, TRUE)
 ```

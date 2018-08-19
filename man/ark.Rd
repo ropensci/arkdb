@@ -6,7 +6,7 @@
 \usage{
 ark(db_con, dir, streamable_table = streamable_base_tsv(), lines = 50000L,
   compress = c("bzip2", "gzip", "xz", "none"), tables = list_tables(db_con),
-  method = c("keep-open", "window", "sql-window"))
+  method = c("keep-open", "window", "sql-window"), overwrite = "ask")
 }
 \arguments{
 \item{db_con}{a database connection}
@@ -26,6 +26,11 @@ archived.  By default, will archive all tables. Table list should specify
 schema if appropriate, see examples.}
 
 \item{method}{method to use to query the database, see details.}
+
+\item{overwrite}{should any existing text files of the same name be overwritten?
+default is "ask", which will ask for confirmation in an interactive session, and
+overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
+always skip such tables.}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.

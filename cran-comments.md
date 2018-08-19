@@ -1,6 +1,9 @@
 Dear CRAN maintainers,
 
-We are pleased to submit the initial release of arkdb for CRAN.
+We are pleased to submit the initial release of arkdb for CRAN. 
+This submission ensures that vignettes, tests, and examples only
+write to temporary directory, and directory must always be specified
+explicitly by the user.
 
 
 ## Test environments

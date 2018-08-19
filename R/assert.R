@@ -30,38 +30,79 @@ assert_connection <- function(x, name = deparse(substitute(x))) {
   }
 }
 
-assert_overwrite <- function(filename){
-  if(file.exists(filename)){
-    if(interactive()){
-      continue <- readline(prompt = paste("a file named", basename(filename), 
-                 "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
-      if(as.numeric(continue) != 1){
-        return(NULL)
-      }
-    } else {
-      warning(paste("overwriting", basename(filename)))
-    }
-    file.remove(filename)
+
+assert_overwrite <- function(filename, overwrite){
+  
+  if(!file.exists(filename)){
+    return(TRUE)  
   }
+  
+  switch(as.character(overwrite),
+         "TRUE"  = overwrite(filename),
+         "FALSE" = dont_overwrite(filename),
+         "ask"   = ask_overwrite(filename))
+}
+
+overwrite <- function(filename){
+  warning(paste("overwriting", basename(filename)))
+  file.remove(filename)
+  TRUE
+}
+
+dont_overwrite <- function(filename){
+  message(paste("not overwriting", basename(filename)))
+  FALSE
+}
+
+#' @importFrom utils askYesNo
+ask_overwrite <- function(filename){
+  if(!interactive()){
+    return(overwrite(filename))
+  }
+    
+  replace <- askYesNo(paste0("Overwrite ", basename(filename), "?"))
+  if(!replace){
+    return(dont_overwrite(filename))
+  }
+  
+  overwrite(filename)
 }
 
 
 
-assert_overwrite_db <- function(db_con, tbl_name){
+
+assert_overwrite_db <- function(db_con, tablename, overwrite){
+  
   con <- normalize_con(db_con)
-  if(DBI::dbExistsTable(con, tbl_name)){
-    if(interactive()){
-      continue <- readline(prompt = paste("a table named", tbl_name, 
-                 "\nalready exists. Overwrite?\n\t 1 = yes\n\t 2 = no\n"))
-      if(as.numeric(continue) != 1){
-        return(NULL)
-      }
-    } else {
-      warning(paste("overwriting", tbl_name))
-    }
-    DBI::dbRemoveTable(con, tbl_name)
+  if(!DBI::dbExistsTable(con, tablename)){
+    return(TRUE)
   }
+  
+  switch(as.character(overwrite),
+         "TRUE"  = overwrite_db(con, tablename),
+         "FALSE" = dont_overwrite(tablename),
+         "ask"   = ask_overwrite_db(con, tablename))
 }
+
+overwrite_db <- function(con, tablename){
+  warning(paste("overwriting", tablename))
+  DBI::dbRemoveTable(con, tablename)
+  TRUE
+}
+
+ask_overwrite_db <- function(con, tablename){
+  if(!interactive()){
+    return(overwrite_db(con, tablename))
+  }
+  
+  if(!askYesNo(paste0("Overwrite ", tablename, "?"))){
+    return(dont_overwrite(tablename))
+  }
+  
+  overwrite_db(con, tablename)
+}
+
+
 
 
 

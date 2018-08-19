@@ -55,8 +55,9 @@ library(fs)
 Consider the `nycflights` database in SQLite:
 
 ``` r
-db <- dbplyr::nycflights13_sqlite(".")
-#> Caching nycflights db at ./nycflights13.sqlite
+tmp <- tempdir() # Or can be your working directory, "."
+db <- dbplyr::nycflights13_sqlite(tmp)
+#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpVwTFWx/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -67,33 +68,34 @@ db <- dbplyr::nycflights13_sqlite(".")
 Create an archive of the database:
 
 ``` r
-ark(db, ".", lines = 50000)
+dir <- fs::dir_create(fs::path(tmp, "nycflights"))
+ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.02494812 secs)
+#>  ...Done! (in 0.01225209 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.03492808 secs)
+#>  ...Done! (in 0.04213691 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 11.74483 secs)
+#>  ...Done! (in 20.41833 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.03923202 secs)
+#>  ...Done! (in 0.05648994 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.8512921 secs)
+#>  ...Done! (in 1.349895 secs)
 ```
 
 ## Unarchive
 
-Import a list of compressed tabular files (i.e. `*.tsv.bz2`) into a
+Import a list of compressed tabular files (i.e. `*.csv.bz2`) into a
 local SQLite database:
 
 ``` r
-files <- fs::dir_ls(glob = "*.csv.bz2")
-new_db <- src_sqlite("local.sqlite", create=TRUE)
+files <- fs::dir_ls(dir, glob = "*.csv.bz2")
+new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
 #> Warning in assert_files_exist(files): no file specified
 
 new_db
-#> src:  sqlite 3.22.0 [local.sqlite]
+#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpVwTFWx/local.sqlite]
 #> tbls:
 ```
 
