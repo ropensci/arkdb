@@ -3,8 +3,8 @@
 status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
 [![Coverage
 status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/cboettig/arkdb?branch=master&svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
+[![Build
+status](https://ci.appveyor.com/api/projects/status/28rxw294yfktiebj?svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
@@ -57,7 +57,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpVwTFWx/nycflights13.sqlite
+#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpjCDDVg/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -71,15 +71,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.01225209 secs)
+#>  ...Done! (in 0.009561777 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.04213691 secs)
+#>  ...Done! (in 0.035254 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 20.41833 secs)
+#>  ...Done! (in 15.58381 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.05648994 secs)
+#>  ...Done! (in 0.04551506 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 1.349895 secs)
+#>  ...Done! (in 1.018439 secs)
 ```
 
 ## Unarchive
@@ -88,15 +88,24 @@ Import a list of compressed tabular files (i.e. `*.csv.bz2`) into a
 local SQLite database:
 
 ``` r
-files <- fs::dir_ls(dir, glob = "*.csv.bz2")
+files <- fs::dir_ls(dir)
 new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
-#> Warning in assert_files_exist(files): no file specified
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.03247809 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.04669309 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 11.08787 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.05716991 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.607512 secs)
 
 new_db
-#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpVwTFWx/local.sqlite]
-#> tbls:
+#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/local.sqlite]
+#> tbls: airlines, airports, flights, planes, weather
 ```
 
 -----
