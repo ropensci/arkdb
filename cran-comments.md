@@ -1,9 +1,8 @@
 Dear CRAN maintainers,
 
-We are pleased to submit the initial release of arkdb for CRAN. 
-This submission ensures that vignettes, tests, and examples only
-write to temporary directory, and directory must always be specified
-explicitly by the user.
+This release patches the issue in which a unit-test attempted to use a Suggested
+package without first checking that said package was installed.  This also corrects
+a grammatical error in the package DESCRIPTION.  
 
 
 ## Test environments

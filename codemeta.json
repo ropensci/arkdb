@@ -5,12 +5,12 @@
   ],
   "@type": "SoftwareSourceCode",
   "identifier": "arkdb",
-  "description": "Flat text files provide a more robust, compressible,\n  and portable way to store tables.  This package provides convenient\n  functions for exporting tables from relational database connections\n  into compressed text files and streaming those text files back into\n  a database without requiring the whole table to fit in working memory.",
+  "description": "Flat text files provide a robust, compressible, and portable\n  way to store tables from databases.  This package provides convenient\n  functions for exporting tables from relational database connections\n  into compressed text files and streaming those text files back into\n  a database without requiring the whole table to fit in working memory.",
   "name": "arkdb: Archive and Unarchive Databases Using Flat Files",
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -237,7 +237,7 @@
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/arkdb/blob/master/README.md",
-  "fileSize": "16.474KB",
+  "fileSize": "16.632KB",
   "contIntegration": [
     "https://travis-ci.org/cboettig/arkdb",
     "https://codecov.io/github/cboettig/arkdb?branch=master",
@@ -250,5 +250,12 @@
     "rstats",
     "dbi"
   ],
-  "developmentStatus": "https://www.tidyverse.org/lifecycle/#stable"
+  "developmentStatus": "https://www.tidyverse.org/lifecycle/#stable",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "relatedLink": "https://CRAN.R-project.org/package=arkdb"
 }

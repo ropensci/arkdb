@@ -18,6 +18,10 @@ new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
 testthat::context("basic")
 testthat::test_that("we can ark and unark a db", {
 
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  
   ark(db, dir, lines = 50000, overwrite = TRUE)
   
 
@@ -47,8 +51,10 @@ testthat::test_that("we can ark and unark a db", {
 testthat::context("plain-txt")
 
 testthat::test_that("we can ark and unark a db in plain text", {
-  #db <- dbplyr::nycflights13_sqlite(tmp)
-  #dir <- fs::dir_create(fs::path(tmp, "nycflights"))
+  
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
   
   ark(db, dir, lines = 50000, compress = "none", overwrite = TRUE)
   
@@ -81,6 +87,10 @@ testthat::context("alternate method")
 
 testthat::test_that("alternate method for ark", {
   
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  
   testthat::expect_warning( 
     ark(db, dir, lines = 50000, method = "window", overwrite = TRUE),
   "overwriting")
@@ -110,6 +120,12 @@ testthat::test_that("alternate method for ark", {
 
 testthat::context("MonetDB")
 testthat::test_that("try with MonetDB & alternate method", {
+  
+  skip_if_not_installed("MonetDBLite")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("fs")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
   
   ## SETUP, with text files. (Could skip as these now exist from above tests)
   data <-  list(airlines = nycflights13::airlines, 

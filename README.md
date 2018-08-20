@@ -8,6 +8,7 @@ status](https://ci.appveyor.com/api/projects/status/28rxw294yfktiebj?svg=true)](
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1343943.svg)](https://doi.org/10.5281/zenodo.1343943)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -57,7 +58,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpjCDDVg/nycflights13.sqlite
+#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvsQbO6/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -71,15 +72,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.009561777 secs)
+#>  ...Done! (in 0.008452892 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.035254 secs)
+#>  ...Done! (in 0.02827597 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 15.58381 secs)
+#>  ...Done! (in 15.24916 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.04551506 secs)
+#>  ...Done! (in 0.05896616 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 1.018439 secs)
+#>  ...Done! (in 1.423234 secs)
 ```
 
 ## Unarchive
@@ -92,19 +93,19 @@ files <- fs::dir_ls(dir)
 new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.03247809 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.04669309 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 11.08787 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.05716991 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.607512 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0220139 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.06350207 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 18.38258 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.1244881 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.698673 secs)
 
 new_db
-#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpjCDDVg/local.sqlite]
+#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/local.sqlite]
 #> tbls: airlines, airports, flights, planes, weather
 ```
 
