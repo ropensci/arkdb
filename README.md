@@ -58,7 +58,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvsQbO6/nycflights13.sqlite
+#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpJ5461F/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -72,15 +72,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.008452892 secs)
+#>  ...Done! (in 0.006890059 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.02827597 secs)
+#>  ...Done! (in 0.03808403 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 15.24916 secs)
+#>  ...Done! (in 12.81669 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.05896616 secs)
+#>  ...Done! (in 0.04250216 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 1.423234 secs)
+#>  ...Done! (in 1.38778 secs)
 ```
 
 ## Unarchive
@@ -93,19 +93,19 @@ files <- fs::dir_ls(dir)
 new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.0220139 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.06350207 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 18.38258 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.1244881 secs)
-#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.698673 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJ5461F/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01596403 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJ5461F/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.06146502 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJ5461F/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 8.835862 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJ5461F/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.04995394 secs)
+#> Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJ5461F/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.5743668 secs)
 
 new_db
-#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvsQbO6/local.sqlite]
+#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJ5461F/local.sqlite]
 #> tbls: airlines, airports, flights, planes, weather
 ```
 

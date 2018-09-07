@@ -54,13 +54,15 @@ dont_overwrite <- function(filename){
   FALSE
 }
 
-#' @importFrom utils askYesNo
 ask_overwrite <- function(filename){
   if(!interactive()){
     return(overwrite(filename))
   }
     
-  replace <- askYesNo(paste0("Overwrite ", basename(filename), "?"))
+  replace <- askyesno(paste0("Overwrite ", basename(filename), "?"))
+  if(is.na(replace)){
+    stop(paste("operation cancelled."), call. = FALSE)
+  } 
   if(!replace){
     return(dont_overwrite(filename))
   }
@@ -68,7 +70,28 @@ ask_overwrite <- function(filename){
   overwrite(filename)
 }
 
-
+# utils::askYesKnow is new to R 3.5.0; avoid for backwards compatibility
+askyesno <- function(msg){
+    
+    prompts <- c("Yes", "No", "Cancel")
+    choices <- tolower(prompts)
+    msg1 <- paste0("(", paste(choices, collapse = "/"), ") ")
+    
+    if (nchar(paste0(msg, msg1)) > 250) {
+      cat(msg, "\n")
+      msg <- msg1
+    }
+    else msg <- paste0(msg, " ", msg1)
+    
+    ans <- readline(msg)
+    match <- pmatch(tolower(ans), tolower(choices))
+    
+    if (!nchar(ans)) 
+      TRUE
+    else if (is.na(match)) 
+      stop("Unrecognized response ", dQuote(ans))
+    else c(TRUE, FALSE, NA)[match]
+}
 
 
 assert_overwrite_db <- function(db_con, tablename, overwrite){
@@ -95,7 +118,7 @@ ask_overwrite_db <- function(con, tablename){
     return(overwrite_db(con, tablename))
   }
   
-  if(!askYesNo(paste0("Overwrite ", tablename, "?"))){
+  if(!askyesno(paste0("Overwrite ", tablename, "?"))){
     return(dont_overwrite(tablename))
   }
   

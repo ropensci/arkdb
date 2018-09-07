@@ -1,4 +1,8 @@
-# arkdb 0.0.2
+# arkdb 0.0.3
+
+* Remove dependency on utils::askYesNo for backward compatibility, [#17](https://github.com/ropensci/arkdb/issues/17)
+
+# arkdb 0.0.2 2018-08-20 (First release to CRAN)
 
 * Ensure the suggested dependency MonetDBLite is available before running unit test using it.
 
