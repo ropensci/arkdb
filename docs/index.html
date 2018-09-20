@@ -10,8 +10,8 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Archive and Unarchive Databases Using Flat Files">
-<meta property="og:description" content="Flat text files provide a more robust, compressible,
-  and portable way to store tables.  This package provides convenient
+<meta property="og:description" content="Flat text files provide a robust, compressible, and portable
+  way to store tables from databases.  This package provides convenient
   functions for exporting tables from relational database connections
   into compressed text files and streaming those text files back into
   a database without requiring the whole table to fit in working memory.">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">arkdb</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.0.3</span>
       </span>
     </div>
 
@@ -115,7 +115,7 @@
 <p>Consider the <code>nycflights</code> database in SQLite:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">tempdir</span>() <span class="co"># Or can be your working directory, "."</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">db &lt;-<span class="st"> </span>dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13">nycflights13_sqlite</a></span>(tmp)</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpJKwt0k/nycflights13.sqlite</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp7nzKna/nycflights13.sqlite</span></a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; Creating table: airlines</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; Creating table: airports</span></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; Creating table: flights</span></a>
@@ -125,15 +125,15 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="reference/ark.html">ark</a></span>(db, dir, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.01664805 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02255106 secs)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02630186 secs)</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02182603 secs)</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 16.01034 secs)</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 13.12359 secs)</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.05012608 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.03794289 secs)</span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 1.065444 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.9766891 secs)</span></a></code></pre></div>
 </div>
 <div id="unarchive" class="section level2">
 <h2 class="hasAnchor">
@@ -143,19 +143,19 @@
 <a class="sourceLine" id="cb5-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw"><a href="reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJKwt0k/nycflights/airlines.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.01576591 secs)</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJKwt0k/nycflights/airports.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.04689217 secs)</span></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJKwt0k/nycflights/flights.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 10.02195 secs)</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJKwt0k/nycflights/planes.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.04633403 secs)</span></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJKwt0k/nycflights/weather.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 0.5779071 secs)</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp7nzKna/nycflights/airlines.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.01726699 secs)</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp7nzKna/nycflights/airports.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.03811598 secs)</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp7nzKna/nycflights/flights.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 14.07894 secs)</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp7nzKna/nycflights/planes.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.06257987 secs)</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; Importing /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp7nzKna/nycflights/weather.tsv.bz2 in 50000 line chunks:</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 0.508342 secs)</span></a>
 <a class="sourceLine" id="cb5-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb5-16" data-line-number="16">new_db</a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpJKwt0k/local.sqlite]</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp7nzKna/local.sqlite]</span></a>
 <a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; tbls: airlines, airports, flights, planes, weather</span></a></code></pre></div>
 <hr>
 <p>Please note that this project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
@@ -168,6 +168,8 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=arkdb">https://​cloud.r-project.org/​package=arkdb</a>
+</li>
 <li>Browse source code at <br><a href="https://github.com/ropensci/arkdb">https://​github.com/​ropensci/​arkdb</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/ropensci/arkdb/issues">https://​github.com/​ropensci/​arkdb/​issues</a>
@@ -198,6 +200,8 @@
 <li><a href="https://cran.r-project.org/package=arkdb"><img src="http://www.r-pkg.org/badges/version/arkdb" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://github.com/ropensci/onboarding/issues/224"><img src="https://badges.ropensci.org/224_status.svg"></a></li>
 <li><a href="https://www.tidyverse.org/lifecycle/#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="lifecycle"></a></li>
+<li><a href="https://CRAN.R-project.org/package=arkdb"><img src="http://cranlogs.r-pkg.org/badges/grand-total/arkdb" alt="CRAN RStudio mirror downloads"></a></li>
+<li><a href="https://doi.org/10.5281/zenodo.1343943"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.1343943.svg" alt="DOI"></a></li>
 </ul>
 </div>
 </div>
