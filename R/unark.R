@@ -103,7 +103,7 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overw
   # May throw an error if we need to read more than 'total' chunks?
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
   message(sprintf("Importing %s in %d line chunks:",
-                  filename, lines))
+                  basename(filename), lines))
   t0 <- Sys.time()
   repeat {
     d <- reader()
