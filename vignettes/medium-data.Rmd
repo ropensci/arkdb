@@ -1,0 +1,24 @@
+---
+title: "Working with medium-sized data"
+author: "Carl Boettiger"
+date: "9/22/2018"
+output: pdf_document
+---
+
+
+Over the past summer, I have written two small-ish R packages to address challenges I frequently run up against during the course of my research.  Both are challenges with what I will refer to as medium-sized data -- not the kind of petabyte scale "big data" which percludes analysis on standard hardware or existing methodology, but large enough that the size alone starts creating problems for certain bits of a typical workflow.  More precisely, I will take *medium-sized* to refer to data that is too large to comfortably fit in memory on most laptops (e.g. on the order of several GB), or data that is merely too large to commit to GitHub.  By *typical workflow*, I mean easily being able to share all parts of analysis publicly or privately with collaborators (or merely different machines, such as my laptop and cloud server) who should be able to reproduce the results with minimal fuss and configuration.
+
+For data too large to fit into memory, there's already a well-established solution of using an external database, to store the data.  Thanks to `dplyr`'s database backends, many R users can adapt their workflow relatively seemlessly to move from `dplyr` commands that call in-memory data frames to identical or nearly identical commands that call a database. This all works pretty well when your data *is already in a database*, but getting it onto a database, and then moving the data around so that other people/machines can access it is not nearly so straight forward. So far, this part of the problem has recieved relatively little attention.
+
+The reason for that is because the usual response to this problem is "you're doing it wrong."  The standard practice in this context is simply not to move the data at all.  A central database server, usually with access controlled by password or other credential, can allow multiple users to all query the same database directly.  Thanks to the magical abstractions of SQL queries such as the `DBI` package, the user (aka client), doesn't need to care about the details of where the database is located, or even what particular backend is used. Moving all that data around can be slow and expensive. Arbitrarily large data can be housed in a central/cloud location and provisioned with enough resources to store everything and process complex queries. Consequently, just about every database backend not only to provides a mechanism for doing your `SQL` / `dplyr` querying, filtering, joining etc on data that cannot fit into memory all at once, but also nearly every such backend provides *server* abilities to do so over a network connection, handling secure logins and so forth.  Why would you want to do anything else?
+
+The problem with the usual response is that it is often at odds with our original objectives and typical scientific workflows.  Setting up a database server can be non-trivial; by which I mean: difficult to automate in a portable/cross-platform manner when working entirely from R.  More importantly, it reflects a use-case more typical of industry context than scientific practice.  Individual researchers need to make data avialable to a global community of scientists who can reproduce results years or decades later; not just to a handful of employees who can be granted authenticated access to a central database.  Archiving data as static text files is far more *scalable*, more *cost-effective* (storing static files is much cheaper than keeping a database server running), more *future-proof* (rapid evolution in database technology is not always backwards compatible) and simplifies or *avoids most security issues* involved in maintaining a public server. In the scientific context, it almost always makes more sense to move the data after all.  
+
+Scientific data repositories are already built on precisely this model: providing long term storage of files that can be downloaded and analyzed locally. For smaller `.csv` files, this works pretty well.
+
+
+
+We just wanted to access data that was a bit larger than our active memory.  There is in fact a widely-used solution to this case: the `Lite` flavors of databases like `SQLite`, or my new favorite, `MonetDBLite`, which provide the disk-based storage but not the support for network connection server model.  Using the corresponding R packages, these databases can be easily deployed to store & query data on our local disk.  
+
+
+
