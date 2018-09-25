@@ -1,4 +1,16 @@
-# arkdb 0.0.3
+
+# arkdb 0.0.4
+
+- `unark()` will strip out non-compliant characters by default.
+- `unark()` is also be more flexible, allowing the user to specify
+   the corresponding table names manually, rather than enforcing
+   they correspond with the incoming csv names. [#18](https://github.com/ropensci/arkdb/issues/18)
+- Technical tweak: readLines call inside `unark()` method will use encoding
+  directly from `getOption("encoding")`, e.g. allowing encoding to be set to UTF-8. 
+  This can resolve parsing errors when using the readr parser on certain files.  See
+  `FAO.R` example in `examples` for an illustration.  
+
+# arkdb 0.0.3 2018-09-11
 
 * Remove dependency on utils::askYesNo for backward compatibility, [#17](https://github.com/ropensci/arkdb/issues/17)
 

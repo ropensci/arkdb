@@ -9,6 +9,9 @@
 #' default is "ask", which will ask for confirmation in an interactive session, and
 #' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 #' always skip such tables.
+#' @param tablenames vector of tablenames to be used for corresponding files.
+#' By default, tables will be named using lowercase names from file basename with
+#' special characters replaced with underscores (for SQL compatibility).
 #' @param ... additional arguments to `streamable_table$read` method.
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
@@ -49,21 +52,29 @@ unark <- function(files,
                   streamable_table =  streamable_base_tsv(), 
                   lines = 50000L, 
                   overwrite = "ask",
+                  tablenames = NULL,
                   ...){
   
   assert_files_exist(files)
   assert_dbi(db_con)
   assert_streamable(streamable_table)
-
+  
+  if(is.null(tablenames)){
+    tablenames <- vapply(files, base_name, character(1))
+  }
   
   db <- normalize_con(db_con)
-  lapply(files, 
-         unark_file, 
-         db, 
-         streamable_table = streamable_table, 
-         lines = lines, 
-         overwrite = overwrite,
-         ...)
+  
+  lapply(seq_along(files), 
+         function(i){
+           unark_file(files[[i]],
+                      db_con = db, 
+                      streamable_table = streamable_table, 
+                      lines = lines, 
+                      overwrite = overwrite,
+                      tablename = tablenames[[i]],
+                      ...)
+           })
   invisible(db_con)  
 }
 
@@ -80,11 +91,16 @@ normalize_con <- function(db_con){
 
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overwrite, ...){
+unark_file <- function(filename,
+                       db_con,
+                       streamable_table,
+                       lines,
+                       overwrite,
+                       tablename = base_name(filename),
+                       ...){
     
-  tbl_name <- base_name(filename)
-  
-  if(!assert_overwrite_db(db_con, tbl_name, overwrite)){
+
+  if(!assert_overwrite_db(db_con, tablename, overwrite)){
     return(NULL)
   }
     
@@ -94,7 +110,10 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overw
   on.exit(close(con))
   
   ## Handle case of `col_names != TRUE`?
-  header <- readLines(con, n = 1L)
+  ## readr method needs UTF-8 encoding for these newlines to be newlines
+  header <- readLines(con, n = 1L, 
+                      encoding = getOption("encoding", "UTF-8"),
+                      warn = FALSE)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
   }
@@ -110,7 +129,7 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overw
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
     chunk <- streamable_table$read(body, ...)
-    DBI::dbWriteTable(db_con, tbl_name, chunk, append=TRUE)
+    DBI::dbWriteTable(db_con, tablename, chunk, append=TRUE)
     
     if (d$complete) {
       break
@@ -128,14 +147,18 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overw
 
 read_chunked <- function(con, n) {
   assert_connection(con)
-  next_chunk <- readLines(con, n)
+  next_chunk <- readLines(con, n, 
+                          encoding = getOption("encoding", "UTF-8"),
+                          warn = FALSE)
   if (length(next_chunk) == 0L) {
     warning("connection has already been completely read")
     return(function() list(data = character(0), complete = TRUE))
   }
   function() {
     data <- next_chunk
-    next_chunk <<- readLines(con, n)
+    next_chunk <<- readLines(con, n,
+                             encoding = getOption("encoding", "UTF-8"),
+                             warn = FALSE)
     complete <- length(next_chunk) == 0L
     list(data = data, complete = complete)
   }
@@ -148,7 +171,10 @@ base_name <- function(filename){
   ext_regex <- "(?<!^|[.])[.][^.]+$"
   path <- sub(ext_regex, "", path, perl = TRUE)
   path <- sub(ext_regex, "", path, perl = TRUE)
-  sub(ext_regex, "", path, perl = TRUE)
+  path <- sub(ext_regex, "", path, perl = TRUE)
+  ## Remove characters not permitted in table names
+  path <- gsub("[^a-zA-Z0-9_]", "_", path, perl = TRUE)
+  tolower(path)
 }
 
 #' @importFrom tools file_ext
