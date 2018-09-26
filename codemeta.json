@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.3.9000",
+  "version": "0.0.4",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -237,7 +237,7 @@
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
   "readme": "https://github.com/ropensci/arkdb/blob/master/README.md",
-  "fileSize": "20.527KB",
+  "fileSize": "18.99KB",
   "contIntegration": [
     "https://travis-ci.org/cboettig/arkdb",
     "https://codecov.io/github/cboettig/arkdb?branch=master",

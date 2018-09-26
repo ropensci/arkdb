@@ -1,7 +1,7 @@
 Dear CRAN maintainers,
 
-This release avoids the use of utils::askYesNo in order to maintain
-greater backwards compatibility with R versions prior to 3.5.0
+This bugfix release adds a few optional arguments to handle alternate
+file encoding types and table naming rules; see NEWS.md for details.
 
 
 ## Test environments
