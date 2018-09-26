@@ -4,8 +4,9 @@
 \alias{unark}
 \title{Unarchive a list of compressed tsv files into a database}
 \usage{
-unark(files, db_con, streamable_table = streamable_base_tsv(),
-  lines = 50000L, overwrite = "ask", ...)
+unark(files, db_con, streamable_table = NULL, lines = 50000L,
+  overwrite = "ask", encoding = Sys.getenv("encoding", "UTF-8"),
+  tablenames = NULL, ...)
 }
 \arguments{
 \item{files}{vector of filenames to be read in. Must be \code{tsv}
@@ -22,6 +23,12 @@ or \code{xz} format at present.}
 default is "ask", which will ask for confirmation in an interactive session, and
 overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 always skip such tables.}
+
+\item{encoding}{encoding to be assumed for input files.}
+
+\item{tablenames}{vector of tablenames to be used for corresponding files.
+By default, tables will be named using lowercase names from file basename with
+special characters replaced with underscores (for SQL compatibility).}
 
 \item{...}{additional arguments to \code{streamable_table$read} method.}
 }

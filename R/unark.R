@@ -9,6 +9,10 @@
 #' default is "ask", which will ask for confirmation in an interactive session, and
 #' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 #' always skip such tables.
+#' @param encoding encoding to be assumed for input files.
+#' @param tablenames vector of tablenames to be used for corresponding files.
+#' By default, tables will be named using lowercase names from file basename with
+#' special characters replaced with underscores (for SQL compatibility).
 #' @param ... additional arguments to `streamable_table$read` method.
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
@@ -46,24 +50,41 @@
 #' @export
 unark <- function(files, 
                   db_con,
-                  streamable_table =  streamable_base_tsv(), 
+                  streamable_table = NULL, 
                   lines = 50000L, 
                   overwrite = "ask",
+                  encoding = Sys.getenv("encoding", "UTF-8"),
+                  tablenames = NULL,
                   ...){
   
   assert_files_exist(files)
   assert_dbi(db_con)
-  assert_streamable(streamable_table)
+  
+  ## Guess streamable table
+  if(is.null(streamable_table)){
+    streamable_table <- guess_stream(files[[1]])
+  }
 
+  assert_streamable(streamable_table)
+  
+  
+  if(is.null(tablenames)){
+    tablenames <- vapply(files, base_name, character(1))
+  }
   
   db <- normalize_con(db_con)
-  lapply(files, 
-         unark_file, 
-         db, 
-         streamable_table = streamable_table, 
-         lines = lines, 
-         overwrite = overwrite,
-         ...)
+  
+  lapply(seq_along(files), 
+         function(i){
+           unark_file(files[[i]],
+                      db_con = db, 
+                      streamable_table = streamable_table, 
+                      lines = lines, 
+                      overwrite = overwrite,
+                      encoding = encoding,
+                      tablename = tablenames[[i]],
+                      ...)
+           })
   invisible(db_con)  
 }
 
@@ -77,28 +98,34 @@ normalize_con <- function(db_con){
   }
 }
 
-
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
-unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overwrite, ...){
+unark_file <- function(filename,
+                       db_con,
+                       streamable_table,
+                       lines,
+                       overwrite,
+                       encoding,
+                       tablename = base_name(filename),
+                       ...){
     
-  tbl_name <- base_name(filename)
-  
-  if(!assert_overwrite_db(db_con, tbl_name, overwrite)){
+
+  if(!assert_overwrite_db(db_con, tablename, overwrite)){
     return(NULL)
   }
     
   
   
-  con <- compressed_file(filename, "r")
+  con <- compressed_file(filename, "r", encoding = encoding)
   on.exit(close(con))
   
   ## Handle case of `col_names != TRUE`?
-  header <- readLines(con, n = 1L)
+  ## readr method needs UTF-8 encoding for these newlines to be newlines
+  header <- read_lines(con, n = 1L, encoding = encoding)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
   }
-  reader <- read_chunked(con, lines)
+  reader <- read_chunked(con, lines, encoding)
   
   # May throw an error if we need to read more than 'total' chunks?
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
@@ -110,7 +137,7 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overw
     body <- paste0(c(header, d$data), "\n", collapse = "")
     p$tick()
     chunk <- streamable_table$read(body, ...)
-    DBI::dbWriteTable(db_con, tbl_name, chunk, append=TRUE)
+    DBI::dbWriteTable(db_con, tablename, chunk, append=TRUE)
     
     if (d$complete) {
       break
@@ -126,16 +153,16 @@ unark_file <- function(filename, db_con, streamable_table, lines = 10000L, overw
 # https://github.com/vimc/montagu-r
 # /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
 
-read_chunked <- function(con, n) {
+read_chunked <- function(con, n, encoding) {
   assert_connection(con)
-  next_chunk <- readLines(con, n)
+  next_chunk <- read_lines(con, n, encoding = encoding)
   if (length(next_chunk) == 0L) {
     warning("connection has already been completely read")
     return(function() list(data = character(0), complete = TRUE))
   }
   function() {
     data <- next_chunk
-    next_chunk <<- readLines(con, n)
+    next_chunk <<- read_lines(con, n, encoding = encoding)
     complete <- length(next_chunk) == 0L
     list(data = data, complete = complete)
   }
@@ -148,7 +175,10 @@ base_name <- function(filename){
   ext_regex <- "(?<!^|[.])[.][^.]+$"
   path <- sub(ext_regex, "", path, perl = TRUE)
   path <- sub(ext_regex, "", path, perl = TRUE)
-  sub(ext_regex, "", path, perl = TRUE)
+  path <- sub(ext_regex, "", path, perl = TRUE)
+  ## Remove characters not permitted in table names
+  path <- gsub("[^a-zA-Z0-9_]", "_", path, perl = TRUE)
+  tolower(path)
 }
 
 #' @importFrom tools file_ext
@@ -159,4 +189,33 @@ compressed_file <- function(path, ...){
          xz = xzfile(path, ...),
          zip = unz(path, ...),
          file(path, ...))
+}
+
+
+read_lines <- function(con,
+                       n,
+                       encoding = "unknown",
+                       warn = FALSE){
+  out <- readLines(con,
+                   n = n,
+                   encoding = encoding,
+                   warn = FALSE)
+
+}
+
+guess_stream <- function(x){  
+  ext <- tools::file_ext(x)
+  ## if compressed, chop off that and try again
+  if(ext %in% c("gz", "bz2", "xz", "zip")){
+    ext <- tools::file_ext(gsub("\\.([[:alnum:]]+)$", "", x))
+  }
+  streamable_table <- 
+    switch(ext,
+           "csv" = streamable_base_csv(),
+           "tsv" = streamable_base_tsv(),
+           stop(paste("Streaming file parser could not be", 
+                      "guessed from file extension.",
+                      "Please specify a streamable_table option"))
+    )
+  streamable_table
 }
