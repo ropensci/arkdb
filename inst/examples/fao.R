@@ -4,13 +4,19 @@ library(arkdb)
 
 x <- list.files("~/FAOSTAT/", pattern="[.]csv",full.names = TRUE)
 dbdir <- rappdirs::user_data_dir("faostat")
-fs::dir_delete(dbdir)
+#fs::dir_delete(dbdir)
 db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), dbdir)
 
 
 ### using the readr parser ###
-options(encoding = "latin2") # Must enforce UTF-8 for readr parsing
-unark(x[[1]], db, streamable_table = streamable_readr_csv(), lines = 5e5, overwrite = TRUE)
+#options(encoding = "latin2") # Must enforce UTF-8 for readr parsing
+unark(x[[1]], 
+      db, 
+      #streamable_table = streamable_readr_csv(), # either works
+      streamable_table = streamable_base_csv(),
+      lines = 5e5, 
+      overwrite = TRUE,
+      encoding = "latin2")
 
 
 

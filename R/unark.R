@@ -9,6 +9,7 @@
 #' default is "ask", which will ask for confirmation in an interactive session, and
 #' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 #' always skip such tables.
+#' @param encoding encoding to be assumed for input files.
 #' @param tablenames vector of tablenames to be used for corresponding files.
 #' By default, tables will be named using lowercase names from file basename with
 #' special characters replaced with underscores (for SQL compatibility).
@@ -49,15 +50,23 @@
 #' @export
 unark <- function(files, 
                   db_con,
-                  streamable_table =  streamable_base_tsv(), 
+                  streamable_table = NULL, 
                   lines = 50000L, 
                   overwrite = "ask",
+                  encoding = Sys.getenv("encoding", "UTF-8"),
                   tablenames = NULL,
                   ...){
   
   assert_files_exist(files)
   assert_dbi(db_con)
+  
+  ## Guess streamable table
+  if(is.null(streamable_table)){
+    streamable_table <- guess_stream(files[[1]])
+  }
+
   assert_streamable(streamable_table)
+  
   
   if(is.null(tablenames)){
     tablenames <- vapply(files, base_name, character(1))
@@ -72,6 +81,7 @@ unark <- function(files,
                       streamable_table = streamable_table, 
                       lines = lines, 
                       overwrite = overwrite,
+                      encoding = encoding,
                       tablename = tablenames[[i]],
                       ...)
            })
@@ -95,6 +105,7 @@ unark_file <- function(filename,
                        streamable_table,
                        lines,
                        overwrite,
+                       encoding,
                        tablename = base_name(filename),
                        ...){
     
@@ -105,16 +116,16 @@ unark_file <- function(filename,
     
   
   
-  con <- compressed_file(filename, "r")
+  con <- compressed_file(filename, "r", encoding = encoding)
   on.exit(close(con))
   
   ## Handle case of `col_names != TRUE`?
   ## readr method needs UTF-8 encoding for these newlines to be newlines
-  header <- read_lines(con, n = 1L)
+  header <- read_lines(con, n = 1L, encoding = encoding)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
   }
-  reader <- read_chunked(con, lines)
+  reader <- read_chunked(con, lines, encoding)
   
   # May throw an error if we need to read more than 'total' chunks?
   p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
@@ -142,16 +153,16 @@ unark_file <- function(filename,
 # https://github.com/vimc/montagu-r
 # /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
 
-read_chunked <- function(con, n) {
+read_chunked <- function(con, n, encoding) {
   assert_connection(con)
-  next_chunk <- read_lines(con, n)
+  next_chunk <- read_lines(con, n, encoding = encoding)
   if (length(next_chunk) == 0L) {
     warning("connection has already been completely read")
     return(function() list(data = character(0), complete = TRUE))
   }
   function() {
     data <- next_chunk
-    next_chunk <<- read_lines(con, n)
+    next_chunk <<- read_lines(con, n, encoding = encoding)
     complete <- length(next_chunk) == 0L
     list(data = data, complete = complete)
   }
@@ -181,17 +192,30 @@ compressed_file <- function(path, ...){
 }
 
 
-# @importFrom stringi stri_enc_toutf8
 read_lines <- function(con,
                        n,
-                       encoding = getOption("encoding", "UTF-8"),
-                       warn = FALSE,
-                       to_utf8 = FALSE){
+                       encoding = "unknown",
+                       warn = FALSE){
   out <- readLines(con,
                    n = n,
                    encoding = encoding,
-                   warn = warn)
-#  if(to_utf8)
-#    stringi::stri_enc_toutf8(out)
+                   warn = FALSE)
+
 }
 
+guess_stream <- function(x){  
+  ext <- tools::file_ext(x)
+  ## if compressed, chop off that and try again
+  if(ext %in% c("gz", "bz2", "xz", "zip")){
+    ext <- tools::file_ext(gsub("\\.([[:alnum:]]+)$", "", x))
+  }
+  streamable_table <- 
+    switch(ext,
+           "csv" = streamable_base_csv(),
+           "tsv" = streamable_base_tsv(),
+           stop(paste("Streaming file parser could not be", 
+                      "guessed from file extension.",
+                      "Please specify a streamable_table option"))
+    )
+  streamable_table
+}
