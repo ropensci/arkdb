@@ -9,7 +9,7 @@ db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), dbdir)
 
 
 ### using the readr parser ###
-options(encoding = "latin1") # Must enforce UTF-8 for readr parsing
+options(encoding = "latin2") # Must enforce UTF-8 for readr parsing
 unark(x[[1]], db, streamable_table = streamable_readr_csv(), lines = 5e5, overwrite = TRUE)
 
 
