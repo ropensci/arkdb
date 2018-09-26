@@ -188,7 +188,7 @@ read_lines <- function(con,
                        warn = FALSE,
                        to_utf8 = FALSE){
   out <- readLines(con,
-                   n = 1L,
+                   n = n,
                    encoding = encoding,
                    warn = warn)
 #  if(to_utf8)
