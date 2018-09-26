@@ -4,17 +4,22 @@ library(arkdb)
 
 x <- list.files("~/FAOSTAT/", pattern="[.]csv",full.names = TRUE)
 dbdir <- rappdirs::user_data_dir("faostat")
+fs::dir_delete(dbdir)
 db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), dbdir)
 
 
 ### using the readr parser ###
-options(encoding = "UTF-8") # Must enforce UTF-8 for readr parsing
-unark(x, db, streamable_table = streamable_readr_csv(), lines = 5e5, overwrite = TRUE)
+options(encoding = "latin1") # Must enforce UTF-8 for readr parsing
+unark(x[[1]], db, streamable_table = streamable_readr_csv(), lines = 5e5, overwrite = TRUE)
+
+
 
 ## Inspect
 tbls <- DBI::dbListTables(db)
-DBI::dbListFields(db, tbls[[42]])
-dplyr::tbl(db, tbls[[42]])
+DBI::dbListFields(db, tbls[[1]])
+library(tidyverse)
+tbl(db, tbls[[1]]) %>% select(Country) %>% distinct() %>% collect() %>% pull(Country)
+
 
 #############################################################
 ### Alternative Approach: custom streamable_table method ####

@@ -88,7 +88,6 @@ normalize_con <- function(db_con){
   }
 }
 
-
 #' @importFrom DBI dbWriteTable
 #' @importFrom progress progress_bar
 unark_file <- function(filename,
@@ -111,9 +110,7 @@ unark_file <- function(filename,
   
   ## Handle case of `col_names != TRUE`?
   ## readr method needs UTF-8 encoding for these newlines to be newlines
-  header <- readLines(con, n = 1L, 
-                      encoding = getOption("encoding", "UTF-8"),
-                      warn = FALSE)
+  header <- read_lines(con, n = 1L)
   if(length(header) == 0){ # empty file, would throw error
     return(invisible(db_con))
   }
@@ -147,18 +144,14 @@ unark_file <- function(filename,
 
 read_chunked <- function(con, n) {
   assert_connection(con)
-  next_chunk <- readLines(con, n, 
-                          encoding = getOption("encoding", "UTF-8"),
-                          warn = FALSE)
+  next_chunk <- read_lines(con, n)
   if (length(next_chunk) == 0L) {
     warning("connection has already been completely read")
     return(function() list(data = character(0), complete = TRUE))
   }
   function() {
     data <- next_chunk
-    next_chunk <<- readLines(con, n,
-                             encoding = getOption("encoding", "UTF-8"),
-                             warn = FALSE)
+    next_chunk <<- read_lines(con, n)
     complete <- length(next_chunk) == 0L
     list(data = data, complete = complete)
   }
@@ -186,3 +179,19 @@ compressed_file <- function(path, ...){
          zip = unz(path, ...),
          file(path, ...))
 }
+
+
+# @importFrom stringi stri_enc_toutf8
+read_lines <- function(con,
+                       n,
+                       encoding = getOption("encoding", "UTF-8"),
+                       warn = FALSE,
+                       to_utf8 = FALSE){
+  out <- readLines(con,
+                   n = 1L,
+                   encoding = encoding,
+                   warn = warn)
+#  if(to_utf8)
+#    stringi::stri_enc_toutf8(out)
+}
+
