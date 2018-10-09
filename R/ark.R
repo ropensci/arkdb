@@ -158,7 +158,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
   res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
   while (TRUE) {
     p$tick()
-    data <- dbFetch(res, n = lines)
+    data <- DBI::dbFetch(res, n = lines)
     if (nrow(data) == 0) break
     streamable_table$write(data, con, omit_header = TRUE)
   }
