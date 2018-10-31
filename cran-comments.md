@@ -1,7 +1,7 @@
 Dear CRAN maintainers,
 
-This bugfix release adds a few optional arguments to handle alternate
-file encoding types and table naming rules; see NEWS.md for details.
+This bugfix release generalizes the header mechanism for Postgres connections. 
+See NEWS.md for details.
 
 
 ## Test environments
