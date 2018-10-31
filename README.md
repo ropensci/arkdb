@@ -16,14 +16,14 @@ downloads](http://cranlogs.r-pkg.org/badges/grand-total/arkdb)](https://CRAN.R-p
 
 # arkdb
 
-The goal of arkdb is to provide a convienent way to move data from large
-compressed text files (tsv, csv, etc) into any DBI-compliant database
-connection (e.g. MYSQL, Postgres, SQLite; see
+The goal of `arkdb` is to provide a convenient way to move data from
+large compressed text files (tsv, csv, etc) into any DBI-compliant
+database connection (e.g. MYSQL, Postgres, SQLite; see
 [DBI](https://db.rstudio.com/dbi/)), and move tables out of such
-databases into text files. The key feature of arkdb is that files are
+databases into text files. The key feature of `arkdb` is that files are
 moved between databases and text files in chunks of a fixed size,
-allowing the package functions to work with tables that would be much to
-large to read into memory all at once.
+allowing the package functions to work with tables that would be much
+too large to read into memory all at once.
 
 ## Links
 
@@ -60,7 +60,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmp3oFbR8/nycflights13.sqlite
+#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSuS4nu/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -74,15 +74,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.00859499 secs)
+#>  ...Done! (in 0.00863409 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.03927302 secs)
+#>  ...Done! (in 0.04200196 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 27.67571 secs)
+#>  ...Done! (in 15.4965 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.2452919 secs)
+#>  ...Done! (in 0.03863502 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 2.398423 secs)
+#>  ...Done! (in 0.8389361 secs)
 ```
 
 ## Unarchive
@@ -96,18 +96,18 @@ new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
 #> Importing airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.04621601 secs)
+#>  ...Done! (in 0.02775288 secs)
 #> Importing airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.146152 secs)
+#>  ...Done! (in 0.03623009 secs)
 #> Importing flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 17.44235 secs)
+#>  ...Done! (in 10.21193 secs)
 #> Importing planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.06386805 secs)
+#>  ...Done! (in 0.07380605 secs)
 #> Importing weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 1.224544 secs)
+#>  ...Done! (in 0.754385 secs)
 
 new_db
-#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmp3oFbR8/local.sqlite]
+#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpSuS4nu/local.sqlite]
 #> tbls: airlines, airports, flights, planes, weather
 ```
 

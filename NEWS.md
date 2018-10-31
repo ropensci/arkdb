@@ -1,12 +1,12 @@
 
-# arkdb 0.0.5
+# arkdb 0.0.5 2018-10-31
 
 - `ark()`'s default `keep-open` method would cut off header names for
    Postgres connections (due to variation in the behavior of SQL queries
    with `LIMIT 0`.)  The issue is now resolved by accessing the header in
    a more robust, general way.
 
-# arkdb 0.0.4
+# arkdb 0.0.4 2018-09-27
 
 - `unark()` will strip out non-compliant characters in table names by default.
 - `unark()` gains the optional argument `tablenames`, allowing the user to
