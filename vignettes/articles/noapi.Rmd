@@ -9,6 +9,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## *DRAFT POST*
+
 Over the past summer, I have written two small-ish R packages to address challenges I frequently run up against during the course of my research.  Both are challenges with what I will refer to as medium-sized data -- not the kind of petabyte scale "big data" which precludes analysis on standard hardware or existing methodology, but large enough that the size alone starts creating problems for certain bits of a typical workflow.  More precisely, I will take *medium-sized* to refer to data that is too large to comfortably fit in memory on most laptops (e.g. on the order of several GB), or data that is merely too large to commit to GitHub.  By *typical workflow*, I mean easily being able to share all parts of analysis publicly or privately with collaborators (or merely different machines, such as my laptop and cloud server) who should be able to reproduce the results with minimal fuss and configuration.
 
 For data too large to fit into memory, there's already a well-established solution of using an external database, to store the data.  Thanks to `dplyr`'s database backends, many R users can adapt their workflow relatively seamlessly to move from `dplyr` commands that call in-memory data frames to identical or nearly identical commands that call a database. This all works pretty well when your data *is already in a database*, but getting it onto a database, and then moving the data around so that other people/machines can access it is not nearly so straight forward. So far, this part of the problem has received relatively little attention.
