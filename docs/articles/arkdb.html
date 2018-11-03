@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">arkdb</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.99</span>
       </span>
     </div>
 
@@ -87,7 +87,7 @@
       <h1>Introduction to arkdb</h1>
                         <h4 class="author">Carl Boettiger</h4>
             
-            <h4 class="date">2018-10-31</h4>
+            <h4 class="date">2018-11-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ropensci/arkdb/blob/master/vignettes/arkdb.Rmd"><code>vignettes/arkdb.Rmd</code></a></small>
       <div class="hidden name"><code>arkdb.Rmd</code></div>
@@ -130,29 +130,29 @@
 <p>First, we’ll need an example database to work with. Conveniently, there is a nice example using the NYC flights data built into the <code>dbplyr</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">tempdir</span>() <span class="co"># Or can be your working directory, "."</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">db &lt;-<span class="st"> </span>dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13">nycflights13_sqlite</a></span>(tmp)</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpHSUUIU/nycflights13.sqlite</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpvPc1bT/nycflights13.sqlite</span></a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; Creating table: airlines</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; Creating table: airports</span></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; Creating table: flights</span></a>
 <a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; Creating table: planes</span></a>
 <a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; Creating table: weather</span></a></code></pre></div>
 <p>To create an archive, we just give <code>ark</code> the connection to the database and tell it where we want the <code>*.tsv.bz2</code> files to be archived. We can also set the chunk size as the number of <code>lines</code> read in a single chunk. More lines per chunk usually means faster run time at the cost of higher memory requirements.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/create">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.006599903 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.01068306 secs)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02018189 secs)</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02057886 secs)</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 11.12319 secs)</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 11.07059 secs)</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.03582788 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.03515291 secs)</span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.7464259 secs)</span></a></code></pre></div>
-<p>We can take a look and confirm the files have been written. Note that we can use <code><a href="http://fs.r-lib.org/reference/dir_ls.html">fs::dir_info</a></code> to get a nice snapshot of the file sizes. Compare the compressed sizes to the original database:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_info</a></span>(dir) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.7474589 secs)</span></a></code></pre></div>
+<p>We can take a look and confirm the files have been written. Note that we can use <code><a href="http://www.rdocumentation.org/packages/fs/topics/dir_ls">fs::dir_info</a></code> to get a nice snapshot of the file sizes. Compare the compressed sizes to the original database:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/dir_ls">dir_info</a></span>(dir) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(path, size) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">path =</span> fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path_file.html">path_file</a></span>(path))</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">path =</span> fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path_file">path_file</a></span>(path))</a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; # A tibble: 5 x 2</span></a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt;   path                    size</span></a>
 <a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt;   &lt;fs::path&gt;       &lt;fs::bytes&gt;</span></a>
@@ -162,7 +162,7 @@
 <a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 4 planes.tsv.bz2        11.96K</span></a>
 <a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 5 weather.tsv.bz2      278.84K</span></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13">fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/file_info.html">file_info</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp,<span class="st">"nycflights13.sqlite"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13">fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/file_info">file_info</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp,<span class="st">"nycflights13.sqlite"</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb5-14" data-line-number="14"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(size)</a>
 <a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 44.9M</span></a></code></pre></div>
 </div>
@@ -170,25 +170,25 @@
 <h2 class="hasAnchor">
 <a href="#unarchive" class="anchor"></a>Unarchive</h2>
 <p>Now that we’ve gotten all the database into (compressed) plain text files, let’s get them back out. We simply need to pass <code>unark</code> a list of these compressed files and a connection to the database. Here we create a new local SQLite database. Note that this design means that it is also easy to use <code>arkdb</code> to move data between databases.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(dir, <span class="dt">glob =</span> <span class="st">"*.tsv.bz2"</span>)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/dir_ls">dir_ls</a></span>(dir, <span class="dt">glob =</span> <span class="st">"*.tsv.bz2"</span>)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp, <span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <p>As with <code>ark</code>, we can set the chunk size to control the memory footprint required:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)  </a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Importing airlines.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.01069999 secs)</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;  ...Done! (in 0.01202416 secs)</span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; Importing airports.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.0232439 secs)</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;  ...Done! (in 0.02757907 secs)</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; Importing flights.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 7.854657 secs)</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 7.815914 secs)</span></a>
 <a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Importing planes.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.03870487 secs)</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.05008507 secs)</span></a>
 <a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; Importing weather.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.376317 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 0.4042199 secs)</span></a></code></pre></div>
 <p><code>unark</code> returns a <code>dplyr</code> database connection that we can use in the usual way:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(new_db, <span class="st">"flights"</span>)</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; # Database: sqlite 3.22.0</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpHSUUIU/local.sqlite]</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; #   [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpvPc1bT/local.sqlite]</span></a>
 <a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt;     year month   day dep_time sched_dep_time dep_delay arr_time</span></a>
 <a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt;    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;int&gt;    &lt;int&gt;</span></a>
 <a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt;  1  2013     1     1      517            515         2      830</span></a>
@@ -208,42 +208,42 @@
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># Remove example files we created.</span></a>
 <a class="sourceLine" id="cb9-2" data-line-number="2">DBI<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/DBI/topics/dbDisconnect">dbDisconnect</a></span>(new_db<span class="op">$</span>con)</a>
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw">unlink</span>(dir, <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">unlink</span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"local.sqlite"</span>))</a></code></pre></div>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">unlink</span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp, <span class="st">"local.sqlite"</span>))</a></code></pre></div>
 </div>
 <div id="pluggable-text-formats" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pluggable-text-formats" class="anchor"></a>Pluggable text formats</h2>
 <p>By default, <code>arkdb</code> uses <code>tsv</code> format, implemented in base tools, as the text-based serialization. The <code>tsv</code> standard is particularly attractive because it side-steps some of the ambiguities present in the CSV format due to string quoting. The <a href="https://www.iana.org/assignments/media-types/text/tab-separated-values">IANA Standard for TSV</a> neatly avoids this for tab-separated values by insisting that a tab can only ever be a separator.</p>
 <p><code>arkdb</code> provides a pluggable mechanism for changing the back end utility used to write text files. For instance, if we need to read in or export in <code>.csv</code> format, we can simply swap in a <code>csv</code> based reader in both <code><a href="../reference/ark.html">ark()</a></code> and <code><a href="../reference/unark.html">unark()</a></code> methods, as illustrated here:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/create">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, </a>
 <a class="sourceLine" id="cb10-4" data-line-number="4">    <span class="dt">streamable_table =</span> <span class="kw"><a href="../reference/streamable_base_csv.html">streamable_base_csv</a></span>())</a>
 <a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.004092932 secs)</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.004786968 secs)</span></a>
 <a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.02115822 secs)</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.02187109 secs)</span></a>
 <a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 12.96726 secs)</span></a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 13.11987 secs)</span></a>
 <a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.03623223 secs)</span></a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.04123807 secs)</span></a>
 <a class="sourceLine" id="cb10-13" data-line-number="13"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 0.764533 secs)</span></a></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(dir, <span class="dt">glob =</span> <span class="st">"*.csv.bz2"</span>)</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp,<span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 0.8375969 secs)</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/dir_ls">dir_ls</a></span>(dir, <span class="dt">glob =</span> <span class="st">"*.csv.bz2"</span>)</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp,<span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb11-4" data-line-number="4"><span class="kw"><a href="../reference/unark.html">unark</a></span>(files, new_db,</a>
 <a class="sourceLine" id="cb11-5" data-line-number="5">      <span class="dt">streamable_table =</span> <span class="kw"><a href="../reference/streamable_base_csv.html">streamable_base_csv</a></span>())</a>
 <a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; Importing airlines.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 0.0100081 secs)</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt;  ...Done! (in 0.01529503 secs)</span></a>
 <a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; Importing airports.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.04043198 secs)</span></a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt;  ...Done! (in 0.02695489 secs)</span></a>
 <a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; Importing flights.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 8.368721 secs)</span></a>
+<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt;  ...Done! (in 9.141099 secs)</span></a>
 <a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; Importing planes.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt;  ...Done! (in 0.04479718 secs)</span></a>
+<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt;  ...Done! (in 0.03902292 secs)</span></a>
 <a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt; Importing weather.csv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt;  ...Done! (in 0.2880991 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt;  ...Done! (in 0.3072152 secs)</span></a></code></pre></div>
 <p><code>arkdb</code> also provides the function <code><a href="../reference/streamable_table.html">streamable_table()</a></code> to facilitate users creating their own streaming table interfaces. For instance, if you would prefer to use <code>readr</code> methods to read and write <code>tsv</code> files, we could construct the table as follows (<code><a href="../reference/streamable_readr_tsv.html">streamable_readr_tsv()</a></code> and <code><a href="../reference/streamable_readr_csv.html">streamable_readr_csv()</a></code> are also shipped inside <code>arkdb</code> for convenience):</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">stream &lt;-<span class="st"> </span></a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="st">   </span><span class="kw"><a href="../reference/streamable_table.html">streamable_table</a></span>(</a>
@@ -255,15 +255,15 @@
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/ark.html">ark</a></span>(db, dir, </a>
 <a class="sourceLine" id="cb13-2" data-line-number="2">    <span class="dt">streamable_table =</span> stream)</a>
 <a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02484703 secs)</span></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02789402 secs)</span></a>
 <a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.01741886 secs)</span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.01764584 secs)</span></a>
 <a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 8.449388 secs)</span></a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 9.193425 secs)</span></a>
 <a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.05046201 secs)</span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.03249002 secs)</span></a>
 <a class="sourceLine" id="cb13-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb13-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.5301778 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb13-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.49212 secs)</span></a></code></pre></div>
 <p>Note several constraints on this design. The write method must be able to take a generic R <code>connection</code> object (which will allow it to handle the compression methods used, if any), and the read method must be able to take a <code>textConnection</code> object. <code>readr</code> functions handle these cases out of the box, so the above method is easy to write. Also note that the write method must be able to <code>append</code>, i.e. it should use a header if <code>append=TRUE</code>, but omit when it is <code>FALSE</code>. See the built-in methods for more examples.</p>
 </div>
 <div id="a-note-on-compression" class="section level2">

@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">arkdb</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5.99</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@
 <div id="arkdb" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#arkdb" class="anchor"></a>arkdb</h1></div>
-<p>The goal of arkdb is to provide a convienent way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see <a href="https://db.rstudio.com/dbi/">DBI</a>), and move tables out of such databases into text files. The key feature of arkdb is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.</p>
+<p>The goal of <code>arkdb</code> is to provide a convenient way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see <a href="https://db.rstudio.com/dbi/">DBI</a>), and move tables out of such databases into text files. The key feature of <code>arkdb</code> is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much too large to read into memory all at once.</p>
 <div id="links" class="section level2">
 <h2 class="hasAnchor">
 <a href="#links" class="anchor"></a>Links</h2>
@@ -129,47 +129,47 @@
 <p>Consider the <code>nycflights</code> database in SQLite:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">tmp &lt;-<span class="st"> </span><span class="kw">tempdir</span>() <span class="co"># Or can be your working directory, "."</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">db &lt;-<span class="st"> </span>dbplyr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/dbplyr/topics/nycflights13">nycflights13_sqlite</a></span>(tmp)</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmppNPGBN/nycflights13.sqlite</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpFkFFAH/nycflights13.sqlite</span></a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; Creating table: airlines</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; Creating table: airports</span></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; Creating table: flights</span></a>
 <a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; Creating table: planes</span></a>
 <a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; Creating table: weather</span></a></code></pre></div>
 <p>Create an archive of the database:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/create.html">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">dir &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/create">dir_create</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp, <span class="st">"nycflights"</span>))</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="reference/ark.html">ark</a></span>(db, dir, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Exporting airlines in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02286696 secs)</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  ...Done! (in 0.02383685 secs)</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Exporting airports in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02344108 secs)</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.02021289 secs)</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Exporting flights in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 12.06154 secs)</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 11.538 secs)</span></a>
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Exporting planes in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.04260802 secs)</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 0.05211091 secs)</span></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Exporting weather in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.8393619 secs)</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.798624 secs)</span></a></code></pre></div>
 </div>
 <div id="unarchive" class="section level2">
 <h2 class="hasAnchor">
 <a href="#unarchive" class="anchor"></a>Unarchive</h2>
 <p>Import a list of compressed tabular files (i.e. <code>*.csv.bz2</code>) into a local SQLite database:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/dir_ls.html">dir_ls</a></span>(dir)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://fs.r-lib.org/reference/path.html">path</a></span>(tmp, <span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">files &lt;-<span class="st"> </span>fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/dir_ls">dir_ls</a></span>(dir)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">new_db &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/src_dbi.html">src_sqlite</a></span>(fs<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/fs/topics/path">path</a></span>(tmp, <span class="st">"local.sqlite"</span>), <span class="dt">create=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw"><a href="reference/unark.html">unark</a></span>(files, new_db, <span class="dt">lines =</span> <span class="dv">50000</span>)</a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Importing airlines.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.0133779 secs)</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt;  ...Done! (in 0.01833892 secs)</span></a>
 <a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Importing airports.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.03685403 secs)</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt;  ...Done! (in 0.03392005 secs)</span></a>
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Importing flights.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 8.931148 secs)</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt;  ...Done! (in 8.30417 secs)</span></a>
 <a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; Importing planes.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.04559612 secs)</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt;  ...Done! (in 0.03742099 secs)</span></a>
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; Importing weather.tsv.bz2 in 50000 line chunks:</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 0.502105 secs)</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt;  ...Done! (in 0.497813 secs)</span></a>
 <a class="sourceLine" id="cb5-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb5-16" data-line-number="16">new_db</a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmppNPGBN/local.sqlite]</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpFkFFAH/local.sqlite]</span></a>
 <a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; tbls: airlines, airports, flights, planes, weather</span></a></code></pre></div>
 <hr>
 <p>Please note that this project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
