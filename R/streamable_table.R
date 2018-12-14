@@ -73,8 +73,8 @@ streamable_readr_tsv <- function() {
     read <- function(file, ...) {
       read_tsv(file, ...)
     }
-    write <- function(x, path, omit_header = FALSE) {
-      write_tsv(x = x, path = path, append = omit_header)
+    write <- function(x, path, omit_header = FALSE, ...) {
+      write_tsv(x = x, path = path, append = omit_header, ...)
     }
     
   streamable_table(read, write, "tsv")
@@ -99,8 +99,8 @@ streamable_readr_csv <- function() {
   read <- function(file, ...) {
     read_csv(file, ...)
   }
-  write <- function(x, path, omit_header = FALSE) {
-    write_csv(x = x, path = path, append = omit_header)
+  write <- function(x, path, omit_header = FALSE, ...) {
+    write_csv(x = x, path = path, append = omit_header, ...)
   }
   
   streamable_table(read, write, "csv")
@@ -128,14 +128,15 @@ streamable_base_tsv <- function() {
                       stringsAsFactors = FALSE,
                       ...)
   }
-  write_tsv <- function(x, path, omit_header) {
+  write_tsv <- function(x, path, omit_header, ...) {
     utils::write.table(x,
                        file = path, 
                        append = omit_header, 
                        sep = "\t",
                        quote = FALSE,
                        row.names = FALSE,
-                       col.names = !omit_header)
+                       col.names = !omit_header,
+                       ...)
   }
   streamable_table(read_tsv, write_tsv, "tsv")
 }
@@ -166,7 +167,7 @@ streamable_base_csv <- function() {
   }
   ## NOTE: write.csv does not permit setting 
   ## `col.names = FALSE``, so cannot omit_header
-  write_csv <- function(x, path, omit_header) {
+  write_csv <- function(x, path, omit_header, ...) {
       utils::write.table(x,
                        file = path, 
                        sep = ",", 
@@ -174,7 +175,8 @@ streamable_base_csv <- function() {
                        qmethod = "double",
                        row.names = FALSE,
                        col.names = !omit_header,
-                       append = omit_header
+                       append = omit_header,
+                       ...
       )
   }
   streamable_table(read_csv, write_csv, "csv")

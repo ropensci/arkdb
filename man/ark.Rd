@@ -33,7 +33,8 @@ default is "ask", which will ask for confirmation in an interactive session, and
 overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 always skip such tables.}
 
-\item{...}{additional arguments to streamable_table$write}
+\item{...}{additional arguments to \code{streamable_table$write()} method. Applies
+to (default) \code{keep_open} method only.}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.
