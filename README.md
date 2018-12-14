@@ -60,7 +60,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//RtmpSuS4nu/nycflights13.sqlite
+#> Caching nycflights db at /var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T//Rtmpt0w5bS/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -74,15 +74,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.00863409 secs)
+#>  ...Done! (in 0.0198071 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.04200196 secs)
+#>  ...Done! (in 0.06162405 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 15.4965 secs)
+#>  ...Done! (in 17.17472 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.03863502 secs)
+#>  ...Done! (in 0.04745317 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.8389361 secs)
+#>  ...Done! (in 0.981755 secs)
 ```
 
 ## Unarchive
@@ -96,18 +96,18 @@ new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
 
 unark(files, new_db, lines = 50000)
 #> Importing airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.02775288 secs)
+#>  ...Done! (in 0.02516317 secs)
 #> Importing airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.03623009 secs)
+#>  ...Done! (in 0.06215596 secs)
 #> Importing flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 10.21193 secs)
+#>  ...Done! (in 10.64093 secs)
 #> Importing planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.07380605 secs)
+#>  ...Done! (in 0.04773688 secs)
 #> Importing weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.754385 secs)
+#>  ...Done! (in 0.6174891 secs)
 
 new_db
-#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/RtmpSuS4nu/local.sqlite]
+#> src:  sqlite 3.22.0 [/var/folders/y8/0wn724zs10jd79_srhxvy49r0000gn/T/Rtmpt0w5bS/local.sqlite]
 #> tbls: airlines, airports, flights, planes, weather
 ```
 

@@ -16,7 +16,8 @@
 #' default is "ask", which will ask for confirmation in an interactive session, and
 #' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 #' always skip such tables.
-
+#' @param ... additional arguments to `streamable_table$write()` method. Applies
+#' to (default) `keep_open` method only.  
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
@@ -65,7 +66,8 @@ ark <- function(db_con,
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window"),
-                overwrite = "ask"){
+                overwrite = "ask",
+                ...){
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
@@ -89,7 +91,8 @@ ark <- function(db_con,
          dir = dir, 
          compress = compress,
          method = method,
-         overwrite = overwrite)
+         overwrite = overwrite,
+         ...)
   
   invisible(dir)
 }
@@ -107,7 +110,8 @@ ark_file <- function(tablename,
                      dir, 
                      compress,
                      method,
-                     overwrite){
+                     overwrite, 
+                     ...){
   
   ## Set up compressed connection
   ext <- switch(compress,
@@ -135,12 +139,12 @@ ark_file <- function(tablename,
  
   switch(method,
           "keep-open" = keep_open(db_con, streamable_table, lines, 
-                                  p, tablename, con),
+                                  p, tablename, con, ...),
              "window" = window(db_con, streamable_table, lines, 
                                compress, p, tablename, con),
          "sql-window" = sql_window(db_con, streamable_table, lines, 
                                    compress, p, tablename, con),
-         keep_open(db_con, streamable_table, lines, p, tablename, con)
+         keep_open(db_con, streamable_table, lines, p, tablename, con, ...)
   )
   
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
@@ -155,10 +159,10 @@ get_header <- function(db, tablename){
   as.data.frame(lapply(fields, function(x) character(0)))
 }
 
-keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
+keep_open <- function(db_con, streamable_table, lines, p, tablename, con, ...){
   ## Create header to avoid duplicate column names
   header <- get_header(db_con, tablename)
-  streamable_table$write(header, con, omit_header = FALSE)
+  streamable_table$write(header, con, omit_header = FALSE, ...)
   
   ## 
   res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
@@ -166,7 +170,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
     p$tick()
     data <- DBI::dbFetch(res, n = lines)
     if (nrow(data) == 0) break
-    streamable_table$write(data, con, omit_header = TRUE)
+    streamable_table$write(data, con, omit_header = TRUE, ...)
   }
   DBI::dbClearResult(res)
 }

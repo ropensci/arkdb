@@ -1,3 +1,7 @@
+# arkdb 0.0.6
+
+- Support passing additional arguments to the streamable_table$write method as well
+
 
 # arkdb 0.0.5 2018-10-31
 

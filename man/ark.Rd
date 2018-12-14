@@ -7,7 +7,7 @@
 ark(db_con, dir, streamable_table = streamable_base_tsv(),
   lines = 50000L, compress = c("bzip2", "gzip", "xz", "none"),
   tables = list_tables(db_con), method = c("keep-open", "window",
-  "sql-window"), overwrite = "ask")
+  "sql-window"), overwrite = "ask", ...)
 }
 \arguments{
 \item{db_con}{a database connection}
@@ -32,6 +32,8 @@ schema if appropriate, see examples.}
 default is "ask", which will ask for confirmation in an interactive session, and
 overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 always skip such tables.}
+
+\item{...}{additional arguments to streamable_table$write}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.
