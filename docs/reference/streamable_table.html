@@ -172,9 +172,9 @@ for more examples.</p>
     <pre class="examples"><div class='input'>
 <span class='no'>streamable_readr_tsv</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>() {
   <span class='fu'>streamable_table</span>(
-    <span class='kw'>function</span>(<span class='no'>file</span>, <span class='no'>...</span>) <span class='kw pkg'>readr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/readr/topics/read_delim'>read_tsv</a></span>(<span class='no'>file</span>, <span class='no'>...</span>),
+    <span class='kw'>function</span>(<span class='no'>file</span>, <span class='no'>...</span>) <span class='kw pkg'>readr</span><span class='kw ns'>::</span><span class='fu'><a href='https://readr.tidyverse.org/reference/read_delim.html'>read_tsv</a></span>(<span class='no'>file</span>, <span class='no'>...</span>),
     <span class='kw'>function</span>(<span class='no'>x</span>, <span class='no'>path</span>, <span class='no'>omit_header</span>)
-      <span class='kw pkg'>readr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/readr/topics/write_delim'>write_tsv</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>, <span class='kw'>omit_header</span> <span class='kw'>=</span> <span class='no'>omit_header</span>),
+      <span class='kw pkg'>readr</span><span class='kw ns'>::</span><span class='fu'><a href='https://readr.tidyverse.org/reference/write_delim.html'>write_tsv</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='no'>path</span>, <span class='kw'>omit_header</span> <span class='kw'>=</span> <span class='no'>omit_header</span>),
     <span class='st'>"tsv"</span>)
 }</div></pre>
   </div>

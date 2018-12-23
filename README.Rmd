@@ -2,6 +2,8 @@
 output: github_document
 ---
 
+# arkdb <img src="man/figures/logo.svg" align="right" alt="" width="120" />
+
 [![Travis build status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
 [![Coverage status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
 [![Build status](https://ci.appveyor.com/api/projects/status/28rxw294yfktiebj?svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
@@ -20,8 +22,6 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
-
-# arkdb
 
 The goal of `arkdb` is to provide a convenient way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. The key feature of `arkdb` is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much too large to read into memory all at once.    
 

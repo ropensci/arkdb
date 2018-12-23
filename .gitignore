@@ -6,3 +6,4 @@ inst/doc
 *.sqlite
 *.tsv
 *.bz2
+.DS_Store
