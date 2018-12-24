@@ -14,3 +14,4 @@
 ^cran-comments\.md$
 ^medium-data.Rmd$
 ^vignettes/articles$
+pkgdown
