@@ -1,17 +1,26 @@
-library(DBI)
-library(MonetDBLite)
-library(readr)
-library(nycflights13)
 library(arkdb)
 library(testthat)
 
+
 test_that("We can do fast bulk import with MonetDBLite in most cases", {
+  
+  skip_if_not_installed("MonetDBLite")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  library(nycflights13)
+  
+  MonetDBLite::monetdblite_shutdown()
   tmp <- tempdir()
+  
+  # test unark on alternate DB
+  monet_dir <- fs::dir_create(fs::path(tmp, "monet"))
+  db_con <- DBI::dbConnect(MonetDBLite::MonetDBLite(), monet_dir)
+  
   readr::write_tsv(airlines, file.path(tmp, "airlines.tsv.xz"))
   readr::write_tsv(planes, file.path(tmp, "planes.tsv.xz"))
   readr::write_tsv(flights, file.path(tmp, "flights.tsv.xz"))
   
-  db_con <- DBI::dbConnect(MonetDBLite::MonetDBLite(), tempdir())
   #f <- arkdb:::bulk_importer(db_con, arkdb::streamable_readr_tsv())
   #f(db_con,  file.path(tmp, "flights.tsv.xz"), "flights")
   
@@ -19,6 +28,7 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
                         "planes.tsv.xz", 
                         "flights.tsv.xz"), 
                  sep="/")
+  
   # 3.003 seconds
   system.time({
     unark(files, db_con)
@@ -28,19 +38,35 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
   expect_identical(sort(who), sort(c("airlines", "planes", "flights")))
   remote_flights <- dplyr::tbl(db_con, "flights")
   expect_is(remote_flights, "tbl_MonetDBEmbeddedConnection")
+  
+  DBI::dbDisconnect(db_con)
+  unlink(monet_dir, TRUE)
+  unlink(tmp)
 })
 
 
 
 
 test_that("We can do fast bulk import with MonetDBLite in most cases", {
+  
+  skip_if_not_installed("MonetDBLite")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  library(nycflights13)
+  
+  MonetDBLite::monetdblite_shutdown()
   tmp <- tempdir()
   readr::write_tsv(airlines, file.path(tmp, "airlines.tsv.xz"))
   readr::write_tsv(planes, file.path(tmp, "planes.tsv.xz"))
   readr::write_tsv(flights, file.path(tmp, "flights.tsv.xz"))
   
-  db_con <- DBI::dbConnect(MonetDBLite::MonetDBLite(), tempdir())
-
+  
+  # test unark on alternate DB
+  monet_dir <- fs::dir_create(fs::path(tmp, "monet"))
+  db_con <- DBI::dbConnect(MonetDBLite::MonetDBLite(), monet_dir)
+  
+  
   files <- paste(tmp, c("airlines.tsv.xz", 
                         "planes.tsv.xz", 
                         "flights.tsv.xz"), 
@@ -54,4 +80,10 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
   expect_identical(sort(who), sort(c("airlines", "planes", "flights")))
   remote_flights <- dplyr::tbl(db_con, "flights")
   expect_is(remote_flights, "tbl_MonetDBEmbeddedConnection")
+  
+
+  
+  DBI::dbDisconnect(db_con)
+  unlink(monet_dir, TRUE)
+  unlink(tmp)
 })

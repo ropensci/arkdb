@@ -6,7 +6,7 @@
 \usage{
 unark(files, db_con, streamable_table = NULL, lines = 50000L,
   overwrite = "ask", encoding = Sys.getenv("encoding", "UTF-8"),
-  tablenames = NULL, ...)
+  tablenames = NULL, try_native = TRUE, ...)
 }
 \arguments{
 \item{files}{vector of filenames to be read in. Must be \code{tsv}
@@ -29,6 +29,11 @@ always skip such tables.}
 \item{tablenames}{vector of tablenames to be used for corresponding files.
 By default, tables will be named using lowercase names from file basename with
 special characters replaced with underscores (for SQL compatibility).}
+
+\item{try_native}{logical, default TRUE. Should we try to use a native bulk
+import method for the database connection?  This can substantially speed up
+read times and will fall back on the DBI method for any table that fails
+to import.  Currently only MonetDBLite connections support this.}
 
 \item{...}{additional arguments to \code{streamable_table$read} method.}
 }
