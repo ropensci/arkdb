@@ -24,7 +24,8 @@ Imports:
     DBI,
     progress,
     tools,
-    utils
+    utils,
+    R.utils
 Suggests:
     readr,
     spelling, 
