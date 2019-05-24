@@ -143,7 +143,7 @@
     }
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
-  "fileSize": "81.849KB",
+  "fileSize": "81.856KB",
   "contIntegration": [
     "https://travis-ci.org/cboettig/arkdb",
     "https://codecov.io/github/cboettig/arkdb?branch=master",
