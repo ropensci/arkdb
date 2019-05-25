@@ -19,7 +19,7 @@ bulk_importer <- function(db_con, streamable_table){
   bulk_monetdb <- function(conn, file, tablename){
     if(tools::file_ext(file) %in% c("gz", "bz2", "xz")){
       if(grepl("://", file)){ # replace URL paths with local path
-        tmp <- tempfile()
+        tmp <- file.path(tempdir(), basename(file))
         utils::download.file(file, tmp)
         file <- tmp
       }
