@@ -1,7 +1,7 @@
 library(arkdb)
 library(testthat)
 
-
+testthat::context("MonetDBLite bulk importer")
 test_that("We can do fast bulk import with MonetDBLite in most cases", {
   skip_on_cran()
   skip_if_offline()
