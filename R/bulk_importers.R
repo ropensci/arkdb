@@ -1,6 +1,7 @@
 
 #' @importFrom R.utils gunzip
 #' @importFrom tools file_path_sans_ext
+#' @importFrom utils download.file
 bulk_importer <- function(db_con, streamable_table){
   
   delim <- switch(streamable_table$extension,
@@ -17,6 +18,11 @@ bulk_importer <- function(db_con, streamable_table){
   
   bulk_monetdb <- function(conn, file, tablename){
     if(tools::file_ext(file) %in% c("gz", "bz2", "xz")){
+      if(grepl("://", file)){ # replace URL paths with local path
+        tmp <- tempfile()
+        utils::download.file(file, tmp)
+        file <- tmp
+      }
       dest <- tools::file_path_sans_ext(file)
       R.utils::gunzip(file, dest)
     } else {

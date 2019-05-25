@@ -3,7 +3,8 @@ library(testthat)
 
 
 test_that("We can do fast bulk import with MonetDBLite in most cases", {
-  
+  skip_on_cran()
+  skip_if_offline()
   skip_if_not_installed("MonetDBLite")
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
@@ -39,6 +40,14 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
   remote_flights <- dplyr::tbl(db_con, "flights")
   expect_is(remote_flights, "tbl_MonetDBEmbeddedConnection")
   
+  ## import from URL
+  url <- paste0("https://github.com/ropensci/piggyback",
+                "/releases/download/v0.0.3/mtcars.tsv.xz")
+  unark(url, db_con)
+  
+  remote_cars <- dplyr::collect(dplyr::tbl(db_con, "mtcars"))
+  expect_identical(mtcars, remote_cars)
+  
   DBI::dbDisconnect(db_con)
   unlink(monet_dir, TRUE)
   unlink(tmp)
@@ -49,6 +58,7 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
 
 test_that("We can do fast bulk import with MonetDBLite in most cases", {
   
+  skip_on_cran()
   skip_if_not_installed("MonetDBLite")
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
