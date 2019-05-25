@@ -46,7 +46,8 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
   unark(url, db_con)
   
   remote_cars <- dplyr::collect(dplyr::tbl(db_con, "mtcars"))
-  expect_identical(mtcars, remote_cars)
+  expect_is(remote_cars, "data.frame")
+  expect_equivalent(mtcars, remote_cars)
   
   DBI::dbDisconnect(db_con)
   unlink(monet_dir, TRUE)
