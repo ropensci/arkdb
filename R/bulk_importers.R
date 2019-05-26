@@ -24,7 +24,7 @@ bulk_importer <- function(db_con, streamable_table){
         file <- tmp
       }
       dest <- tools::file_path_sans_ext(file)
-      R.utils::gunzip(file, dest)
+      R.utils::gunzip(file, dest, remove = FALSE)
     } else {
       dest <- file
     }
