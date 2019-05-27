@@ -17,6 +17,8 @@ bulk_importer <- function(db_con, streamable_table){
                   NULL)
   
   bulk_monetdb <- function(conn, file, tablename){
+    
+    ## if compressed: uncompress first. (remote urls will also be downloaded)
     if(tools::file_ext(file) %in% c("gz", "bz2", "xz")){
       if(grepl("://", file)){ # replace URL paths with local path
         tmp <- file.path(tempdir(), basename(file))
@@ -28,6 +30,8 @@ bulk_importer <- function(db_con, streamable_table){
     } else {
       dest <- file
     }
+    
+    
     suppress_msg({
     MonetDBLite::monet.read.csv(
       conn, dest, tablename,
