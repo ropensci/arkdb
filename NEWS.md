@@ -1,3 +1,7 @@
+# arkdb 0.0.6
+
+- Add mechanism to attempt a bulk importer, when available
+
 
 # arkdb 0.0.5 2018-10-31
 

@@ -24,7 +24,8 @@ Imports:
     DBI,
     progress,
     tools,
-    utils
+    utils,
+    R.utils
 Suggests:
     readr,
     spelling, 
@@ -39,3 +40,4 @@ Suggests:
     RSQLite,
     MonetDBLite (>= 0.5.0)
 Language: en-US
+Remotes: MonetDB/MonetDBLite-R

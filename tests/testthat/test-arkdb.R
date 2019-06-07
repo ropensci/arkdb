@@ -62,7 +62,7 @@ testthat::test_that("we can ark and unark a db in plain text", {
   files <- list.files(dir, pattern = "[.]tsv.bz2$", full.names = TRUE)
   testthat::expect_length(files, 5)
  
-  suppressWarnings(
+  suppressWarnings( # ignore overwrite warning
     myflights <- readr::read_tsv(file.path(dir, "flights.tsv.bz2"))
   )
   testthat::expect_equal(dim(myflights), 
@@ -70,8 +70,9 @@ testthat::test_that("we can ark and unark a db in plain text", {
   
   ## unark
   #new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
-  unark(files, new_db, lines = 50000, overwrite = TRUE)
-  
+  suppressWarnings( # ignore overwrite warning
+    unark(files, new_db, lines = 50000, overwrite = TRUE)
+  )
   myflights <- dplyr::tbl(new_db, "flights")
   testthat::expect_is(myflights, "tbl_dbi")
   

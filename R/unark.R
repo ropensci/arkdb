@@ -13,6 +13,10 @@
 #' @param tablenames vector of tablenames to be used for corresponding files.
 #' By default, tables will be named using lowercase names from file basename with
 #' special characters replaced with underscores (for SQL compatibility).
+#' @param try_native logical, default TRUE. Should we try to use a native bulk
+#' import method for the database connection?  This can substantially speed up
+#' read times and will fall back on the DBI method for any table that fails
+#' to import.  Currently only MonetDBLite connections support this.
 #' @param ... additional arguments to `streamable_table$read` method.
 #' @details `unark` will read in a files in chunks and 
 #' write them into a database.  This is essential for processing
@@ -55,6 +59,7 @@ unark <- function(files,
                   overwrite = "ask",
                   encoding = Sys.getenv("encoding", "UTF-8"),
                   tablenames = NULL,
+                  try_native = TRUE,
                   ...){
   
   assert_files_exist(files)
@@ -83,8 +88,10 @@ unark <- function(files,
                       overwrite = overwrite,
                       encoding = encoding,
                       tablename = tablenames[[i]],
+                      try_native = try_native,
                       ...)
            })
+  
   invisible(db_con)  
 }
 
@@ -107,6 +114,7 @@ unark_file <- function(filename,
                        overwrite,
                        encoding,
                        tablename = base_name(filename),
+                       try_native = try_native,
                        ...){
     
 
@@ -114,7 +122,14 @@ unark_file <- function(filename,
     return(NULL)
   }
     
-  
+  ## Check for a bulk importer first
+  bulk <- bulk_importer(db_con, streamable_table)
+  if(!is.null(bulk) && try_native){
+    status <- 
+      tryCatch(bulk(db_con, filename, tablename),
+               error = function(e) 1)
+    if(status == 0) return(invisible(db_con))
+  }
   
   con <- compressed_file(filename, "r", encoding = encoding)
   on.exit(close(con))
