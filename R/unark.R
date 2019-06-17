@@ -62,7 +62,6 @@ unark <- function(files,
                   try_native = TRUE,
                   ...){
   
-  assert_files_exist(files)
   assert_dbi(db_con)
   
   ## Guess streamable table
@@ -123,12 +122,16 @@ unark_file <- function(filename,
   }
     
   ## Check for a bulk importer first
+  ## FIXME use S3 method
   bulk <- bulk_importer(db_con, streamable_table)
   if(!is.null(bulk) && try_native){
+    message("Native bulk importer found, attempting fast import")
     status <- 
       tryCatch(bulk(db_con, filename, tablename),
                error = function(e) 1)
     if(status == 0) return(invisible(db_con))
+    else
+      warning("Bulk import failed, falling back on R-based parser", call. = FALSE)
   }
   
   con <- compressed_file(filename, "r", encoding = encoding)

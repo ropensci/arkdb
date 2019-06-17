@@ -1,16 +1,4 @@
 
-assert_files_exist <- function(files){
-  if(length(files) == 0){
-    warning("no file specified")
-  }
-  if(length(files) == 1){
-    if(!file.exists(files))
-      warning(sprintf("file '%s' not found", files), call. = FALSE)
-  }
-  lapply(files, function(f) 
-    if(!file.exists(f)) 
-      warning(sprintf("'%s' not found", f), call. = FALSE))
-}
 
 assert_dir_exists <- function(dir){
   if(!dir.exists(dir)) 
