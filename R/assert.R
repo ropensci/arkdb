@@ -20,10 +20,10 @@ assert_dir_exists <- function(dir){
 assert_dbi <- function(x, name = deparse(substitute(x))) {
   ## src_sql is the deprecated class of src_dbi.  
   ## Not all connections will defin a DBI::dbIsValid
-  if (!inherits(x, "DBIConnection") || 
-      !inherits(x, "src_dbi") || 
-      !inherits(x, "src_sql") || 
-      !DBI::dbIsValid(x)) {
+  if (!(inherits(x, "DBIConnection") || 
+        inherits(x, "src_dbi") || 
+        inherits(x, "src_sql") || 
+        DBI::dbIsValid(x))) {
     stop(sprintf("'%s' must be a DBIConnection or src_dbi object", name),
          call. = FALSE)
   }
