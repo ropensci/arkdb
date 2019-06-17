@@ -18,7 +18,7 @@ assert_dir_exists <- function(dir){
 }
 
 assert_dbi <- function(x, name = deparse(substitute(x))) {
-  if (! (inherits(x, "DBIConnection") || inherits(x, "src_dbi"))) {
+  if (!DBI::dbIsValid(x)) {
     stop(sprintf("'%s' must be a DBIConnection or src_dbi object", name),
          call. = FALSE)
   }
