@@ -14,7 +14,7 @@ bulk_importer <- function(db_con, streamable_table){
   if(is.null(delim)) return(NULL)
   
   quote <- switch(streamable_table$extension,
-                  "tsv" = "",
+                  "tsv" = "\"", # hmmm...
                   "csv" = "\"",
                   NULL)
   
@@ -29,7 +29,8 @@ bulk_importer <- function(db_con, streamable_table){
         delim = delim, 
         quote = quote,
         nrow.check = 1e4,
-        best.effort = FALSE) 
+        best.effort = FALSE,
+        colClasses = "character") 
     })
     return(0)
   }
@@ -48,18 +49,27 @@ download_if_remote <- function(file){
     tmp <- file.path(tempdir(), basename(file))
     utils::download.file(file, tmp)
     tmp
+  } else if (file.exists(file)) {
+    file
+  } else {
+    warning(paste("file", file, "not found."), call.=FALSE)
   }
 }
 expand_if_compressed <- function(file){
   if(tools::file_ext(file) %in% c("gz", "bz2", "xz")){
     file <- download_if_remote(file)
     dest <- tools::file_path_sans_ext(file)
-    R.utils::gunzip(file, dest, remove = FALSE)
+    if(!file.exists(dest)) # assumes if it exists that it is the same thing :/
+      R.utils::gunzip(file, dest, remove = FALSE)
   } else {
     dest <- file
   }
   dest
 }
+
+
+
+
 
 
 
