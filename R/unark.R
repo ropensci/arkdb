@@ -127,7 +127,7 @@ unark_file <- function(filename,
   if(!is.null(bulk) && try_native){
     message("Native bulk importer found, attempting fast import")
     status <- 
-      tryCatch(bulk(db_con, filename, tablename),
+      tryCatch(bulk(db_con, filename, tablename, ...),
                error = function(e) 1)
     if(status == 0) return(invisible(db_con))
     else

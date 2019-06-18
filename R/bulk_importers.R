@@ -1,4 +1,8 @@
-
+## FIXME rewrite bulk_monetdb to use S3 method
+## to use more robust SQL generalization of monet.read.csv that does not involve 
+## collisions in arguments between it and passing to read.table (quotes, delim/sep, nrows)
+## Should have an S3 generic: bulk(con, file, tablename, ...) that passes all ...
+## to read.table / read_tsv and understands column headers etc
 
 
 #' @importFrom R.utils gunzip
@@ -19,7 +23,7 @@ bulk_importer <- function(db_con, streamable_table){
                   NULL)
   
   ## Method returns this function
-  bulk_monetdb <- function(conn, file, tablename){
+  bulk_monetdb <- function(conn, file, tablename, ...){
     file <- expand_if_compressed(file)
     suppress_msg({
       MonetDBLite::monet.read.csv(
@@ -30,7 +34,7 @@ bulk_importer <- function(db_con, streamable_table){
         quote = quote,
         nrow.check = 1e4,
         best.effort = FALSE,
-        colClasses = "character") 
+        ...) 
     })
     return(0)
   }
