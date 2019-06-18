@@ -33,8 +33,10 @@ bulk_importer <- function(db_con, streamable_table){
         delim = delim, 
         quote = quote,
         nrow.check = 1e4,
-        best.effort = FALSE,
-        ...) 
+        best.effort = FALSE) 
+      ## For now, omit ... from monet.read.csv call.  `...` may
+      ## contain arguments to readr::read_tsv that will not be recognized by `read.table`
+      ## and thus may cause errors
     })
     return(0)
   }
