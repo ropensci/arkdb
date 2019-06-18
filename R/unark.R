@@ -134,7 +134,7 @@ unark_file <- function(filename,
       message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
       return(invisible(db_con))
     } else {
-      warning("Bulk import failed, falling back on R-based parser", call. = FALSE)
+      message("Native import failed, falling back on R-based parser")
     }
   }
   

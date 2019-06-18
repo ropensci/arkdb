@@ -50,6 +50,10 @@ bulk_importer <- function(db_con, streamable_table){
   NULL
 }
 
+
+
+## FIXME Consider migrating these up into arkdb::unark behavior, so that standard R-DBI method
+## can also work with URLs of .bz2 and .xz files (currently bzfile & xzfile don't work over URLs)
 download_if_remote <- function(file){
   if(grepl("://", file)){ # replace URL paths with local path
     tmp <- file.path(tempdir(), basename(file))
