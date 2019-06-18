@@ -12,9 +12,8 @@ test_that("We can do fast bulk import with MonetDBLite in most cases", {
   library(nycflights13)
   
   MonetDBLite::monetdblite_shutdown()
-  tmp <- tempdir()
   
-  # test unark on alternate DB
+  tmp <- tempdir()
   monet_dir <- fs::dir_create(fs::path(tmp, "monet"))
   db_con <- DBI::dbConnect(MonetDBLite::MonetDBLite(), monet_dir)
   
