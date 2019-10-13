@@ -125,6 +125,7 @@ streamable_base_tsv <- function() {
                       header = TRUE, 
                       sep = "\t", 
                       quote = "",
+                      comment.char = "",
                       stringsAsFactors = FALSE,
                       ...)
   }
@@ -161,6 +162,7 @@ streamable_base_csv <- function() {
                       header = TRUE, 
                       sep = ",", 
                       quote = "\"",
+                      comment.char = "",
                       stringsAsFactors = FALSE,
                       ...)
   }
