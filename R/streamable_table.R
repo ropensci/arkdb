@@ -120,11 +120,12 @@ streamable_readr_csv <- function() {
 #' 
 #' @importFrom utils read.table write.table 
 streamable_base_tsv <- function() {
-  read_tsv <- function(file, ...) {
+  read_tsv <- function(file, comment.char = "", ...) {
     utils::read.table(textConnection(file), 
                       header = TRUE, 
                       sep = "\t", 
                       quote = "",
+                      comment.char = comment.char,
                       stringsAsFactors = FALSE,
                       ...)
   }
@@ -155,12 +156,13 @@ streamable_base_tsv <- function() {
 #' @importFrom utils read.table write.table 
 #' 
 streamable_base_csv <- function() {
-  read_csv <- function(file, ...) {
+  read_csv <- function(file, comment.char = "", ...) {
     ## Consider case of header = FALSE...
     utils::read.table(textConnection(file), 
                       header = TRUE, 
                       sep = ",", 
                       quote = "\"",
+                      comment.char = comment.char,
                       stringsAsFactors = FALSE,
                       ...)
   }
