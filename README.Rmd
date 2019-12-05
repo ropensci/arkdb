@@ -27,8 +27,8 @@ The goal of `arkdb` is to provide a convenient way to move data from large compr
 
 ## Links
 
-- A more detailed introduction to package design and use can be found in the package [Vignette](https://ropensci.github.io/arkdb/articles/arkdb_intro.html)
-- [Online versions of package documentation](https://ropensci.github.io/arkdb)
+- A more detailed introduction to package design and use can be found in the package [Vignette](https://docs.ropensci.org/arkdb/articles/arkdb.html)
+- [Online versions of package documentation](https://docs.ropensci.org/arkdb)
 
 ## Installation
 

@@ -29,9 +29,9 @@ too large to read into memory all at once.
 
   - A more detailed introduction to package design and use can be found
     in the package
-    [Vignette](https://ropensci.github.io/arkdb/articles/arkdb_intro.html)
+    [Vignette](https://docs.ropensci.org/arkdb/articles/arkdb.html)
   - [Online versions of package
-    documentation](https://ropensci.github.io/arkdb)
+    documentation](https://docs.ropensci.org/arkdb)
 
 ## Installation
 
