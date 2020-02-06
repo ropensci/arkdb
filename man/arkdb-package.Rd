@@ -26,13 +26,14 @@ as well.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://docs.ropensci.org/arkdb}
   \item \url{https://github.com/ropensci/arkdb}
   \item Report bugs at \url{https://github.com/ropensci/arkdb/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Carl Boettiger \email{cboettig@gmail.com} (0000-0002-1642-628X) [copyright holder]
+\strong{Maintainer}: Carl Boettiger \email{cboettig@gmail.com} (\href{https://orcid.org/0000-0002-1642-628X}{ORCID}) [copyright holder]
 
 Other contributors:
 \itemize{

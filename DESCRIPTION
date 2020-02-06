@@ -18,14 +18,15 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.0
 Roxygen: list(markdown = TRUE)
 Imports: 
     DBI,
     progress,
     tools,
     utils,
-    R.utils
+    R.utils,
+    rappdirs
 Suggests:
     readr,
     spelling, 
@@ -38,6 +39,7 @@ Suggests:
     fs,
     rmarkdown,
     RSQLite,
-    MonetDBLite (>= 0.5.0)
+    MonetDBLite (>= 0.5.0),
+    duckdb
 Language: en-US
-Remotes: MonetDB/MonetDBLite-R
+Additional_repositories: https://cboettig.github.io/drat, http://download.duckdb.org/alias/master/rstats/

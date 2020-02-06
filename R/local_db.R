@@ -6,11 +6,11 @@
 #' minimal complexity, as described in details. 
 #' 
 #' @details This function provides several abstractions to `[DBI::dbConnect]` to 
-#' provide a seemless backend for use inside other R packages.  
+#' provide a seamless backend for use inside other R packages.  
 #' 
 #' First, this  provides a generic method that allows the use of a `[RSQLite::SQLite]``
 #' connection if nothing else is available, while being able to automatically
-#' select a much faster, more powerful engine like `[duckdb::duckdb]` or `[monetDBLite::monetDBLite]`
+#' select a much faster, more powerful engine like `[duckdb::duckdb]` or `[MonetDBLite::MonetDBLite]`
 #' if available.  An argument or environmental variable can be used to override this
 #' to manually set a database endpoint for testing purposes. 
 #' 
@@ -43,7 +43,7 @@
 #' db <- local_db()
 #'
 #' }
-local_db <- function(dbdir = localdb_dir(),
+local_db <- function(dbdir = arkdb_dir(),
                        driver = Sys.getenv("ARKDB_DRIVER")){
 
   dbname <- file.path(dbdir, "database")
