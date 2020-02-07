@@ -47,7 +47,7 @@ local_db <- function(dbdir = arkdb_dir(),
                        driver = Sys.getenv("ARKDB_DRIVER")){
 
   dbname <- file.path(dbdir, "database")
-  db <- mget("td_db", envir = arkdb_cache, ifnotfound = NA)[[1]]
+  db <- mget("ark_db", envir = arkdb_cache, ifnotfound = NA)[[1]]
   if (inherits(db, "DBIConnection")) {
     if (DBI::dbIsValid(db)) {
       return(db)
@@ -58,7 +58,7 @@ local_db <- function(dbdir = arkdb_dir(),
 
   db <- db_driver(dbname, driver)
   #db <- monetdblite_connect(dbname)
-  assign("td_db", db, envir = arkdb_cache)
+  assign("ark_db", db, envir = arkdb_cache)
   db
 }
 
@@ -136,23 +136,25 @@ monetdblite_connect <- function(dbname, ignore_lock = TRUE){
 #' @examples \donttest{
 #'
 #' ## Disconnect from the database:
-#' td_disconnect()
+#' local_db_disconnect()
 #'
 #' }
 
-td_disconnect <- function(env = arkdb_cache){
-  db <- mget("td_db", envir = env, ifnotfound = NA)[[1]]
+local_db_disconnect <- function(db = local_db(), env = arkdb_cache){
   if (inherits(db, "DBIConnection")) {
     suppressWarnings(
     DBI::dbDisconnect(db)
     )
+  }
+  if(exists("ark_db", envir =env)){
+    rm("ark_db", envir = env)
   }
 }
 
 ## Enironment to store the cached copy of the connection
 ## and a finalizer to close the connection on exit.
 arkdb_cache <- new.env()
-reg.finalizer(arkdb_cache, td_disconnect, onexit = TRUE)
+reg.finalizer(arkdb_cache, local_db_disconnect, onexit = TRUE)
 
 
 arkdb_dir <- function(){

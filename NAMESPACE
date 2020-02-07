@@ -2,12 +2,12 @@
 
 export(ark)
 export(local_db)
+export(local_db_disconnect)
 export(streamable_base_csv)
 export(streamable_base_tsv)
 export(streamable_readr_csv)
 export(streamable_readr_tsv)
 export(streamable_table)
-export(td_disconnect)
 export(unark)
 importFrom(DBI,dbClearResult)
 importFrom(DBI,dbConnect)
