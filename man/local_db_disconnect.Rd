@@ -7,6 +7,8 @@
 local_db_disconnect(db = local_db(), env = arkdb_cache)
 }
 \arguments{
+\item{db}{a DBI connection. By default, will call \link{local_db} for the default connection.}
+
 \item{env}{The environment where the function looks for a connection.}
 }
 \description{

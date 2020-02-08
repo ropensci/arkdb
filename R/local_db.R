@@ -127,7 +127,8 @@ monetdblite_connect <- function(dbname, ignore_lock = TRUE){
 
 #' Disconnect from the arkdb database.
 #'
-#' @param env The environment where the function looks for a connection.
+#' @param db a DBI connection. By default, will call [local_db] for the default connection.
+#' @param env The environment where the function looks for a connection. 
 #' @details This function manually closes a connection to the `arkdb` database.
 #'
 #' @importFrom DBI dbConnect dbIsValid
@@ -142,9 +143,13 @@ monetdblite_connect <- function(dbname, ignore_lock = TRUE){
 
 local_db_disconnect <- function(db = local_db(), env = arkdb_cache){
   if (inherits(db, "DBIConnection")) {
-    suppressWarnings(
-    DBI::dbDisconnect(db)
-    )
+    suppressWarnings({
+      if(inherits(db, "MonetDBEmbeddedConnection")) 
+        DBI::dbDisconnect(db, shutdown=TRUE)
+      else
+        DBI::dbDisconnect(db)
+
+    })
   }
   if(exists("ark_db", envir =env)){
     rm("ark_db", envir = env)
