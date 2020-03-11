@@ -4,9 +4,17 @@
 \alias{unark}
 \title{Unarchive a list of compressed tsv files into a database}
 \usage{
-unark(files, db_con, streamable_table = NULL, lines = 50000L,
-  overwrite = "ask", encoding = Sys.getenv("encoding", "UTF-8"),
-  tablenames = NULL, try_native = TRUE, ...)
+unark(
+  files,
+  db_con,
+  streamable_table = NULL,
+  lines = 50000L,
+  overwrite = "ask",
+  encoding = Sys.getenv("encoding", "UTF-8"),
+  tablenames = NULL,
+  try_native = TRUE,
+  ...
+)
 }
 \arguments{
 \item{files}{vector of filenames to be read in. Must be \code{tsv}
@@ -66,7 +74,7 @@ db <- dbplyr::nycflights13_sqlite(tempdir())
 ark(db, dir)
 
 ## list all files in archive (full paths)
-files <- list.files(dir, "[.]tsv\\\\.bz2$", full.names = TRUE)
+files <- list.files(dir, "bz2$", full.names = TRUE)
 
 ## Read archived files into a new database (another sqlite in this case)
 new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)

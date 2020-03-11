@@ -41,7 +41,7 @@
 #' ark(db, dir)
 #' 
 #' ## list all files in archive (full paths)
-#' files <- list.files(dir, "[.]tsv\\.bz2$", full.names = TRUE)
+#' files <- list.files(dir, "bz2$", full.names = TRUE)
 #' 
 #' ## Read archived files into a new database (another sqlite in this case)
 #' new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
