@@ -18,7 +18,7 @@ bulk_importer <- function(db_con, streamable_table){
   if(is.null(delim)) return(NULL)
   
   quote <- switch(streamable_table$extension,
-                  "tsv" = "\"", # hmmm...
+                  "tsv" = "", # hmmm...
                   "csv" = "\"",
                   NULL)
   

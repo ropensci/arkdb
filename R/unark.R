@@ -209,7 +209,7 @@ compressed_file <- function(path, ...){
          gz = gzfile(path, ...),
          bz2 = bzfile(path, ...),
          xz = xzfile(path, ...),
-         zip = unz(path, ...),
+         zip = zipfile(path, ...),
          file(path, ...))
 }
 
@@ -224,6 +224,15 @@ read_lines <- function(con,
                    warn = FALSE)
 
 }
+
+zipfile <- function(x, ...){
+  manifest <- unzip(x, list = TRUE)
+  files <- manifest$Name
+  if(length(files) > 1)
+    warning(paste("multiple files found in zip archive, unzipping only",  files[[1]]))
+  unz(files[[1]], ...)
+}
+
 
 guess_stream <- function(x){  
   ext <- tools::file_ext(x)
