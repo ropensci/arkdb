@@ -8,7 +8,7 @@ output: github_document
 [![Travis build status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
 [![Coverage status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
-[![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
+[![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/software-review/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
  [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/arkdb)](https://CRAN.R-project.org/package=arkdb) 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1343943.svg)](https://doi.org/10.5281/zenodo.1343943)
@@ -75,18 +75,16 @@ Import a list of compressed tabular files (i.e. `*.csv.bz2`) into a local SQLite
 
 ```{r}
 files <- fs::dir_ls(dir)
-new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
+new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-
-new_db
 ```
 
 
 
 ```{r include=FALSE}
 DBI::dbDisconnect(db$con)
-DBI::dbDisconnect(new_db$con)
+DBI::dbDisconnect(new_db)
 
 codemetar::write_codemeta()
 ```

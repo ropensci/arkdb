@@ -8,7 +8,7 @@ status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-
 [![Coverage
 status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
-[![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
+[![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/software-review/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 [![CRAN RStudio mirror
 downloads](http://cranlogs.r-pkg.org/badges/grand-total/arkdb)](https://CRAN.R-project.org/package=arkdb)
@@ -61,7 +61,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/RtmpRmToUN/nycflights13.sqlite
+#> Caching nycflights db at /tmp/Rtmpk9256H/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -75,15 +75,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.005429983 secs)
+#>  ...Done! (in 0.004869938 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.01718426 secs)
+#>  ...Done! (in 0.01680803 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 8.495846 secs)
+#>  ...Done! (in 8.538626 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02319217 secs)
+#>  ...Done! (in 0.02418709 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.6052904 secs)
+#>  ...Done! (in 0.5942342 secs)
 ```
 
 ## Unarchive
@@ -93,27 +93,19 @@ local SQLite database:
 
 ``` r
 files <- fs::dir_ls(dir)
-new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
-#> Warning: `src_sqlite()` is deprecated as of dplyr 1.0.0.
-#> Please use `tbl()` directly with a database connection
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_warnings()` to see where this warning was generated.
+new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/RtmpRmToUN/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01021028 secs)
-#> Importing /tmp/RtmpRmToUN/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01834083 secs)
-#> Importing /tmp/RtmpRmToUN/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 4.517271 secs)
-#> Importing /tmp/RtmpRmToUN/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.02785492 secs)
-#> Importing /tmp/RtmpRmToUN/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.1834235 secs)
-
-new_db
-#> src:  sqlite 3.30.1 [/tmp/RtmpRmToUN/local.sqlite]
-#> tbls: airlines, airports, flights, planes, weather
+#> Importing /tmp/Rtmpk9256H/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01019955 secs)
+#> Importing /tmp/Rtmpk9256H/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01868176 secs)
+#> Importing /tmp/Rtmpk9256H/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 4.912452 secs)
+#> Importing /tmp/Rtmpk9256H/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.026896 secs)
+#> Importing /tmp/Rtmpk9256H/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.1781762 secs)
 ```
 
 -----

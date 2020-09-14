@@ -1,21 +1,15 @@
-library(arkdb)
-#library(dbplyr)
-#library(dplyr)
-#library(nycflights13)
-#library(fs)
-#library(RSQLite)
-#library(MonetDBLite)
+context("basic")
 
 # Setup
-tmp <- tempdir()
-db <- dbplyr::nycflights13_sqlite(tmp)
-dir <- file.path(tmp, "nycflights")
-dir.create(dir, showWarnings = FALSE)
-new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
+  tmp <- tempdir()
+  db <- dbplyr::nycflights13_sqlite(tmp)
+  dir <- file.path(tmp, "nycflights")
+  dir.create(dir, showWarnings = FALSE)
+  dbdir <- fs::path(tmp, "local.sqlite")
+  new_db <- DBI::dbConnect(RSQLite::SQLite(), dbdir)
 
 ## Note: later tests will overwrite existing tables and files, throwing warnings
 
-testthat::context("basic")
 testthat::test_that("we can ark and unark a db", {
 
   skip_if_not_installed("dplyr")
@@ -169,7 +163,9 @@ testthat::test_that("try with MonetDB & alternate method", {
   
 })
 
-## Cleanup 
-DBI::dbDisconnect(db$con)
-DBI::dbDisconnect(new_db$con)
-unlink(dir, TRUE) # ark'd text files
+  ## Cleanup 
+  DBI::dbDisconnect(db$con)
+  DBI::dbDisconnect(new_db)
+  unlink(dir, TRUE) # ark'd text files
+
+

@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.5.99",
+  "version": "0.0.6",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -276,7 +276,7 @@
     }
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
-  "fileSize": "552.264KB",
+  "fileSize": "557.258KB",
   "contIntegration": ["https://travis-ci.org/ropensci/arkdb", "https://codecov.io/github/ropensci/arkdb?branch=master"],
   "keywords": [
     "database",
@@ -294,7 +294,10 @@
     "name": "Comprehensive R Archive Network (CRAN)",
     "url": "https://cran.r-project.org"
   },
-  "relatedLink": ["https://CRAN.R-project.org/package=arkdb", "https://docs.ropensci.org/arkdb"],
+  "relatedLink": [
+    "https://CRAN.R-project.org/package=arkdb",
+    "https://docs.ropensci.org/arkdb"
+  ],
   "review": {
     "@type": "Review",
     "url": "https://github.com/ropensci/software-review/issues/224",
