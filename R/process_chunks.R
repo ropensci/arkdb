@@ -34,7 +34,7 @@ process_chunks <- function(file,
   reader <- read_chunked(con, lines, encoding)
   
   # May throw an error if we need to read more than 'total' chunks?
-  p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
+  p <- progress("[:spin] chunk :current", total = 100000)
   message(sprintf("Importing %s in %d line chunks:",
                   summary(con)$description, lines))
   t0 <- Sys.time()

@@ -22,12 +22,12 @@ RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Imports: 
     DBI,
-    progress,
     tools,
     utils,
     R.utils,
     rappdirs
 Suggests:
+    progress,
     readr,
     spelling,
     dplyr,

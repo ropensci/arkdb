@@ -105,7 +105,6 @@ normalize_con <- function(db_con){
 }
 
 #' @importFrom DBI dbWriteTable
-#' @importFrom progress progress_bar
 unark_file <- function(filename,
                        db_con,
                        streamable_table,
