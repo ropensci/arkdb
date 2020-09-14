@@ -125,7 +125,7 @@ ark_file <- function(tablename,
     return(NULL)
   }
   
-  con <- compressed_file(filename, "w")
+  con <- compressed_file(filename, "wb")
   on.exit(close(con))
   
   ## Progress reporting
