@@ -4,15 +4,16 @@ output: github_document
 
 # arkdb <img src="man/figures/logo.svg" align="right" alt="" width="120" />
 
+[![R build status](https://github.com/ropensci/arkdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/arkdb/actions)
 [![Travis build status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
 [![Coverage status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
-[![Build status](https://ci.appveyor.com/api/projects/status/28rxw294yfktiebj?svg=true)](https://ci.appveyor.com/project/cboettig/arkdb)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/onboarding/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
  [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/arkdb)](https://CRAN.R-project.org/package=arkdb) 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1343943.svg)](https://doi.org/10.5281/zenodo.1343943)
-
+  <!-- badges: end -->
+  
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, echo = FALSE}
