@@ -1,11 +1,11 @@
-testthat::context("streamable_table")
+context("streamable_table")
 
 
 test_stream <- function(stream) {
   
   filename <- tempfile(fileext = ".txt")
   
-  con <- compressed_file(filename, "w")
+  con <- compressed_file(filename, "wb")
   on.exit(close(con))
   
   data <- datasets::iris
@@ -15,7 +15,7 @@ test_stream <- function(stream) {
   
   close(con)
   
-  con <- compressed_file(filename, "r")
+  con <- compressed_file(filename, "rb")
   on.exit(close(con))
   
   ## unark works via readLines.  This is necessary for
@@ -40,6 +40,11 @@ testthat::test_that("streamable_readr_csv",{
 testthat::test_that("streamable_readr_tsv",{
   test_stream( streamable_readr_tsv() )
 })
+
+testthat::test_that("streamable_vroom",{
+  test_stream( streamable_vroom() )
+})
+
 
 testthat::test_that("internal closure constructor", {
   window <- windowing(FALSE)

@@ -1,3 +1,8 @@
+# arkdb 0.0.7
+
+- support vroom as an opt-in streamable table
+- export `process_chunks`
+
 # arkdb 0.0.6
 
 - Add mechanism to attempt a bulk importer, when available (#27)
