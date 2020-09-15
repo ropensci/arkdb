@@ -8,6 +8,9 @@ test_that("local_db works with default provider",{
 })
 
 test_that("local_db works with MonetDBLite", {
+  
+  skip_if_not_installed("MonetDBLite")
+  
 
   ## Make sure any previous monetDB use is also shut down
   MonetDBLite::monetdblite_shutdown()
@@ -31,6 +34,9 @@ test_that("local_db works with RSQLite", {
   })
 
 test_that("local_db works with duckdb", {
+  
+  skip_if_not_installed("duckdb")
+  
   
   db <- local_db(driver = "duckdb")
   expect_is(db, "DBIConnection")
