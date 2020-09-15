@@ -32,7 +32,7 @@ too large to read into memory all at once.
     in the package
     [Vignette](https://docs.ropensci.org/arkdb/articles/arkdb.html)
   - [Online versions of package
-    documentation](https://docs.ropensci.org/arkdb)
+    documentation](https://docs.ropensci.org/arkdb/)
 
 ## Installation
 
@@ -61,7 +61,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/Rtmpk9256H/nycflights13.sqlite
+#> Caching nycflights db at /tmp/Rtmp3Ebd1H/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -75,15 +75,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.004869938 secs)
+#>  ...Done! (in 0.008990765 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.01680803 secs)
+#>  ...Done! (in 0.03013897 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 8.538626 secs)
+#>  ...Done! (in 8.753164 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02418709 secs)
+#>  ...Done! (in 0.02437472 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.5942342 secs)
+#>  ...Done! (in 0.6173553 secs)
 ```
 
 ## Unarchive
@@ -96,22 +96,22 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/Rtmpk9256H/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01019955 secs)
-#> Importing /tmp/Rtmpk9256H/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01868176 secs)
-#> Importing /tmp/Rtmpk9256H/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 4.912452 secs)
-#> Importing /tmp/Rtmpk9256H/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.026896 secs)
-#> Importing /tmp/Rtmpk9256H/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.1781762 secs)
+#> Importing /tmp/Rtmp3Ebd1H/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01028419 secs)
+#> Importing /tmp/Rtmp3Ebd1H/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01863098 secs)
+#> Importing /tmp/Rtmp3Ebd1H/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 5.179139 secs)
+#> Importing /tmp/Rtmp3Ebd1H/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0276711 secs)
+#> Importing /tmp/Rtmp3Ebd1H/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.202945 secs)
 ```
 
 -----
 
 Please note that this project is released with a [Contributor Code of
-Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
-to abide by its terms.
+Conduct](https://ropensci.org/code-of-conduct/). By participating in
+this project you agree to abide by its terms.
 
 [![ropensci\_footer](https://ropensci.org/public_images/ropensci_footer.png)](https://ropensci.org)
