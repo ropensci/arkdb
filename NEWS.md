@@ -1,7 +1,13 @@
 # arkdb 0.0.6
 
+- support vroom as an opt-in streamable table
+- export `process_chunks`
 - Add mechanism to attempt a bulk importer, when available (#27)
 - Bugfix for case when text contains `#` characters in base parser (#28)
+- lighten core dependencies.  Fully recursive dependencies include only 4
+  non-base packages now, as `progress` is now optional.
+- Use "magic numbers" instead of extensions to guess compression type.
+  (NOTE: requires that file is local and not a URL)
 
 # arkdb 0.0.5 2018-10-31
 

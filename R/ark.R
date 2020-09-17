@@ -125,12 +125,12 @@ ark_file <- function(tablename,
     return(NULL)
   }
   
-  con <- compressed_file(filename, "w")
+  con <- generic_connection(filename, "wb")
   on.exit(close(con))
   
   ## Progress reporting
   message(sprintf("Exporting %s in %d line chunks:", tablename, lines))
-  p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
+  p <- progress("[:spin] chunk :current", total = 100000)
   t0 <- Sys.time()
  
   switch(method,

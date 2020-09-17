@@ -26,7 +26,6 @@ as well.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://docs.ropensci.org/arkdb}
   \item \url{https://github.com/ropensci/arkdb}
   \item Report bugs at \url{https://github.com/ropensci/arkdb/issues}
 }

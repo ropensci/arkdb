@@ -105,7 +105,6 @@ normalize_con <- function(db_con){
 }
 
 #' @importFrom DBI dbWriteTable
-#' @importFrom progress progress_bar
 unark_file <- function(filename,
                        db_con,
                        streamable_table,
@@ -137,58 +136,25 @@ unark_file <- function(filename,
       message("Native import failed, falling back on R-based parser")
     }
   }
-  
-  con <- compressed_file(filename, "r", encoding = encoding)
-  on.exit(close(con))
+
   
   ## Handle case of `col_names != TRUE`?
   ## readr method needs UTF-8 encoding for these newlines to be newlines
-  header <- read_lines(con, n = 1L, encoding = encoding)
-  if(length(header) == 0){ # empty file, would throw error
-    return(invisible(db_con))
-  }
-  reader <- read_chunked(con, lines, encoding)
-  
-  # May throw an error if we need to read more than 'total' chunks?
-  p <- progress::progress_bar$new("[:spin] chunk :current", total = 100000)
-  message(sprintf("Importing %s in %d line chunks:",
-                  basename(filename), lines))
-  t0 <- Sys.time()
-  repeat {
-    d <- reader()
-    body <- paste0(c(header, d$data), "\n", collapse = "")
-    p$tick()
-    chunk <- streamable_table$read(body, ...)
+
+  dbi_writer <- function(chunk){
     DBI::dbWriteTable(db_con, tablename, chunk, append=TRUE)
-    
-    if (d$complete) {
-      break
-    }
   }
-  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
+  process_chunks(filename, 
+                 process_fn = dbi_writer,
+                 streamable_table = streamable_table,
+                 lines = lines, 
+                 encoding = encoding,
+                 ...
+                 )
   
   invisible(db_con)
 }
 
-
-# Adapted from @richfitz, MIT licensed
-# https://github.com/vimc/montagu-r
-# /blob/4fe82fd29992635b30e637d5412312b0c5e3e38f/R/util.R#L48-L60
-
-read_chunked <- function(con, n, encoding) {
-  assert_connection(con)
-  next_chunk <- read_lines(con, n, encoding = encoding)
-  if (length(next_chunk) == 0L) {
-    warning("connection has already been completely read")
-    return(function() list(data = character(0), complete = TRUE))
-  }
-  function() {
-    data <- next_chunk
-    next_chunk <<- read_lines(con, n, encoding = encoding)
-    complete <- length(next_chunk) == 0L
-    list(data = data, complete = complete)
-  }
-}
 
 
 ## Do repeatedly to remove compression extension and file extension
@@ -203,35 +169,6 @@ base_name <- function(filename){
   tolower(path)
 }
 
-#' @importFrom tools file_ext
-compressed_file <- function(path, ...){
-  con <- switch(tools::file_ext(path),
-         gz = gzfile(path, ...),
-         bz2 = bzfile(path, ...),
-         xz = xzfile(path, ...),
-         zip = zipfile(path, ...),
-         file(path, ...))
-}
-
-
-read_lines <- function(con,
-                       n,
-                       encoding = "unknown",
-                       warn = FALSE){
-  out <- readLines(con,
-                   n = n,
-                   encoding = encoding,
-                   warn = FALSE)
-
-}
-
-zipfile <- function(x, ...){
-  manifest <- unzip(x, list = TRUE)
-  files <- manifest$Name
-  if(length(files) > 1)
-    warning(paste("multiple files found in zip archive, unzipping only",  files[[1]]))
-  unz(x, filename = files[[1]], ...)
-}
 
 
 guess_stream <- function(x){  

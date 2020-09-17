@@ -90,7 +90,7 @@ Now that we've gotten all the database into (compressed) plain text files, let's
 
 ```{r}
 files <- fs::dir_ls(dir, glob = "*.tsv.bz2")
-new_db <- src_sqlite(fs::path(tmp, "local.sqlite"), create=TRUE)
+new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 ```
 
@@ -110,7 +110,7 @@ tbl(new_db, "flights")
 
 ```{r}
 # Remove example files we created.
-DBI::dbDisconnect(new_db$con)
+DBI::dbDisconnect(new_db)
 unlink(dir, TRUE)
 unlink(fs::path(tmp, "local.sqlite"))
 ```
@@ -138,7 +138,7 @@ ark(db, dir,
 
 ```{r}
 files <- fs::dir_ls(dir, glob = "*.csv.bz2")
-new_db <- src_sqlite(fs::path(tmp,"local.sqlite"), create=TRUE)
+new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db,
       streamable_table = streamable_base_csv())
@@ -175,13 +175,13 @@ Note several constraints on this design. The write method must be able to take a
 
 ## Distributing data
 
-Once you have archived your database files with `ark`, consider sharing them privately or publicly as part of your project GitHub repo using the [`piggyback` R package](https://github.com/cboettig/piggyback). For more permanent, versioned, and citable data archiving, upload your `*.tsv.bz2` files to a data repository like [Zenodo.org](https://zenodo.org).  
+Once you have archived your database files with `ark`, consider sharing them privately or publicly as part of your project GitHub repo using the [`piggyback` R package](https://github.com/ropensci/piggyback). For more permanent, versioned, and citable data archiving, upload your `*.tsv.bz2` files to a data repository like [Zenodo.org](https://zenodo.org).  
 
 
 
 
 ```{r include=FALSE}
 DBI::dbDisconnect(db$con)
-DBI::dbDisconnect(new_db$con)
+DBI::dbDisconnect(new_db)
 unlink(dir, TRUE)
 ```
