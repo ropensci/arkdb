@@ -34,15 +34,51 @@ compression_signature <- function(x){
   
 }
 
+#' @importFrom tools file_ext
+compression_extension <- function(path, ...){
+  switch(tools::file_ext(path),
+         gz = "gzip",
+         bz2 = "bz2",
+         xz = "xz",
+         zip = "zip",
+         "")
+}
+
+
+
+is_url <- function(x) grepl("^((http|ftp)s?|sftp)://", x)
 
 generic_connection <- function(path, ...) {
   
-  con <- switch(compression_signature(path),
+  if (inherits(path, "connection"))
+    return(path)
+  
+  ## non-existent file could be an intended writing destination
+  if(!file.exists(path)){
+    if(is_url(path)){
+      x <- tempfile()
+      download.file(path, x, quiet = options("verbose", TRUE))
+      path <- x
+    } else {
+      compression <- compression_extension(path)
+    }
+    
+  } else {
+    compression <- compression_signature(path)  
+  }
+  
+  
+  
+  con <- switch(compression,
                 gzip = gzfile(path, ...),
                 bz2 = bzfile(path, ...),
                 xz = xzfile(path, ...),
                 zip = unz(path, ...),
                 file(path, ...))
+  
+  return(con)
+  
+  
   
 }
 
