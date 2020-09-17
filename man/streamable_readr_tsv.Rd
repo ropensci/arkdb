@@ -13,5 +13,5 @@ a \code{streamable_table} object (S3)
 streamable tsv using \code{readr}
 }
 \seealso{
-\code{\link[readr:read_tsv]{readr::read_tsv()}}, \code{\link[readr:write_tsv]{readr::write_tsv()}}
+\code{\link[readr:read_delim]{readr::read_tsv()}}, \code{\link[readr:write_delim]{readr::write_tsv()}}
 }

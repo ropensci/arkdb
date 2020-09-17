@@ -230,7 +230,7 @@ zipfile <- function(x, ...){
   files <- manifest$Name
   if(length(files) > 1)
     warning(paste("multiple files found in zip archive, unzipping only",  files[[1]]))
-  unz(files[[1]], ...)
+  unz(x, filename = files[[1]], ...)
 }
 
 

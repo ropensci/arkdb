@@ -4,7 +4,11 @@
 \alias{local_db}
 \title{Connect to a local stand-alone database}
 \usage{
-local_db(dbdir = arkdb_dir(), driver = Sys.getenv("ARKDB_DRIVER"))
+local_db(
+  dbdir = arkdb_dir(),
+  driver = Sys.getenv("ARKDB_DRIVER"),
+  readonly = FALSE
+)
 }
 \arguments{
 \item{dbdir}{Path to the database.}
@@ -13,6 +17,9 @@ local_db(dbdir = arkdb_dir(), driver = Sys.getenv("ARKDB_DRIVER"))
 It will select the first one of those it finds available if a
 driver is not set. This fallback can be overwritten either by explicit
 argument or by setting the environmental variable \code{ARKDB_DRIVER}.}
+
+\item{readonly}{Should the database be opened read-only? (duckdb only).
+This allows multiple concurrent connections (e.g. from different R sessions)}
 }
 \value{
 Returns a \code{src_dbi} connection to the default duckdb database
