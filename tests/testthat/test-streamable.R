@@ -5,7 +5,7 @@ test_stream <- function(stream) {
   
   filename <- tempfile(fileext = ".txt")
   
-  con <- compressed_file(filename, "wb")
+  con <- generic_connection(filename, "wb")
   on.exit(close(con))
   
   data <- datasets::iris
@@ -15,7 +15,7 @@ test_stream <- function(stream) {
   
   close(con)
   
-  con <- compressed_file(filename, "rb")
+  con <- generic_connection(filename, "rb")
   on.exit(close(con))
   
   ## unark works via readLines.  This is necessary for

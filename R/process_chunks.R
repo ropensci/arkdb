@@ -23,7 +23,7 @@ process_chunks <- function(file,
   if(is.null(streamable_table)){
     streamable_table <- guess_stream(file)
   }
-  con <- compressed_file(file, "rb", encoding = encoding)
+  con <- generic_connection(file, "rb", encoding = encoding)
   on.exit(close(con))
   
   

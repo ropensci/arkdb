@@ -125,7 +125,7 @@ ark_file <- function(tablename,
     return(NULL)
   }
   
-  con <- compressed_file(filename, "wb")
+  con <- generic_connection(filename, "wb")
   on.exit(close(con))
   
   ## Progress reporting

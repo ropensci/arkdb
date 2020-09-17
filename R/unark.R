@@ -169,17 +169,6 @@ base_name <- function(filename){
   tolower(path)
 }
 
-#' @importFrom tools file_ext
-compressed_file <- function(path, ...){
-  con <- switch(tools::file_ext(path),
-         gz = gzfile(path, ...),
-         bz2 = bzfile(path, ...),
-         xz = xzfile(path, ...),
-         zip = unz(path, ...),
-         file(path, ...))
-}
-
-
 
 
 guess_stream <- function(x){  
