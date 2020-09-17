@@ -29,6 +29,8 @@
 #'   It will select the first one of those it finds available if a
 #'   driver is not set. This fallback can be overwritten either by explicit
 #'   argument or by setting the environmental variable `ARKDB_DRIVER`.
+#' @param readonly Should the database be opened read-only? (duckdb only).
+#'  This allows multiple concurrent connections (e.g. from different R sessions)
 #' @return Returns a `src_dbi` connection to the default duckdb database
 #'
 #' @importFrom DBI dbConnect dbIsValid
@@ -44,7 +46,8 @@
 #'
 #' }
 local_db <- function(dbdir = arkdb_dir(),
-                       driver = Sys.getenv("ARKDB_DRIVER")){
+                     driver = Sys.getenv("ARKDB_DRIVER"),
+                     readonly = FALSE){
 
   dbname <- file.path(dbdir, "database")
   db <- mget("ark_db", envir = arkdb_cache, ifnotfound = NA)[[1]]
@@ -62,21 +65,23 @@ local_db <- function(dbdir = arkdb_dir(),
   db
 }
 
-db_driver <- function(dbname, driver = Sys.getenv("ARKDB_DRIVER")){
+db_driver <- function(dbname, 
+                      driver = Sys.getenv("ARKDB_DRIVER"), 
+                      readonly = FALSE){
 
-  ## Evaluate capabilities in reverse-priorty order
+  ## Evaluate capabilities in reverse-priority order
   drivers <- "dplyr"
 
   if (requireNamespace("RSQLite", quietly = TRUE)){
     SQLite <- getExportedValue("RSQLite", "SQLite")
     drivers <- c("RSQLite", drivers)
   }
+  
   if (requireNamespace("MonetDBLite", quietly = TRUE)){
     MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
     drivers <- c("MonetDBLite", drivers)
   }
-  ## duckdb lacks necessary stability
-  ## https://github.com/cwida/duckdb/issues/58
+
   if (requireNamespace("duckdb", quietly = TRUE)){
     duckdb <- getExportedValue("duckdb", "duckdb")
     drivers <- c("duckdb", drivers)
@@ -87,8 +92,9 @@ db_driver <- function(dbname, driver = Sys.getenv("ARKDB_DRIVER")){
 
 
   db <- switch(driver,
-         duckdb = DBI::dbConnect(duckdb( dbdir = file.path(dbname,"duckdb")),
-                                 dbname = file.path(dbname,"duckdb")),
+         duckdb = DBI::dbConnect(duckdb(),
+                                 dbdir = file.path(dbname,"duckdb"),
+                                 readonly = readonly),
          MonetDBLite = monetdblite_connect(file.path(dbname,"MonetDBLite")),
          RSQLite = DBI::dbConnect(SQLite(),
                                   file.path(dbname, "sqlite.sqlite")),
