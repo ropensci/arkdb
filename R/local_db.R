@@ -31,7 +31,7 @@
 #'   argument or by setting the environmental variable `ARKDB_DRIVER`.
 #' @param readonly Should the database be opened read-only? (duckdb only).
 #'  This allows multiple concurrent connections (e.g. from different R sessions)
-#' @return Returns a `src_dbi` connection to the default duckdb database
+#' @return Returns a `[DBIcoonection]` connection to the default duckdb database
 #'
 #' @importFrom DBI dbConnect dbIsValid
 # @importFrom duckdb duckdb
@@ -60,10 +60,11 @@ local_db <- function(dbdir = arkdb_dir(),
   dir.create(dbname, showWarnings = FALSE, recursive = TRUE)
 
   db <- db_driver(dbname, driver)
-  #db <- monetdblite_connect(dbname)
   assign("ark_db", db, envir = arkdb_cache)
   db
 }
+
+
 
 db_driver <- function(dbname, 
                       driver = Sys.getenv("ARKDB_DRIVER"), 
@@ -90,6 +91,11 @@ db_driver <- function(dbname,
   ## If driver is undefined or not in available list, use first from the list
   if (  !(driver %in% drivers) ) driver <- drivers[[1]]
 
+  
+  dir.create(dbname, showWarnings = FALSE, recursive = TRUE)
+  
+  
+  
   db <- switch(driver,
          duckdb = DBI::dbConnect(duckdb(),
                                  dbdir = file.path(dbname,"duckdb"),
