@@ -57,7 +57,7 @@ generic_connection <- function(path, ...) {
   if(!file.exists(path)){
     if(is_url(path)){
       x <- tempfile()
-      download.file(path, x, quiet = options("verbose", TRUE))
+      download.file(path, x, quiet = TRUE)
       path <- x
     } else {
       compression <- compression_extension(path)

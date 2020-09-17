@@ -90,11 +90,13 @@ db_driver <- function(dbname,
   ## If driver is undefined or not in available list, use first from the list
   if (  !(driver %in% drivers) ) driver <- drivers[[1]]
 
+  if(!dir.exists(dbname))
+    dir.create(dbname, FALSE, TRUE)
 
   db <- switch(driver,
          duckdb = DBI::dbConnect(duckdb(),
                                  dbdir = file.path(dbname,"duckdb"),
-                                 readonly = readonly),
+                                 read_only = readonly),
          MonetDBLite = monetdblite_connect(file.path(dbname,"MonetDBLite")),
          RSQLite = DBI::dbConnect(SQLite(),
                                   file.path(dbname, "sqlite.sqlite")),
