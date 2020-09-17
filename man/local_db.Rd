@@ -22,7 +22,7 @@ argument or by setting the environmental variable \code{ARKDB_DRIVER}.}
 This allows multiple concurrent connections (e.g. from different R sessions)}
 }
 \value{
-Returns a \code{src_dbi} connection to the default duckdb database
+Returns a \verb{[DBIcoonection]} connection to the default duckdb database
 }
 \description{
 This function will provide a connection to the best available database.
@@ -34,7 +34,7 @@ minimal complexity, as described in details.
 This function provides several abstractions to \verb{[DBI::dbConnect]} to
 provide a seamless backend for use inside other R packages.
 
-First, this  provides a generic method that allows the use of a \verb{[RSQLite::SQLite]`` connection if nothing else is available, while being able to automatically select a much faster, more powerful engine like }\link[duckdb:duckdb]{duckdb::duckdb}\code{or}\link[MonetDBLite:MonetDBLite]{MonetDBLite::MonetDBLite}`
+First, this  provides a generic method that allows the use of a \verb{[RSQLite::SQLite]`` connection if nothing else is available, while being able to automatically select a much faster, more powerful backend from }\link[duckdb:duckdb]{duckdb::duckdb}`
 if available.  An argument or environmental variable can be used to override this
 to manually set a database endpoint for testing purposes.
 

@@ -39,8 +39,6 @@ Suggests:
     fs,
     rmarkdown,
     RSQLite,
-    MonetDBLite (>= 0.5.0),
     duckdb,
     vroom
 Language: en-US
-Additional_repositories: https://cboettig.github.io/drat

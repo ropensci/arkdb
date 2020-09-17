@@ -38,7 +38,7 @@ test_that("local_db works with duckdb", {
   skip_if_not_installed("duckdb")
   
   
-  db <- local_db(driver = "duckdb")
+  db <- local_db(tempfile(), driver = "duckdb")
   expect_is(db, "DBIConnection")
   expect_is(db, "duckdb_connection")
   local_db_disconnect(db)
