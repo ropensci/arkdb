@@ -10,7 +10,7 @@
 #' 
 #' First, this  provides a generic method that allows the use of a `[RSQLite::SQLite]``
 #' connection if nothing else is available, while being able to automatically
-#' select a much faster, more powerful engine like `[duckdb::duckdb]` or `[MonetDBLite::MonetDBLite]`
+#' select a much faster, more powerful backend from `[duckdb::duckdb]` 
 #' if available.  An argument or environmental variable can be used to override this
 #' to manually set a database endpoint for testing purposes. 
 #' 
@@ -77,10 +77,10 @@ db_driver <- function(dbname,
     drivers <- c("RSQLite", drivers)
   }
   
-  if (requireNamespace("MonetDBLite", quietly = TRUE)){
-    MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
-    drivers <- c("MonetDBLite", drivers)
-  }
+#  if (requireNamespace("MonetDBLite", quietly = TRUE)){
+#    MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
+#    drivers <- c("MonetDBLite", drivers)
+#  }
 
   if (requireNamespace("duckdb", quietly = TRUE)){
     duckdb <- getExportedValue("duckdb", "duckdb")
@@ -90,14 +90,11 @@ db_driver <- function(dbname,
   ## If driver is undefined or not in available list, use first from the list
   if (  !(driver %in% drivers) ) driver <- drivers[[1]]
 
-  if(!dir.exists(dbname))
-    dir.create(dbname, FALSE, TRUE)
-
   db <- switch(driver,
          duckdb = DBI::dbConnect(duckdb(),
                                  dbdir = file.path(dbname,"duckdb"),
                                  read_only = readonly),
-         MonetDBLite = monetdblite_connect(file.path(dbname,"MonetDBLite")),
+#         MonetDBLite = monetdblite_connect(file.path(dbname,"MonetDBLite")),
          RSQLite = DBI::dbConnect(SQLite(),
                                   file.path(dbname, "sqlite.sqlite")),
          dplyr = NULL,
@@ -106,32 +103,6 @@ db_driver <- function(dbname,
 
 
 
-
-# Provide an error handler for connecting to monetdblite if locked
-# by another session
-# @importFrom MonetDBLite MonetDBLite
-monetdblite_connect <- function(dbname, ignore_lock = TRUE){
-
-
-  if (requireNamespace("MonetDBLite", quietly = TRUE))
-    MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
-
-  db <- tryCatch({
-    if (ignore_lock) unlink(file.path(dbname, ".gdk_lock"))
-    DBI::dbConnect(MonetDBLite(), dbname = dbname)
-    },
-    error = function(e){
-      if(grepl("Database lock", e))
-        stop(paste("Local arkdb database is locked by another R session.\n",
-                   "Try closing that session first or set the arkdb_HOME\n",
-                   "environmental variable to a new location.\n"),
-             call. = FALSE)
-      else stop(e)
-    },
-    finally = NULL
-  )
-  db
-}
 
 #' Disconnect from the arkdb database.
 #'

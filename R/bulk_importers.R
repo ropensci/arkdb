@@ -26,7 +26,12 @@ bulk_importer <- function(db_con, streamable_table){
   bulk_monetdb <- function(conn, file, tablename, ...){
     file <- expand_if_compressed(file)
     suppress_msg({
-      MonetDBLite::monet.read.csv(
+    
+    #  if (requireNamespace("MonetDBLite", quietly = TRUE)){
+    monet.read.csv <- getExportedValue("MonetDBLite", "monet.read.csv")
+    #  }  
+      
+      monet.read.csv(
         conn, 
         file, 
         tablename,

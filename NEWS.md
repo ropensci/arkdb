@@ -8,6 +8,8 @@
   non-base packages now, as `progress` is now optional.
 - Use "magic numbers" instead of extensions to guess compression type.
   (NOTE: requires that file is local and not a URL)
+- Now that `duckdb` is on CRAN and `MonetDBLite` isn't, drop built-in
+  support for `MonetDBLite` in favor of `duckdb` alone.
 
 # arkdb 0.0.5 2018-10-31
 

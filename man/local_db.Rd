@@ -34,7 +34,7 @@ minimal complexity, as described in details.
 This function provides several abstractions to \verb{[DBI::dbConnect]} to
 provide a seamless backend for use inside other R packages.
 
-First, this  provides a generic method that allows the use of a \verb{[RSQLite::SQLite]`` connection if nothing else is available, while being able to automatically select a much faster, more powerful engine like }\link[duckdb:duckdb]{duckdb::duckdb}\code{or}\link[MonetDBLite:MonetDBLite]{MonetDBLite::MonetDBLite}`
+First, this  provides a generic method that allows the use of a \verb{[RSQLite::SQLite]`` connection if nothing else is available, while being able to automatically select a much faster, more powerful backend from }\link[duckdb:duckdb]{duckdb::duckdb}`
 if available.  An argument or environmental variable can be used to override this
 to manually set a database endpoint for testing purposes.
 
