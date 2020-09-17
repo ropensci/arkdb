@@ -1,6 +1,5 @@
 
 ## Optionally: Force a backend type, otherwise will use the best available
-## (which is currently MonetDBLite, since it is suggested)
 #Sys.setenv(ARKDB_DRIVER="MonetDBLite")
 #Sys.setenv(ARKDB_DRIVER="RSQLite")
 #Sys.setenv(ARKDB_DRIVER="duckdb")
