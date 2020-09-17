@@ -22,7 +22,7 @@ argument or by setting the environmental variable \code{ARKDB_DRIVER}.}
 This allows multiple concurrent connections (e.g. from different R sessions)}
 }
 \value{
-Returns a \code{src_dbi} connection to the default duckdb database
+Returns a \verb{[DBIcoonection]} connection to the default duckdb database
 }
 \description{
 This function will provide a connection to the best available database.
