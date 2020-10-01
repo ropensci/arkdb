@@ -164,7 +164,11 @@ testthat::test_that("try with MonetDB & alternate method", {
 })
 
   ## Cleanup 
-  DBI::dbDisconnect(db$con)
+  if (packageVersion("dbplyr") > "1.99") {
+    DBI::dbDisconnect(db)
+  } else {
+    DBI::dbDisconnect(db$con)
+  }
   DBI::dbDisconnect(new_db)
   unlink(dir, TRUE) # ark'd text files
 
