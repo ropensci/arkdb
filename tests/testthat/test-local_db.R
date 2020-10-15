@@ -10,7 +10,7 @@ test_that("local_db works with default provider",{
 test_that("local_db works with MonetDBLite", {
   
   skip_if_not_installed("MonetDBLite")
-  
+  skip_on_cran() # some CRAN engines appear not to obey skip_if_not_installed
 
   ## Make sure any previous monetDB use is also shut down
   MonetDBLite::monetdblite_shutdown()
