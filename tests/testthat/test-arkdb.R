@@ -63,7 +63,6 @@ testthat::test_that("we can ark and unark a db in plain text", {
                          dim(nycflights13::flights))
   
   ## unark
-  #new_db <- dplyr::src_sqlite(fs::path(tmp, "local.sqlite"), create = TRUE)
   suppressWarnings( # ignore overwrite warning
     unark(files, new_db, lines = 50000, overwrite = TRUE)
   )

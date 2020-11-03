@@ -44,7 +44,7 @@
 #' files <- list.files(dir, "bz2$", full.names = TRUE)
 #' 
 #' ## Read archived files into a new database (another sqlite in this case)
-#' new_db <- src_sqlite(file.path(dir, "local.sqlite"), create=TRUE)
+#' new_db <- DBI::dbConnect(RSQLite::SQLite())
 #' unark(files, new_db)
 #' 
 #' ## Prove table is returned successfully.
