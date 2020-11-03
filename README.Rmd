@@ -83,7 +83,18 @@ unark(files, new_db, lines = 50000)
 
 
 ```{r include=FALSE}
-DBI::dbDisconnect(db$con)
+
+
+disconnect <- function(db){
+  ## Cleanup 
+  if(inherits(db, "DBIConnection")){
+    DBI::dbDisconnect(db)
+  } else {
+    DBI::dbDisconnect(db$con)
+  }
+}
+
+DBI::dbDisconnect(db)
 DBI::dbDisconnect(new_db)
 
 codemetar::write_codemeta()

@@ -157,19 +157,14 @@ testthat::test_that("try with MonetDB & alternate method", {
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
   
-  DBI::dbDisconnect(monet_db)
+  disconnect(monet_db)
   unlink(monet_dir, TRUE)
   
   
 })
 
-  ## Cleanup 
-  if (packageVersion("dbplyr") > "1.99") {
-    DBI::dbDisconnect(db)
-  } else {
-    DBI::dbDisconnect(db$con)
-  }
-  DBI::dbDisconnect(new_db)
+  disconnect(db)
+  disconnect(new_db)
   unlink(dir, TRUE) # ark'd text files
 
 

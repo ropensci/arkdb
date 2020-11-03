@@ -12,3 +12,11 @@ Sys.setenv(ARKDB_HOME=test_db)
 
 print(paste("Testing using backend", class(local_db())))
 
+disconnect <- function(db){
+  ## Cleanup 
+  if(inherits(db, "DBIConnection")){
+    DBI::dbDisconnect(db)
+  } else {
+    DBI::dbDisconnect(db$con)
+  }
+}
