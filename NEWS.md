@@ -1,3 +1,8 @@
+# arkdb 0.0.8
+
+- bugfix for dplyr 2.0.0 release
+
+
 # arkdb 0.0.7
 
 - bugfix for upcoming dplyr 2.0.0 release
