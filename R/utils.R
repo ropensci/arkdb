@@ -6,7 +6,7 @@ progress <- function(txt, total = 100000){
     p <- progress_bar$new("[:spin] chunk :current", total = 100000)
   } else {
     ## dummy progress bar if we don't have progress installed
-    p <- function(){ list(tick = function()  invisible(NULL)) }
+    p <- list(tick = function() invisible(NULL))
   }
   
   p

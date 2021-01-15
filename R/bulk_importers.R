@@ -5,7 +5,6 @@
 ## to read.table / read_tsv and understands column headers etc
 
 
-#' @importFrom R.utils gunzip
 #' @importFrom tools file_path_sans_ext
 #' @importFrom utils download.file
 bulk_importer <- function(db_con, streamable_table){
@@ -74,8 +73,13 @@ expand_if_compressed <- function(file){
   if(tools::file_ext(file) %in% c("gz", "bz2", "xz")){
     file <- download_if_remote(file)
     dest <- tools::file_path_sans_ext(file)
-    if(!file.exists(dest)) # assumes if it exists that it is the same thing :/
-      R.utils::gunzip(file, dest, remove = FALSE)
+    if(!file.exists(dest)){ # assumes if it exists that it is the same thing :/
+      if(requireNamespace("R.utils", quietly = TRUE)){
+        R.utils::gunzip(file, dest, remove = FALSE)
+      } else {
+        warning("R.utils is required for automatic expansion of compressed files")
+      }
+    }
   } else {
     dest <- file
   }

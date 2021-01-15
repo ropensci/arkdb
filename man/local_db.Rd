@@ -42,7 +42,7 @@ Second, this function will cache the database connection in an R environment and
 load that cache.  That means you can call \code{local_db()} as fast/frequently as you
 like without causing errors that would occur by rapid calls to \verb{[DBI::dbConnect]}
 
-Third, this function defaults to persistent storage location set by \verb{[rappdirs::user_data_dir]}
+Third, this function defaults to persistent storage location set by \verb{[tools::R_user_dir]}
 and configurable by setting the environmental variable \code{ARKDB_HOME}.  This allows
 a package to provide persistent storage out-of-the-box, and easily switch that storage
 to a temporary directory (e.g. for testing purposes, or custom user configuration) without

@@ -3,7 +3,7 @@ library(arkdb)
 #lapply(x, unzip)
 
 x <- list.files("~/FAOSTAT/", pattern="[.]csv",full.names = TRUE)
-dbdir <- rappdirs::user_data_dir("faostat")
+dbdir <- tools::R_user_dir("faostat")
 #fs::dir_delete(dbdir)
 db <- DBI::dbConnect(MonetDBLite::MonetDBLite(), dbdir)
 

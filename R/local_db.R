@@ -18,7 +18,7 @@
 #' load that cache.  That means you can call `local_db()` as fast/frequently as you 
 #' like without causing errors that would occur by rapid calls to `[DBI::dbConnect]`
 #' 
-#' Third, this function defaults to persistent storage location set by `[rappdirs::user_data_dir]`
+#' Third, this function defaults to persistent storage location set by `[tools::R_user_dir]`
 #' and configurable by setting the environmental variable `ARKDB_HOME`.  This allows 
 #' a package to provide persistent storage out-of-the-box, and easily switch that storage
 #' to a temporary directory (e.g. for testing purposes, or custom user configuration) without
@@ -148,5 +148,5 @@ reg.finalizer(arkdb_cache, local_db_disconnect, onexit = TRUE)
 
 
 arkdb_dir <- function(){
-  Sys.getenv("ARKDB_HOME",  rappdirs::user_data_dir("arkdb"))
+  Sys.getenv("ARKDB_HOME",  tools::R_user_dir("arkdb"))
 }
