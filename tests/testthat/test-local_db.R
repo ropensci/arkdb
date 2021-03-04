@@ -7,6 +7,20 @@ test_that("local_db works with default provider",{
   local_db_disconnect(db)
 })
 
+test_that("local_db works readonly",{
+  db <- local_db(readonly = TRUE)
+  expect_is(db, "DBIConnection")
+  local_db_disconnect(db)
+  
+  ## and in a non-existant location
+  expect_message({
+  db <- local_db(tempfile(), readonly = TRUE)
+  })
+  expect_is(db, "DBIConnection")
+  local_db_disconnect(db)
+  
+})
+
 test_that("local_db works with MonetDBLite", {
   
   skip_if_not_installed("MonetDBLite")

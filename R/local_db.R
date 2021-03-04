@@ -51,7 +51,7 @@
 #'
 #' }
 local_db <- function (dbdir = arkdb_dir(), 
-                      driver = Sys.getenv("ARKDB_DRIVER"),
+                      driver = Sys.getenv("ARKDB_DRIVER", "duckdb"),
                       readonly = FALSE, 
                       memory_limit = getOption("duckdb_memory_limit", NA), 
                       ...) {
@@ -60,15 +60,15 @@ local_db <- function (dbdir = arkdb_dir(),
   dbname <- dbdir
   read_only <- readonly
   
-  if (!dir.exists(dbdir)){
-    dir.create(dbdir, FALSE, TRUE)
+  if (!file.exists(dbname)){
+    dir.create(dbname, FALSE, TRUE)
   }
 
   ## Cannot open read-only on a database that does not exist
   ## So we open it read-write, and close it.
   if (!file.exists(file.path(dbname, driver)) && read_only) {
+    message(paste("initializing", driver, "at", dbname))
     db <- db_driver(dbname, driver = driver, read_only = FALSE)
-    DBI::dbWriteTable(db, "init", data.frame(arkdb="arkdb"))
     DBI::dbDisconnect(db, shutdown=TRUE)
   }
   

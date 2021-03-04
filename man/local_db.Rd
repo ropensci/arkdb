@@ -6,7 +6,7 @@
 \usage{
 local_db(
   dbdir = arkdb_dir(),
-  driver = Sys.getenv("ARKDB_DRIVER"),
+  driver = Sys.getenv("ARKDB_DRIVER", "duckdb"),
   readonly = FALSE,
   memory_limit = getOption("duckdb_memory_limit", NA),
   ...
