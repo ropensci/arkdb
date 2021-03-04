@@ -15,8 +15,8 @@ print(paste("Testing using backend", class(local_db())))
 disconnect <- function(db){
   ## Cleanup 
   if(inherits(db, "DBIConnection")){
-    DBI::dbDisconnect(db)
+    DBI::dbDisconnect(db, shutdown=TRUE)
   } else {
-    DBI::dbDisconnect(db$con)
+    DBI::dbDisconnect(db$con, shutdown=TRUE)
   }
 }

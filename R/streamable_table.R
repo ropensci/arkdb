@@ -107,7 +107,7 @@ streamable_readr_tsv <- function() {
       read_tsv(file, ...)
     }
     write <- function(x, path, omit_header = FALSE) {
-      write_tsv(x = x, path = path, append = omit_header)
+      write_tsv(x = x, file = path, append = omit_header)
     }
     
   streamable_table(read, write, "tsv")
@@ -133,7 +133,7 @@ streamable_readr_csv <- function() {
     read_csv(file, ...)
   }
   write <- function(x, path, omit_header = FALSE) {
-    write_csv(x = x, path = path, append = omit_header)
+    write_csv(x = x, file = path, append = omit_header)
   }
   
   streamable_table(read, write, "csv")

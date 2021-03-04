@@ -5,6 +5,11 @@
 # @importFrom MonetDBLite MonetDBLite
 monetdblite_connect <- function(dbname, ignore_lock = TRUE){
   
+  ## Path must exist, but db must not yet exist
+  dir <- dirname(dbname)
+  if(!dir.exists(dir)){
+    dir.create(dir, FALSE, TRUE)
+  }
   
   if (requireNamespace("MonetDBLite", quietly = TRUE))
     MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
@@ -16,7 +21,7 @@ monetdblite_connect <- function(dbname, ignore_lock = TRUE){
   error = function(e){
     if(grepl("Database lock", e))
       stop(paste("Local arkdb database is locked by another R session.\n",
-                 "Try closing that session first or set the arkdb_HOME\n",
+                 "Try closing that session first or set the ARKDB_HOME\n",
                  "environmental variable to a new location.\n"),
            call. = FALSE)
     else stop(e)
@@ -25,3 +30,4 @@ monetdblite_connect <- function(dbname, ignore_lock = TRUE){
   )
   db
 }
+

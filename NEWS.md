@@ -1,3 +1,8 @@
+# arkdb 0.0.10
+
+- Better handling of read_only vs read_write connections.  Only caches
+  read_only connections.  
+
 # arkdb 0.0.8
 
 - bugfix for dplyr 2.0.0 release

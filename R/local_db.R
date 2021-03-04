@@ -31,10 +31,15 @@
 #'   argument or by setting the environmental variable `ARKDB_DRIVER`.
 #' @param readonly Should the database be opened read-only? (duckdb only).
 #'  This allows multiple concurrent connections (e.g. from different R sessions)
-#' @return Returns a `[DBIcoonection]` connection to the default duckdb database
+#' @param memory_limit Set a memory limit for duckdb, in GB.  This can
+#' also be set for the session by using options, e.g. 
+#' `options(duckdb_memory_limit=10)` for a limit of 10GB.  On most systems 
+#' duckdb will automatically set a limit to 80% of machine capacity if not 
+#' set explicitly.  
+#' @param ... additional arguments (not used at this time)
+#' @return Returns a `[DBIconnection]` connection to the default database
 #'
 #' @importFrom DBI dbConnect dbIsValid
-# @importFrom duckdb duckdb
 #' @export
 #' @examples \donttest{
 #' ## OPTIONAL: you can first set an alternative home location,
@@ -45,69 +50,143 @@
 #' db <- local_db()
 #'
 #' }
-local_db <- function(dbdir = arkdb_dir(),
-                     driver = Sys.getenv("ARKDB_DRIVER"),
-                     readonly = FALSE){
-
-  dbname <- file.path(dbdir, "database")
-  db <- mget("ark_db", envir = arkdb_cache, ifnotfound = NA)[[1]]
-  if (inherits(db, "DBIConnection")) {
-    if (DBI::dbIsValid(db)) {
-      return(db)
-    }
+local_db <- function (dbdir = arkdb_dir(), 
+                      driver = Sys.getenv("ARKDB_DRIVER"),
+                      readonly = FALSE, 
+                      memory_limit = getOption("duckdb_memory_limit", NA), 
+                      ...) {
+  
+  
+  dbname <- dbdir
+  read_only <- readonly
+  
+  if (!dir.exists(dbdir)){
+    dir.create(dbdir, FALSE, TRUE)
   }
 
-  dir.create(dbname, showWarnings = FALSE, recursive = TRUE)
-
-  db <- db_driver(dbname, driver)
-  assign("ark_db", db, envir = arkdb_cache)
+  ## Cannot open read-only on a database that does not exist
+  ## So we open it read-write, and close it.
+  if (!file.exists(file.path(dbname, driver)) && read_only) {
+    db <- db_driver(dbname, driver = driver, read_only = FALSE)
+    DBI::dbWriteTable(db, "init", data.frame(arkdb="arkdb"))
+    DBI::dbDisconnect(db, shutdown=TRUE)
+  }
+  
+  db <- mget("arkdb_db", envir = arkdb_cache, ifnotfound = NA)[[1]]
+  cached_driver <- mget("arkdb_driver", envir = arkdb_cache, ifnotfound = NA)[[1]]
+  cached_dbname <- mget("arkdb_dbname", envir = arkdb_cache, ifnotfound = NA)[[1]]
+  
+  ## ONLY return cached connection if read_only & driver and dir match!!
+  if (inherits(db, "DBIConnection")) {
+    if (DBI::dbIsValid(db)) {
+      if (read_only & cached_dbname == dbname & cached_driver == driver) {
+        return(db)
+      } else {
+        ## shut down the cached (read_only) connection first 
+        ## so we can make a new connection with write privileges
+        DBI::dbDisconnect(db, shutdown = TRUE)
+      }
+    }
+  }
+  db <- db_driver(dbname, driver = driver, read_only = read_only)
+  
+  if(!is.na(memory_limit) && driver =="duckdb"){
+    pragma <- paste0("PRAGMA memory_limit='", memory_limit, "GB'")
+    DBI::dbExecute(db, pragma)
+  }
+  
+  ## Only cache read-only connections
+  if (read_only) {
+    assign("arkdb_db", db, envir = arkdb_cache)
+    assign("arkdb_driver", driver, envir = arkdb_cache)
+    assign("arkdb_dbname", dbname, envir = arkdb_cache)
+    
+  }
+  
   db
+}
+
+
+#' delete the local arkdb database
+#' 
+#' @param db_dir neon database location 
+#' @param ask Ask for confirmation first?
+#' @details Just a helper function that deletes the database
+#' files.  Usually unnecessary but can be
+#' helpful in resetting a corrupt database.  
+#' 
+#' @importFrom utils askYesNo
+#' @export
+#' @examples 
+#' 
+#' # Create a db
+#' dir <- tempfile()
+#' db <- local_db(dir)
+#' 
+#' # Delete it
+#' arkdb_delete_db(dir, ask = FALSE)
+#' 
+#' 
+arkdb_delete_db <- function(db_dir = arkdb_dir(), ask = interactive()){
+  continue <- TRUE
+  if(ask){
+    continue <- utils::askYesNo(paste("Delete local DB in", db_dir, "?"))
+  }
+  if(continue){
+    db_files <- list.files(db_dir, "^database.*", full.names = TRUE)
+    lapply(db_files, unlink, TRUE)
+  }
+  if (exists("arkdb_db", envir = arkdb_cache)) {
+    suppressWarnings(
+      rm("arkdb_db", envir = arkdb_cache)
+    )
+  }
+  return(invisible(continue))
 }
 
 
 
 db_driver <- function(dbname, 
                       driver = Sys.getenv("ARKDB_DRIVER"), 
-                      readonly = FALSE){
-
+                      read_only = FALSE){
+  
   ## Evaluate capabilities in reverse-priority order
-  drivers <- "dplyr"
-
+  
+  drivers <- NULL
+  if (requireNamespace("dplyr", quietly = TRUE)){
+    drivers <- "dplyr"
+  }
+  
   if (requireNamespace("RSQLite", quietly = TRUE)){
     SQLite <- getExportedValue("RSQLite", "SQLite")
     drivers <- c("RSQLite", drivers)
   }
   
-#  if (requireNamespace("MonetDBLite", quietly = TRUE)){
-#    MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
-#    drivers <- c("MonetDBLite", drivers)
-#  }
-
+  if (requireNamespace("MonetDBLite", quietly = TRUE)){
+    MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
+    drivers <- c("MonetDBLite", drivers)
+  }
+  
   if (requireNamespace("duckdb", quietly = TRUE)){
     duckdb <- getExportedValue("duckdb", "duckdb")
     drivers <- c("duckdb", drivers)
   }
-
+  
+  if(is.null(drivers)) stop("No drivers found. see ?arkdb::local_db")
+  
   ## If driver is undefined or not in available list, use first from the list
   if (  !(driver %in% drivers) ) driver <- drivers[[1]]
-
-  
-  dir.create(dbname, showWarnings = FALSE, recursive = TRUE)
-  
-  
   
   db <- switch(driver,
-         duckdb = DBI::dbConnect(duckdb(),
-                                 dbdir = file.path(dbname,"duckdb"),
-                                 read_only = readonly),
-#         MonetDBLite = monetdblite_connect(file.path(dbname,"MonetDBLite")),
-         RSQLite = DBI::dbConnect(SQLite(),
-                                  file.path(dbname, "sqlite.sqlite")),
-         dplyr = NULL,
-         NULL)
+               duckdb = DBI::dbConnect(duckdb(),
+                                       file.path(dbname, driver),
+                                       read_only = read_only),
+               MonetDBLite = monetdblite_connect(file.path(dbname, driver)),
+               RSQLite = DBI::dbConnect(SQLite(),
+                                        file.path(dbname, "sqlite.sqlite")),
+               dplyr = NULL,
+               NULL)
 }
-
-
 
 
 #' Disconnect from the arkdb database.
@@ -129,19 +208,20 @@ db_driver <- function(dbname,
 local_db_disconnect <- function(db = local_db(), env = arkdb_cache){
   if (inherits(db, "DBIConnection")) {
     suppressWarnings({
-      if(inherits(db, "MonetDBEmbeddedConnection")) 
+      if(inherits(db, "MonetDBEmbeddedConnection") || 
+         inherits(db, "duckdb_connection")) 
         DBI::dbDisconnect(db, shutdown=TRUE)
       else
         DBI::dbDisconnect(db)
-
+      
     })
   }
-  if(exists("ark_db", envir =env)){
+  if(exists("ark_db", envir = env)){
     rm("ark_db", envir = env)
   }
 }
 
-## Enironment to store the cached copy of the connection
+## Environment to store the cached copy of the connection
 ## and a finalizer to close the connection on exit.
 arkdb_cache <- new.env()
 reg.finalizer(arkdb_cache, local_db_disconnect, onexit = TRUE)
@@ -150,3 +230,7 @@ reg.finalizer(arkdb_cache, local_db_disconnect, onexit = TRUE)
 arkdb_dir <- function(){
   Sys.getenv("ARKDB_HOME",  tools::R_user_dir("arkdb"))
 }
+
+
+
+
