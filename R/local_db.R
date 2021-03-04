@@ -56,6 +56,10 @@ local_db <- function (dbdir = arkdb_dir(),
                       memory_limit = getOption("duckdb_memory_limit", NA), 
                       ...) {
   
+  if(driver == ""){
+    message("driver not specified, trying duckdb")
+    driver = "duckdb"
+  }
   
   dbname <- dbdir
   read_only <- readonly
