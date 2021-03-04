@@ -140,14 +140,21 @@ arkdb_delete_db <- function(db_dir = arkdb_dir(), ask = interactive()){
     db_files <- list.files(db_dir, "^database.*", full.names = TRUE)
     lapply(db_files, unlink, TRUE)
   }
-  if (exists("arkdb_db", envir = arkdb_cache)) {
-    suppressWarnings(
-      rm("arkdb_db", envir = arkdb_cache)
-    )
-  }
+  purge_cache()
+  
   return(invisible(continue))
 }
 
+
+purge_cache <- function(){
+  if (exists("arkdb_db", envir = arkdb_cache)) {
+    suppressWarnings({
+      rm("arkdb_db", envir = arkdb_cache)
+      rm("arkdb_driver", envir = arkdb_cache)
+      rm("arkdb_dbname", envir = arkdb_cache)
+    })
+  }
+}
 
 
 db_driver <- function(dbname, 
@@ -220,9 +227,7 @@ local_db_disconnect <- function(db = local_db(), env = arkdb_cache){
       
     })
   }
-  if(exists("ark_db", envir = env)){
-    rm("ark_db", envir = env)
-  }
+  purge_cache()
 }
 
 ## Environment to store the cached copy of the connection
