@@ -36,6 +36,10 @@
 #' `options(duckdb_memory_limit=10)` for a limit of 10GB.  On most systems 
 #' duckdb will automatically set a limit to 80% of machine capacity if not 
 #' set explicitly.  
+#' @param cache_connection should we preserve a cache of the connection? allows
+#' faster load times and prevents connection from being garbage-collected.  However,
+#' keeping open a read-write connection to duckdb or MonetDBLite will block access of
+#' other R sessions to the database.  
 #' @param ... additional arguments (not used at this time)
 #' @return Returns a `[DBIconnection]` connection to the default database
 #'
@@ -53,6 +57,7 @@
 local_db <- function (dbdir = arkdb_dir(), 
                       driver = Sys.getenv("ARKDB_DRIVER", "duckdb"),
                       readonly = FALSE, 
+                      cache_connection = TRUE,
                       memory_limit = getOption("duckdb_memory_limit", NA), 
                       ...) {
   
@@ -100,7 +105,7 @@ local_db <- function (dbdir = arkdb_dir(),
   }
   
   ## Only cache read-only connections
-  if (read_only) {
+  if (cache_connection) {
     assign("arkdb_db", db, envir = arkdb_cache)
     assign("arkdb_driver", driver, envir = arkdb_cache)
     assign("arkdb_dbname", dbname, envir = arkdb_cache)
