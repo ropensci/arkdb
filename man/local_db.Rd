@@ -8,6 +8,7 @@ local_db(
   dbdir = arkdb_dir(),
   driver = Sys.getenv("ARKDB_DRIVER", "duckdb"),
   readonly = FALSE,
+  cache_connection = TRUE,
   memory_limit = getOption("duckdb_memory_limit", NA),
   ...
 )
@@ -22,6 +23,11 @@ argument or by setting the environmental variable \code{ARKDB_DRIVER}.}
 
 \item{readonly}{Should the database be opened read-only? (duckdb only).
 This allows multiple concurrent connections (e.g. from different R sessions)}
+
+\item{cache_connection}{should we preserve a cache of the connection? allows
+faster load times and prevents connection from being garbage-collected.  However,
+keeping open a read-write connection to duckdb or MonetDBLite will block access of
+other R sessions to the database.}
 
 \item{memory_limit}{Set a memory limit for duckdb, in GB.  This can
 also be set for the session by using options, e.g.
