@@ -59,3 +59,14 @@ test_that("local_db works with duckdb", {
   
 })
 
+test_that("Caching local db works", {
+  
+  # default
+  db1 <- local_db(cache_connection = TRUE)
+  db2 <- local_db(cache_connection = TRUE)
+  expect_identical(db1, db2)
+  
+  db3 <- local_db(cache_connection = FALSE)
+  expect_false(identical(db1, db3))
+})
+

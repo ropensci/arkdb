@@ -1,3 +1,7 @@
+# arkdb 0.0.12
+
+- bugfix for arkdb
+
 # arkdb 0.0.11
 
 - make cached connection opt-out instead of applying only to read_only.  This

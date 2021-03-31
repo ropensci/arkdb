@@ -85,10 +85,10 @@ local_db <- function (dbdir = arkdb_dir(),
   cached_driver <- mget("arkdb_driver", envir = arkdb_cache, ifnotfound = NA)[[1]]
   cached_dbname <- mget("arkdb_dbname", envir = arkdb_cache, ifnotfound = NA)[[1]]
   
-  ## ONLY return cached connection if read_only & driver and dir match!!
+  ## ONLY return cached connection if requested to, & driver and dir match!!
   if (inherits(db, "DBIConnection")) {
     if (DBI::dbIsValid(db)) {
-      if (read_only & cached_dbname == dbname & cached_driver == driver) {
+      if (cache_connection & cached_dbname == dbname & cached_driver == driver) {
         return(db)
       } else {
         ## shut down the cached (read_only) connection first 
