@@ -4,7 +4,6 @@
 ## Should have an S3 generic: bulk(con, file, tablename, ...) that passes all ...
 ## to read.table / read_tsv and understands column headers etc
 
-
 #' @importFrom tools file_path_sans_ext
 #' @importFrom utils download.file
 bulk_importer <- function(db_con, streamable_table){
@@ -22,20 +21,35 @@ bulk_importer <- function(db_con, streamable_table){
                   NULL)
   
   ## Method returns this function
-  bulk_monetdb <- function(conn, file, tablename, ...){
-    file <- expand_if_compressed(file)
+  bulk_fn <- get_bulk_fn(db_con, delim, quote)
+  
+  return(bulk_fn)
+}
+
+get_bulk_fn <- function(db_con, delim, quote, ...) {
+  UseMethod("get_bulk_fn", db_con)
+}
+
+get_bulk_fn.default <- function(db_con, delim, quote, ...) {
+  NULL
+}
+
+get_bulk_fn.MonetDBEmbeddedConnection <- function(db_con, delim, quote, ...) {
+  function(conn, filename, tablename, ...){
+    filename <- expand_if_compressed(filename)
     suppress_msg({
-    
-    #  if (requireNamespace("MonetDBLite", quietly = TRUE)){
-    monet.read.csv <- getExportedValue("MonetDBLite", "monet.read.csv")
-    #  }  
+      
+      #  if (requireNamespace("MonetDBLite", quietly = TRUE)){
+      monet.read.csv <- getExportedValue("MonetDBLite", "monet.read.csv")
+      #  }  
       
       monet.read.csv(
         conn, 
-        file, 
-        tablename,
+        files = filename, 
+        tablename = tablename,
         delim = delim, 
         quote = quote,
+        header = TRUE,
         nrow.check = 1e4,
         best.effort = FALSE) 
       ## For now, omit ... from monet.read.csv call.  `...` may
@@ -44,16 +58,27 @@ bulk_importer <- function(db_con, streamable_table){
     })
     return(0)
   }
-  
-  ## Should do this as an S3 method for MonetDBEmbeddedConnection
-  if (inherits(db_con, "MonetDBEmbeddedConnection")){
-    return(bulk_monetdb)
-  }
-
-  ## Make this the return if no method can be found?
-  NULL
 }
 
+get_bulk_fn.duckdb_connection <- function(db_con, delim, quote, ...) {
+  function(conn, filename, tablename, ...){
+    filename <- expand_if_compressed(filename)
+    suppress_msg({
+      
+      duckdb_read_csv <- getExportedValue("duckdb", "duckdb_read_csv")
+
+      duckdb_read_csv(
+        conn = conn, 
+        name = tablename,
+        files = filename, 
+        delim = delim, 
+        quote = quote,
+        header = TRUE,
+        nrow.check = 1e4) 
+    })
+    return(0)
+  }
+}
 
 
 ## FIXME Consider migrating these up into arkdb::unark behavior, so that standard R-DBI method
