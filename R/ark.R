@@ -125,8 +125,15 @@ ark_file <- function(tablename,
     return(NULL)
   }
   
-  con <- generic_connection(filename, "wb")
-  on.exit(close(con))
+  if(streamable_table$extension == "parquet") {
+    # Arrow files need a sink
+    con <- filename
+  } else {
+    # Text files need a connection
+    con <- generic_connection(filename, "wb")
+    on.exit(close(con))
+  }
+
   
   ## Progress reporting
   message(sprintf("Exporting %s in %d line chunks:", tablename, lines))
@@ -157,8 +164,11 @@ get_header <- function(db, tablename){
 
 keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
   ## Create header to avoid duplicate column names
-  header <- get_header(db_con, tablename)
-  streamable_table$write(header, con, omit_header = FALSE)
+  
+  if (!streamable_table$extension == "parquet") {
+    header <- get_header(db_con, tablename)
+    streamable_table$write(header, con, omit_header = FALSE)
+  }
   
   ## 
   res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
@@ -223,8 +233,8 @@ ark_chunk <- function(db_con,
   data <- DBI::dbGetQuery(db_con, query)
   
   omit_header <- start != 1
-  streamable_table$write(data, con, omit_header = omit_header)
   
+  streamable_table$write(data, con, omit_header = omit_header)
 }
 
 ## need to convert large integers to characters

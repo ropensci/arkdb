@@ -174,8 +174,6 @@ streamable_base_tsv <- function() {
   streamable_table(read_tsv, write_tsv, "tsv")
 }
 
-
-
 #' streamable csv using base R functions
 #' 
 #' @return a `streamable_table` object (S3)
@@ -202,7 +200,7 @@ streamable_base_csv <- function() {
   ## NOTE: write.csv does not permit setting 
   ## `col.names = FALSE``, so cannot omit_header
   write_csv <- function(x, path, omit_header) {
-      utils::write.table(x,
+    utils::write.table(x,
                        file = path, 
                        sep = ",", 
                        quote = TRUE,
@@ -210,8 +208,39 @@ streamable_base_csv <- function() {
                        row.names = FALSE,
                        col.names = !omit_header,
                        append = omit_header
-      )
+    )
   }
   streamable_table(read_csv, write_csv, "csv")
 }
 
+
+#' streamable chunked parquet using `arrow`
+#' 
+#' @return a `streamable_table` object (S3)
+#' @export
+#' @seealso [arrow::read_parquet()], [arrow::write_parquet()]
+streamable_parquet <- function() {
+  
+  ## Avoids a hard dependency on arrow for this courtesy function
+  if (!requireNamespace("arrow", quietly = TRUE)) {
+    stop("arrow package must be installed to use parquet",
+         call. = FALSE)
+  }
+  
+  read_parquet <- getExportedValue("arrow", "read_parquet")
+  write_parquet <- getExportedValue("arrow", "write_parquet")
+  
+  read <- function(file, ...) {
+    read_parquet(file, ...)
+  }
+  
+  write <- function(x, path, omit_header = FALSE, ...) {
+    # TODO: use chunk size to automate breaks 
+    write_parquet(x, 
+                  sink = path, 
+                  ...
+    )
+  }
+  
+  streamable_table(read, write, "parquet")
+}

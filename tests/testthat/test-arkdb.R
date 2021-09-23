@@ -162,6 +162,63 @@ testthat::test_that("try with MonetDB & alternate method", {
   
 })
 
+testthat::context("parquet")
+testthat::test_that("try with parquet & alternate method", {
+  
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("fs")
+  skip_if_not_installed("nycflights13")
+  
+  # test ark to parquet from sqlite
+  ark(
+    db, 
+    dir, 
+    lines = 50000, 
+    compress = "none",
+    streamable_table=streamable_parquet(),
+    method = "keep-open",
+    overwrite = TRUE
+  )
+  
+  ## SETUP, with text files. (Could skip as these now exist from above tests)
+  data <-  list(airlines = nycflights13::airlines, 
+                airports = nycflights13::airports, 
+                flights = nycflights13::flights)
+  sink <- lapply(names(data), function(x) 
+    arrow::write_parquet(data[[x]], fs::path(dir, paste0(x, ".parquet"))))
+  
+  files <- fs::dir_ls(dir, glob = "*.parquet")
+  
+  flights <- dplyr::tbl(monet_db, "flights")
+  testthat::expect_equal(dim(flights)[[2]], 19)
+  testthat::expect_is(flights, "tbl_dbi")
+  
+  ## clean out the text files
+  unlink(dir, TRUE) # ark'd text files
+  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
+  
+  ## Test has_between
+  testthat::expect_false( arkdb:::has_between(monet_db, "airlines") )
+  
+  #### Test ark ######
+  ark(monet_db, dir, lines = 50000L, method = "window", overwrite = TRUE)
+  
+  ## test ark results
+  suppressWarnings(
+    myflights <- readr::read_tsv(fs::path(dir, "flights.tsv.bz2"))
+  )
+  testthat::expect_equal(dim(myflights), 
+                         dim(nycflights13::flights))
+  
+  disconnect(monet_db)
+  unlink(monet_dir, TRUE)
+  
+  
+})
+
+
+
   disconnect(db)
   disconnect(new_db)
   unlink(dir, TRUE) # ark'd text files
