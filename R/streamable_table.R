@@ -235,7 +235,39 @@ streamable_parquet <- function() {
   }
   
   write <- function(x, path, omit_header = FALSE, ...) {
-    # TODO: use chunk size to automate breaks 
+    # 1. Store parquet pieces in a directory, create the directory.
+    # 2. Get the number of the last piece via list.files.
+    # 3. Increment the part number, rewrite path, write part to disk.
+    # 4. Profit
+    
+    # Store the parquet pieces in a directory named after the table 
+    # for ease of use with arrow::open_dataset
+    dir_path <- paste0(
+      dirname(path), 
+      "/",
+      strsplit(
+        basename(path), 
+        split = ".", 
+        fixed = TRUE)[[1]][1]
+    )
+    
+    # Create the directory
+    dir.create(dir_path, showWarnings = FALSE)
+    
+    # Check what part numbers have been used and increment 
+    fls <- list.files(dir_path)
+    
+    if(length(fls) == 0) {
+      n <- 1
+    } else {
+      # Find max part number, and increment
+      n <- max(as.integer(gsub(".*?([0-9]+).*", "\\1", fls))) + 1
+    }
+  
+    # Overload path accordingly
+    path <- paste0(
+      dir_path, "/part-", formatC(n, width=5, flag="0"), ".parquet")
+    
     write_parquet(x, 
                   sink = path, 
                   ...

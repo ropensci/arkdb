@@ -174,46 +174,52 @@ testthat::test_that("try with parquet & alternate method", {
   ark(
     db, 
     dir, 
-    lines = 50000, 
+    lines = 25000, 
     compress = "none",
     streamable_table=streamable_parquet(),
     method = "keep-open",
     overwrite = TRUE
   )
   
-  ## SETUP, with text files. (Could skip as these now exist from above tests)
-  data <-  list(airlines = nycflights13::airlines, 
-                airports = nycflights13::airports, 
-                flights = nycflights13::flights)
-  sink <- lapply(names(data), function(x) 
-    arrow::write_parquet(data[[x]], fs::path(dir, paste0(x, ".parquet"))))
+  # Test that parts are written out appropriately
   
-  files <- fs::dir_ls(dir, glob = "*.parquet")
-  
-  flights <- dplyr::tbl(monet_db, "flights")
-  testthat::expect_equal(dim(flights)[[2]], 19)
-  testthat::expect_is(flights, "tbl_dbi")
-  
-  ## clean out the text files
-  unlink(dir, TRUE) # ark'd text files
-  dir <- fs::dir_create(fs::path(tmp, "nycflights"))
-  
-  ## Test has_between
-  testthat::expect_false( arkdb:::has_between(monet_db, "airlines") )
-  
-  #### Test ark ######
-  ark(monet_db, dir, lines = 50000L, method = "window", overwrite = TRUE)
-  
-  ## test ark results
-  suppressWarnings(
-    myflights <- readr::read_tsv(fs::path(dir, "flights.tsv.bz2"))
+  # airlines
+  testthat::expect_equal(
+    "part-00001.parquet", 
+    list.files(paste0(dir, "/", "airlines"))
   )
-  testthat::expect_equal(dim(myflights), 
-                         dim(nycflights13::flights))
   
-  disconnect(monet_db)
-  unlink(monet_dir, TRUE)
+  testthat::expect_equal(
+    nrow(arrow::open_dataset(paste0(dir, "/", "airlines"))),
+    dbGetQuery(db, "SELECT COUNT(*) FROM airlines")[[1]]
+  )
   
+  # airports
+  testthat::expect_equal(
+    "part-00001.parquet",
+    list.files(paste0(dir, "/", "airports"))
+  )
+  
+  testthat::expect_equal(
+    nrow(arrow::open_dataset(paste0(dir, "/", "airports"))),
+    dbGetQuery(db, "SELECT COUNT(*) FROM airports")[[1]]
+  )
+  
+  # flights
+  print(list.files(paste0(dir,"/","flights")))
+  testthat::expect_true("part-00001.parquet" %in% list.files(paste0(dir,"/","flights")))
+  testthat::expect_true("part-00014.parquet" %in% list.files(paste0(dir,"/","flights")))
+  testthat::expect_length(list.files(paste0(dir,"/","flights")), 14)
+
+  testthat::expect_equal(
+    nrow(arrow::open_dataset(paste0(dir, "/", "flights"))),
+    dbGetQuery(db, "SELECT COUNT(*) FROM flights")[[1]]
+  )
+  
+  testthat::expect_equal(
+    dim(arrow::open_dataset(paste0(dir, "/", "flights"))),
+    dim(nycflights13::flights)
+  )
   
 })
 
@@ -221,6 +227,6 @@ testthat::test_that("try with parquet & alternate method", {
 
   disconnect(db)
   disconnect(new_db)
-  unlink(dir, TRUE) # ark'd text files
+  unlink(dir, TRUE) # ark'd text/parquet files
 
 

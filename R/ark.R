@@ -126,7 +126,8 @@ ark_file <- function(tablename,
   }
   
   if(streamable_table$extension == "parquet") {
-    # Arrow files need a sink
+    # Parquet files need a sink. 
+    # TODO: Overwrite means we should unlink(dir, TRUE)
     con <- filename
   } else {
     # Text files need a connection
@@ -166,6 +167,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
   ## Create header to avoid duplicate column names
   
   if (!streamable_table$extension == "parquet") {
+    # Parquet has no append=TRUE method in R
     header <- get_header(db_con, tablename)
     streamable_table$write(header, con, omit_header = FALSE)
   }
