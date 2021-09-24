@@ -174,8 +174,6 @@ streamable_base_tsv <- function() {
   streamable_table(read_tsv, write_tsv, "tsv")
 }
 
-
-
 #' streamable csv using base R functions
 #' 
 #' @return a `streamable_table` object (S3)
@@ -202,7 +200,7 @@ streamable_base_csv <- function() {
   ## NOTE: write.csv does not permit setting 
   ## `col.names = FALSE``, so cannot omit_header
   write_csv <- function(x, path, omit_header) {
-      utils::write.table(x,
+    utils::write.table(x,
                        file = path, 
                        sep = ",", 
                        quote = TRUE,
@@ -210,8 +208,71 @@ streamable_base_csv <- function() {
                        row.names = FALSE,
                        col.names = !omit_header,
                        append = omit_header
-      )
+    )
   }
   streamable_table(read_csv, write_csv, "csv")
 }
 
+
+#' streamable chunked parquet using `arrow`
+#' 
+#' @return a `streamable_table` object (S3)
+#' @export
+#' @seealso [arrow::read_parquet()], [arrow::write_parquet()]
+streamable_parquet <- function() {
+  
+  ## Avoids a hard dependency on arrow for this courtesy function
+  if (!requireNamespace("arrow", quietly = TRUE)) {
+    stop("arrow package must be installed to use parquet",
+         call. = FALSE)
+  }
+  
+  read_parquet <- getExportedValue("arrow", "read_parquet")
+  write_parquet <- getExportedValue("arrow", "write_parquet")
+  
+  read <- function(file, ...) {
+    read_parquet(file, ...)
+  }
+  
+  write <- function(x, path, omit_header = FALSE, ...) {
+    # 1. Store parquet pieces in a directory, create the directory.
+    # 2. Get the number of the last piece via list.files.
+    # 3. Increment the part number, rewrite path, write part to disk.
+    # 4. Profit
+    
+    # Store the parquet pieces in a directory named after the table 
+    # for ease of use with arrow::open_dataset
+    dir_path <- paste0(
+      dirname(path), 
+      "/",
+      strsplit( # TODO: Fix upstream R/ark.R L128 can probably pass `dir` here
+        basename(path), 
+        split = ".", 
+        fixed = TRUE)[[1]][1]
+    )
+    
+    # Create the directory
+    dir.create(dir_path, showWarnings = FALSE)
+    
+    # Check what part numbers have been used and increment 
+    fls <- list.files(dir_path)
+    
+    if(length(fls) == 0) {
+      n <- 1
+    } else {
+      # Find max part number, and increment
+      n <- max(as.integer(gsub(".*?([0-9]+).*", "\\1", fls))) + 1
+    }
+  
+    # Overload path accordingly
+    path <- paste0(
+      dir_path, "/part-", formatC(n, width=5, flag="0"), ".parquet")
+    
+    write_parquet(x, 
+                  sink = path, 
+                  ...
+    )
+  }
+  
+  streamable_table(read, write, "parquet")
+}

@@ -16,7 +16,8 @@
 #' default is "ask", which will ask for confirmation in an interactive session, and
 #' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 #' always skip such tables.
-
+#' @param filter_statement Typically an SQL "WHERE" clause, specific to your
+#' dataset. (e.g., `WHERE year = 2013`) 
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
@@ -65,11 +66,16 @@ ark <- function(db_con,
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window"),
-                overwrite = "ask"){
+                overwrite = "ask",
+                filter_statement = NULL){
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
   assert_streamable(streamable_table)
+  
+  if(!is.null(filter) & length(tables) > 1) {
+    warning("Your filter statement will be applied to all tables.")
+  }
 
   
   method <- match.arg(method)
@@ -89,7 +95,8 @@ ark <- function(db_con,
          dir = dir, 
          compress = compress,
          method = method,
-         overwrite = overwrite)
+         overwrite = overwrite, 
+         filter_statement = filter_statement)
   
   invisible(dir)
 }
@@ -107,7 +114,8 @@ ark_file <- function(tablename,
                      dir, 
                      compress,
                      method,
-                     overwrite){
+                     overwrite, 
+                     filter_statement){
   
   ## Set up compressed connection
   ext <- switch(compress,
@@ -135,12 +143,13 @@ ark_file <- function(tablename,
  
   switch(method,
           "keep-open" = keep_open(db_con, streamable_table, lines, 
-                                  p, tablename, con),
+                                  p, tablename, con, filter_statement),
              "window" = window(db_con, streamable_table, lines, 
-                               compress, p, tablename, con),
+                               compress, p, tablename, con, filter_statement),
          "sql-window" = sql_window(db_con, streamable_table, lines, 
-                                   compress, p, tablename, con),
-         keep_open(db_con, streamable_table, lines, p, tablename, con)
+                                   compress, p, tablename, con, filter_statement),
+         keep_open(db_con, streamable_table, lines, p, tablename, con, 
+                   filter_statement)
   )
   
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
@@ -155,30 +164,45 @@ get_header <- function(db, tablename){
   as.data.frame(lapply(fields, function(x) character(0)))
 }
 
-keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
+keep_open <- function(db_con, streamable_table, lines, p, tablename, con, 
+                      filter_statement) {
   ## Create header to avoid duplicate column names
   header <- get_header(db_con, tablename)
   streamable_table$write(header, con, omit_header = FALSE)
   
   ## 
-  res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
+  if(is.null(filter_statement)) {
+    res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
+  } else {
+    res <- DBI::dbSendQuery(
+      db_con, 
+      paste("SELECT * FROM", filter_statement, tablename)
+    )
+  }
+
   while (TRUE) {
     p$tick()
     data <- DBI::dbFetch(res, n = lines)
     if (nrow(data) == 0) break
     streamable_table$write(data, con, omit_header = TRUE)
   }
+  
   DBI::dbClearResult(res)
 }
 
 
-
-
-
 windowing <- function(sql_supports_windows)
-  function(db_con, streamable_table, lines, compress, p, tablename, con){
+  function(db_con, streamable_table, lines, compress, p, tablename, con, 
+           filter_statement) {
   
-  size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
+  if(is.null(filter_statement)) {
+    size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
+  } else {
+    size <- DBI::dbGetQuery(
+      db_con, 
+      paste("SELECT COUNT(*) FROM", filter_statement, tablename))
+  }
+
   end <- size[[1]][[1]]
   start <- 1
   repeat {
@@ -191,7 +215,8 @@ windowing <- function(sql_supports_windows)
               lines = lines,
               compress = compress, 
               con = con, 
-              sql_supports_windows = sql_supports_windows)
+              sql_supports_windows = sql_supports_windows,
+              filter_statement = filter_statement)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
       break
@@ -206,18 +231,35 @@ ark_chunk <- function(db_con,
                       lines, 
                       compress,
                       con,
-                      sql_supports_windows){
+                      sql_supports_windows, 
+                      filter_statement = NULL){
   
   if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
-    query <- paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN",
-             sql_int((start - 1) * lines), "AND", sql_int(start * lines))
+    if(is.null(filter_statement)) {
+      query <- paste("SELECT * FROM", tablename, filter_statement, 
+                     "AND rownum BETWEEN", sql_int((start - 1) * lines), 
+                     "AND", sql_int(start * lines))
+    } else {
+      query <- paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN",
+                     sql_int((start - 1) * lines), "AND", sql_int(start * lines))      
+    }
+
   } else { 
     ## Any SQL DB can do offset
-    query <- paste("SELECT * FROM", tablename, "LIMIT", 
-                   sql_int(lines), 
-                   "OFFSET", 
-                   sql_int((start-1)*lines))
+    if(is.null(filter_statement)) {
+      query <- paste("SELECT * FROM", tablename, "LIMIT", 
+                     sql_int(lines), 
+                     "OFFSET", 
+                     sql_int((start-1)*lines))
+    } else {
+      query <- paste("SELECT * FROM", tablename, filter_statement, "LIMIT", 
+                     sql_int(lines), 
+                     "OFFSET", 
+                     sql_int((start-1)*lines))      
+
+    }
+
 
   }
   data <- DBI::dbGetQuery(db_con, query)

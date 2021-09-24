@@ -12,7 +12,8 @@ ark(
   compress = c("bzip2", "gzip", "xz", "none"),
   tables = list_tables(db_con),
   method = c("keep-open", "window", "sql-window"),
-  overwrite = "ask"
+  overwrite = "ask",
+  filter_statement = NULL
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ schema if appropriate, see examples.}
 default is "ask", which will ask for confirmation in an interactive session, and
 overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 always skip such tables.}
+
+\item{filter_statement}{Typically an SQL "WHERE" clause, specific to your
+dataset. (e.g., \verb{WHERE year = 2013})}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.
