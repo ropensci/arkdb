@@ -25,6 +25,7 @@ Imports:
     tools,
     utils
 Suggests:
+    arrow,
     R.utils,
     progress,
     readr,
