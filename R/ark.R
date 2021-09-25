@@ -73,7 +73,7 @@ ark <- function(db_con,
   assert_dir_exists(dir)
   assert_streamable(streamable_table)
   
-  if(!is.null(filter) & length(tables) > 1) {
+  if(!is.null(filter_statement) & length(tables) > 1) {
     warning("Your filter statement will be applied to all tables.")
   }
 
