@@ -245,7 +245,7 @@ streamable_parquet <- function() {
     dir_path <- paste0(
       dirname(path), 
       "/",
-      strsplit(
+      strsplit( # TODO: Fix upstream R/ark.R L128 can probably pass `dir` here
         basename(path), 
         split = ".", 
         fixed = TRUE)[[1]][1]

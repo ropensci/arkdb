@@ -1,4 +1,4 @@
-context("basic")
+testthat::context("basic")
 
 # Setup
   tmp <- tempdir()
