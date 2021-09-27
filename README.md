@@ -108,6 +108,15 @@ unark(files, new_db, lines = 50000)
 #>  ...Done! (in 0.202945 secs)
 ```
 
+# Output Formats and Custom Read and Write
+
+The `arkdb` package is easily extended to use custom read and write methods allowing you to dictate your own output formats. See `R/streamable_table.R` for examples that include using: 
+
+- Base c/tsv
+- The `vroom` package 
+- Apache arrow's parquet
+- The `readr` package for c/tsv
+
 -----
 
 Please note that this project is released with a [Contributor Code of

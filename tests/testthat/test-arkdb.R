@@ -162,8 +162,71 @@ testthat::test_that("try with MonetDB & alternate method", {
   
 })
 
+testthat::context("parquet")
+testthat::test_that("try with parquet & alternate method", {
+  
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("fs")
+  skip_if_not_installed("nycflights13")
+  
+  # test ark to parquet from sqlite
+  ark(
+    db, 
+    dir, 
+    lines = 25000, 
+    compress = "none",
+    streamable_table=streamable_parquet(),
+    method = "keep-open",
+    overwrite = TRUE
+  )
+  
+  # Test that parts are written out appropriately
+  
+  # airlines
+  testthat::expect_equal(
+    "part-00001.parquet", 
+    list.files(paste0(dir, "/", "airlines"))
+  )
+  
+  testthat::expect_equal(
+    nrow(arrow::open_dataset(paste0(dir, "/", "airlines"))),
+    dbGetQuery(db, "SELECT COUNT(*) FROM airlines")[[1]]
+  )
+  
+  # airports
+  testthat::expect_equal(
+    "part-00001.parquet",
+    list.files(paste0(dir, "/", "airports"))
+  )
+  
+  testthat::expect_equal(
+    nrow(arrow::open_dataset(paste0(dir, "/", "airports"))),
+    dbGetQuery(db, "SELECT COUNT(*) FROM airports")[[1]]
+  )
+  
+  # flights
+  print(list.files(paste0(dir,"/","flights")))
+  testthat::expect_true("part-00001.parquet" %in% list.files(paste0(dir,"/","flights")))
+  testthat::expect_true("part-00014.parquet" %in% list.files(paste0(dir,"/","flights")))
+  testthat::expect_length(list.files(paste0(dir,"/","flights")), 14)
+
+  testthat::expect_equal(
+    nrow(arrow::open_dataset(paste0(dir, "/", "flights"))),
+    dbGetQuery(db, "SELECT COUNT(*) FROM flights")[[1]]
+  )
+  
+  testthat::expect_equal(
+    dim(arrow::open_dataset(paste0(dir, "/", "flights"))),
+    dim(nycflights13::flights)
+  )
+  
+})
+
+
+
   disconnect(db)
   disconnect(new_db)
-  unlink(dir, TRUE) # ark'd text files
+  unlink(dir, TRUE) # ark'd text/parquet files
 
 
