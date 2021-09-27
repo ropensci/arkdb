@@ -188,7 +188,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con,
   } else {
     res <- DBI::dbSendQuery(
       db_con, 
-      paste("SELECT * FROM", filter_statement, tablename)
+      paste("SELECT * FROM", tablename, filter_statement)
     )
   }
 
@@ -212,7 +212,7 @@ windowing <- function(sql_supports_windows)
   } else {
     size <- DBI::dbGetQuery(
       db_con, 
-      paste("SELECT COUNT(*) FROM", filter_statement, tablename))
+      paste("SELECT COUNT(*) FROM", tablename, filter_statement))
   }
 
   end <- size[[1]][[1]]

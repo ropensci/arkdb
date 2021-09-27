@@ -37,8 +37,6 @@ testthat::test_that("we can ark and unark a db", {
   myflights <- dplyr::collect(myflights)
   testthat::expect_equal(dim(myflights), 
                          dim(nycflights13::flights))
-  
-
 })
 
 
@@ -222,6 +220,40 @@ testthat::test_that("try with parquet & alternate method", {
   )
   
 })
+
+testthat::context("inject filters")
+
+testthat::test_that("e2e with filter for flights month = 2: readr tsv", {
+  # summary(factor(nycflights13::flights$month)) filter month == 2, 24951 records
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+
+  ark(db, dir, streamable_table = streamable_readr_tsv(),
+      lines = 50000, tables = "flights", overwrite = TRUE,
+      filter_statement = "WHERE month = 2")
+
+  r <- read.csv(paste0(dir, "/flights.tsv.bz2"), sep = "\t")
+  testthat::expect_true(all(r$month == 2L))
+  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 2,]))
+})
+
+testthat::test_that("e2e with filter for flights month = 12: parquet", {
+  # summary(factor(nycflights13::flights$month)) filter month = 12, 28132 records
+
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("arrow")
+
+  ark(db, dir, streamable_table = streamable_parquet(),
+      lines = 50000, tables = "flights", overwrite = TRUE,
+      filter_statement = "WHERE month = 12")
+
+  r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
+  testthat::expect_true(all(r$month == 12L))
+  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12,]))
+})
+
 
 
 
