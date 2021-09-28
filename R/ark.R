@@ -129,14 +129,19 @@ ark_file <- function(tablename,
   filename <- file.path(dir, dest)
   
   ## Handle case in which file already exists. Otherwise, we'll append to it
-  if(!assert_overwrite(filename, overwrite)){
+  if(!assert_overwrite(filename, overwrite)) {
     return(NULL)
   }
   
   if(streamable_table$extension == "parquet") {
     # Parquet files need a sink. 
-    # TODO: Overwrite means we should unlink(dir, TRUE)
     con <- filename
+    
+    # Parquet writes chunks, need to unlink directory to delete files. 
+    if (overwrite) 
+      unlink(paste0(dir, tablename, sep = "/"), TRUE)
+    
+    
   } else {
     # Text files need a connection
     con <- generic_connection(filename, "wb")

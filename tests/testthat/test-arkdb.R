@@ -204,7 +204,6 @@ testthat::test_that("try with parquet & alternate method", {
   )
   
   # flights
-  print(list.files(paste0(dir,"/","flights")))
   testthat::expect_true("part-00001.parquet" %in% list.files(paste0(dir,"/","flights")))
   testthat::expect_true("part-00014.parquet" %in% list.files(paste0(dir,"/","flights")))
   testthat::expect_length(list.files(paste0(dir,"/","flights")), 14)
@@ -228,13 +227,15 @@ testthat::test_that("e2e with filter for flights month = 2: readr tsv", {
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
+  
+  file.remove(paste0(dir,"/flights.tsv.bz2"))
 
   ark(db, dir, streamable_table = streamable_readr_tsv(),
       lines = 50000, tables = "flights", overwrite = TRUE,
       filter_statement = "WHERE month = 2")
 
   r <- read.csv(paste0(dir, "/flights.tsv.bz2"), sep = "\t")
-  testthat::expect_true(all(r$month == 2L))
+  testthat::expect_true(all(r$month == 2))
   testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 2,]))
 })
 
@@ -244,17 +245,48 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("arrow")
+  
+  # clean up previous test
+  unlink(paste0(dir, "/flights"), TRUE)
+  
 
   ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = "flights", overwrite = TRUE,
       filter_statement = "WHERE month = 12")
 
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
-  testthat::expect_true(all(r$month == 12L))
+  testthat::expect_true(all(r$month == 12))
+  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12,]))
+  
+  # clean up previous test
+  unlink(paste0(dir, "/flights"), TRUE)
+  
+  ark(db, dir, streamable_table = streamable_parquet(),
+      lines = 50000, tables = "flights", overwrite = TRUE,
+      filter_statement = "WHERE month = 12", method = "window")
+  
+  r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
+  testthat::expect_true(all(r$month == 12))
   testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12,]))
 })
 
 
+testthat::test_that("Warns when applying filter to multiple tables", {
+  # clean up previous test
+  unlink(paste0(dir, "/flights"), TRUE)
+  unlink(paste0(dir, "/weather"), TRUE)
+  expect_warning(
+    ark(db, dir, streamable_table = streamable_parquet(),
+      lines = 50000, tables = c("flights", "weather"), overwrite = TRUE,
+      filter_statement = "WHERE month = 12"), 
+    "Your filter statement will be applied to all tables"
+  )
+  
+  r <- arrow::read_parquet(paste0(dir, "/weather/part-00001.parquet"))
+  testthat::expect_true(all(r$month == 12))
+  testthat::expect_true(nrow(r) == nrow(nycflights13::weather[
+    nycflights13::weather$month == 12,]))  
+})
 
 
   disconnect(db)
