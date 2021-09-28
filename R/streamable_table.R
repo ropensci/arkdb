@@ -217,6 +217,12 @@ streamable_base_csv <- function() {
 #' streamable chunked parquet using `arrow`
 #' 
 #' @return a `streamable_table` object (S3)
+#' @details Parquet files are streamed to disk by breaking them into chunks that are
+#' equal to the `nlines` parameter in the initial call to `ark`. For each `tablename`, a 
+#' folder is created and the chunks are placed in the folder in the form `part-000000.parquet`.
+#' The software looks at the folder, and increments the name appropriately for the next 
+#' chunk. This is done intentionally so that users can take advantage of `arrow::open_dataset` 
+#' in the future, when coming back to review or perform analysis of these data. 
 #' @export
 #' @seealso [arrow::read_parquet()], [arrow::write_parquet()]
 streamable_parquet <- function() {

@@ -28,10 +28,10 @@ too large to read into memory all at once.
 
 ## Links
 
-  - A more detailed introduction to package design and use can be found
+-   A more detailed introduction to package design and use can be found
     in the package
     [Vignette](https://docs.ropensci.org/arkdb/articles/arkdb.html)
-  - [Online versions of package
+-   [Online versions of package
     documentation](https://docs.ropensci.org/arkdb/)
 
 ## Installation
@@ -61,7 +61,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/Rtmp3Ebd1H/nycflights13.sqlite
+#> Caching nycflights db at /tmp/RtmpTor2hC/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -75,15 +75,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.008990765 secs)
+#>  ...Done! (in 0.008597136 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.03013897 secs)
+#>  ...Done! (in 0.02015805 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 8.753164 secs)
+#>  ...Done! (in 10.31823 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02437472 secs)
+#>  ...Done! (in 0.0298245 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.6173553 secs)
+#>  ...Done! (in 0.6843452 secs)
 ```
 
 ## Unarchive
@@ -96,28 +96,29 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01028419 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01863098 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 5.179139 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.0276711 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.202945 secs)
+#> Importing /tmp/RtmpTor2hC/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01362443 secs)
+#> Importing /tmp/RtmpTor2hC/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.02313852 secs)
+#> Importing /tmp/RtmpTor2hC/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 7.650134 secs)
+#> Importing /tmp/RtmpTor2hC/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.03760815 secs)
+#> Importing /tmp/RtmpTor2hC/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.2434587 secs)
 ```
 
 # Output Formats and Custom Read and Write
 
-The `arkdb` package is easily extended to use custom read and write methods allowing you to dictate your own output formats. See `R/streamable_table.R` for examples that include using: 
+The `arkdb` package is easily extended to use custom read and write
+methods allowing you to dictate your own output formats. See
+`R/streamable_table.R` for examples that include using:
 
-- Base c/tsv
-- The `vroom` package 
-- Apache arrow's parquet
-- The `readr` package for c/tsv
+-   Base c/tsv
+-   Apache arrow’s parquet
+-   The `readr` package for c/ts
 
------
+------------------------------------------------------------------------
 
 Please note that this project is released with a [Contributor Code of
 Conduct](https://ropensci.org/code-of-conduct/). By participating in

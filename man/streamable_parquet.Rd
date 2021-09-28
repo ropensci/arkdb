@@ -12,6 +12,14 @@ a \code{streamable_table} object (S3)
 \description{
 streamable chunked parquet using \code{arrow}
 }
+\details{
+Parquet files are streamed to disk by breaking them into chunks that are
+equal to the \code{nlines} parameter in the initial call to \code{ark}. For each \code{tablename}, a
+folder is created and the chunks are placed in the folder in the form \verb{part-000000.parquet}.
+The software looks at the folder, and increments the name appropriately for the next
+chunk. This is done intentionally so that users can take advantage of \code{arrow::open_dataset}
+in the future, when coming back to review or perform analysis of these data.
+}
 \seealso{
 \code{\link[arrow:read_parquet]{arrow::read_parquet()}}, \code{\link[arrow:write_parquet]{arrow::write_parquet()}}
 }
