@@ -100,6 +100,15 @@ DBI::dbDisconnect(new_db)
 codemetar::write_codemeta()
 ```
 
+# Output Formats and Custom Read and Write
+
+The `arkdb` package is easily extended to use custom read and write methods allowing you to dictate your own output formats. See `R/streamable_table.R` for examples that include using: 
+
+- Base c/tsv
+- Apache arrow's parquet
+- The `readr` package for c/tsv
+
+
 -----
 
 Please note that this project is released with a [Contributor Code of Conduct](https://ropensci.org/code-of-conduct/).

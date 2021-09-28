@@ -37,6 +37,7 @@ Useful links:
 Other contributors:
 \itemize{
   \item Richard FitzJohn [contributor]
+  \item Brandon Bertelsen \email{brandon@bertelsen.ca} [contributor]
 }
 
 }
