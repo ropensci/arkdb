@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -31,6 +31,12 @@
       "@type": "Person",
       "givenName": "Richard",
       "familyName": "FitzJohn"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Brandon",
+      "familyName": "Bertelsen",
+      "email": "brandon@bertelsen.ca"
     }
   ],
   "copyrightHolder": [
@@ -293,7 +299,7 @@
     }
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
-  "fileSize": "197.083KB",
+  "fileSize": "199.155KB",
   "contIntegration": ["https://travis-ci.org/ropensci/arkdb", "https://codecov.io/github/ropensci/arkdb?branch=master"],
   "keywords": [
     "database",

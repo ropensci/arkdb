@@ -106,7 +106,7 @@ The `arkdb` package is easily extended to use custom read and write methods allo
 
 - Base c/tsv
 - Apache arrow's parquet
-- The `readr` package for c/ts
+- The `readr` package for c/tsv
 
 
 -----

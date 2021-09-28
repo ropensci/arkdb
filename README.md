@@ -61,7 +61,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/RtmpTor2hC/nycflights13.sqlite
+#> Caching nycflights db at /tmp/RtmpUvctyQ/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -75,15 +75,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.008597136 secs)
+#>  ...Done! (in 0.006162643 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.02015805 secs)
+#>  ...Done! (in 0.02732372 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 10.31823 secs)
+#>  ...Done! (in 10.007 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.0298245 secs)
+#>  ...Done! (in 0.02248931 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.6843452 secs)
+#>  ...Done! (in 0.6889441 secs)
 ```
 
 ## Unarchive
@@ -96,16 +96,16 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/RtmpTor2hC/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01362443 secs)
-#> Importing /tmp/RtmpTor2hC/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.02313852 secs)
-#> Importing /tmp/RtmpTor2hC/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 7.650134 secs)
-#> Importing /tmp/RtmpTor2hC/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.03760815 secs)
-#> Importing /tmp/RtmpTor2hC/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.2434587 secs)
+#> Importing /tmp/RtmpUvctyQ/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01336098 secs)
+#> Importing /tmp/RtmpUvctyQ/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.02390742 secs)
+#> Importing /tmp/RtmpUvctyQ/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 7.327238 secs)
+#> Importing /tmp/RtmpUvctyQ/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.03689456 secs)
+#> Importing /tmp/RtmpUvctyQ/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.2198594 secs)
 ```
 
 # Output Formats and Custom Read and Write
@@ -116,7 +116,7 @@ methods allowing you to dictate your own output formats. See
 
 -   Base c/tsv
 -   Apache arrow’s parquet
--   The `readr` package for c/ts
+-   The `readr` package for c/tsv
 
 ------------------------------------------------------------------------
 
