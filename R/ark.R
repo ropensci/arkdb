@@ -163,7 +163,7 @@ ark_file <- function(tablename,
     
     # Parquet writes chunks, need to unlink directory to delete files. 
     if (overwrite != "ask") {
-      if (overite)
+      if (overwrite)
         unlink(paste0(dir, tmp_tablename, sep = "/"), TRUE)
     }
     
