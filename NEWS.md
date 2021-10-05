@@ -1,3 +1,8 @@
+# arkdb 0.0.14
+
+- Added ability to name output files directly
+- Add warning when users specify compression for parquet files
+
 # arkdb 0.0.13 
 
 - Added ability to filter databases by allowing users to specify a "WHERE" clause. 

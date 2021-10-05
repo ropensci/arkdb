@@ -250,9 +250,9 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   unlink(paste0(dir, "/flights"), TRUE)
   
 
-  ark(db, dir, streamable_table = streamable_parquet(),
+  testthat::expect_warning(ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = "flights", overwrite = TRUE,
-      filter_statement = "WHERE month = 12")
+      filter_statement = "WHERE month = 12"), "Parquet is already compressed")
 
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
   testthat::expect_true(all(r$month == 12))
@@ -263,7 +263,7 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   
   ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = "flights", overwrite = TRUE,
-      filter_statement = "WHERE month = 12", method = "window")
+      filter_statement = "WHERE month = 12", method = "window", compress = "none")
   
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
   testthat::expect_true(all(r$month == 12))
@@ -278,7 +278,7 @@ testthat::test_that("Warns when applying filter to multiple tables", {
   expect_warning(
     ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = c("flights", "weather"), overwrite = TRUE,
-      filter_statement = "WHERE month = 12"), 
+      filter_statement = "WHERE month = 12", compress = "none"), 
     "Your filter statement will be applied to all tables"
   )
   
