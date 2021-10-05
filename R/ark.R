@@ -67,36 +67,51 @@ ark <- function(db_con,
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window"),
                 overwrite = "ask",
-                filter_statement = NULL){
+                filter_statement = NULL, filenames = TRUE){
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
   assert_streamable(streamable_table)
   
-  if(!is.null(filter_statement) & length(tables) > 1) {
+  if(!is.null(filter_statement) & length(tables) > 1)
     warning("Your filter statement will be applied to all tables.")
-  }
 
+  if (!is.null(filenames)) {
+    if(length(tables) != length(filenames))
+      stop("The number of filenames should be equal to the number of tables")
+  }
   
+
+ 
   method <- match.arg(method)
   compress <- match.arg(compress)
   lines <- as.integer(lines)
   
   stopifnot(inherits(streamable_table, "streamable_table"))
   
+  if(streamable_table$extension == "parquet" & compression != "none")
+    warning("Parquet is already compressed. Additional compression may not be effective")
+    
+  
   ## exclude sqlite's internal tables
   tables <- tables[!grepl("sqlite_", tables)]
   
-  lapply(tables, 
-         ark_file, 
-         db_con = normalize_con(db_con),
-         streamable_table = streamable_table,
-         lines = lines, 
-         dir = dir, 
-         compress = compress,
-         method = method,
-         overwrite = overwrite, 
-         filter_statement = filter_statement)
+  for(i in seq_along(tables)) { # Need to iterate over 
+    ark_file(
+      table = tables[i],
+      db_con = normalize_con(db_con),
+      streamable_table = streamable_table,
+      lines = lines, 
+      dir = dir, 
+      compress = compress,
+      method = method,
+      overwrite = overwrite, 
+      filter_statement = filter_statement,
+      filename = filenames[i]
+    )
+
+  }
+         
   
   invisible(dir)
 }
@@ -115,7 +130,8 @@ ark_file <- function(tablename,
                      compress,
                      method,
                      overwrite, 
-                     filter_statement){
+                     filter_statement, 
+                     filename) {
   
   ## Set up compressed connection
   ext <- switch(compress,
@@ -125,7 +141,15 @@ ark_file <- function(tablename,
                 "none" = "",
                 ".bz2")
   
-  dest <- sprintf("%s.%s%s", tablename, streamable_table$extension, ext)
+  # Used as a switch when a filename is provided to the function
+  # This allows us to unlink
+  if (!is.null(filename)) {
+    tmp_tablename <- filename
+  } else {
+    tmp_tablename <- tablename
+  }
+
+  dest <- sprintf("%s.%s%s", tmp_tablename, streamable_table$extension, ext)
   filename <- file.path(dir, dest)
   
   ## Handle case in which file already exists. Otherwise, we'll append to it
@@ -133,14 +157,15 @@ ark_file <- function(tablename,
     return(NULL)
   }
   
-  if(streamable_table$extension == "parquet") {
+  if (streamable_table$extension == "parquet") {
     # Parquet files need a sink. 
     con <- filename
     
     # Parquet writes chunks, need to unlink directory to delete files. 
-    if (overwrite) 
-      unlink(paste0(dir, tablename, sep = "/"), TRUE)
-    
+    if (overwrite != "ask") {
+      if (overite)
+        unlink(paste0(dir, tmp_tablename, sep = "/"), TRUE)
+    }
     
   } else {
     # Text files need a connection
