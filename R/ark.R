@@ -18,7 +18,10 @@
 #' always skip such tables.
 #' @param filter_statement Typically an SQL "WHERE" clause, specific to your
 #' dataset. (e.g., `WHERE year = 2013`) 
+#' @param filenames An optional vector of names that will be used to name the 
+#' files instead of using the tablename from the `tables` parameter. 
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
+#' Or other formats that have a `streamtable_table method`, like parquet. 
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
 #' is probably why you are using a database in the first place!)  Compressed
@@ -67,7 +70,8 @@ ark <- function(db_con,
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window"),
                 overwrite = "ask",
-                filter_statement = NULL, filenames = TRUE){
+                filter_statement = NULL, 
+                filenames = NULL) {
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
@@ -80,7 +84,6 @@ ark <- function(db_con,
     if(length(tables) != length(filenames))
       stop("The number of filenames should be equal to the number of tables")
   }
-  
 
  
   method <- match.arg(method)
@@ -164,7 +167,7 @@ ark_file <- function(tablename,
     # Parquet writes chunks, need to unlink directory to delete files. 
     if (overwrite != "ask") {
       if (overwrite)
-        unlink(paste0(dir, tmp_tablename, sep = "/"), TRUE)
+        unlink(paste0(dir, tmp_tablename, sep = "/"), recursive= TRUE)
     }
     
   } else {
