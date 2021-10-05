@@ -89,7 +89,7 @@ ark <- function(db_con,
   
   stopifnot(inherits(streamable_table, "streamable_table"))
   
-  if(streamable_table$extension == "parquet" & compression != "none")
+  if(streamable_table$extension == "parquet" & compress != "none")
     warning("Parquet is already compressed. Additional compression may not be effective")
     
   
