@@ -105,7 +105,7 @@ ark <- function(db_con,
   
   for(i in seq_along(tables)) { # Need to iterate over 
     ark_file(
-      table = tables[i],
+      tablename = tables[i],
       db_con = normalize_con(db_con),
       streamable_table = streamable_table,
       lines = lines, 
@@ -295,11 +295,11 @@ ark_chunk <- function(db_con,
   if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
     if(is.null(filter_statement)) {
-      query <- paste("SELECT * FROM", tablename, filter_statement, 
-                     "AND rownum BETWEEN", sql_int((start - 1) * lines), 
+      query <- paste("SELECT * FROM", tablename, 
+                     "WHERE rownum BETWEEN", sql_int((start - 1) * lines), 
                      "AND", sql_int(start * lines))
     } else {
-      query <- paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN",
+      query <- paste("SELECT * FROM", tablename, filter_statement, "AND rownum BETWEEN",
                      sql_int((start - 1) * lines), "AND", sql_int(start * lines))      
     }
 
