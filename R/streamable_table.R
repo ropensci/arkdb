@@ -248,23 +248,14 @@ streamable_parquet <- function() {
     
     # Store the parquet pieces in a directory named after the table 
     # for ease of use with arrow::open_dataset
-    
-    # Need a conditional for situations where someone sets a path that is 
-    # the same as the basename. Likely that they don't want path/path/X.parquet
-    # but rather path/X.parquet.
-    if(dirname(path) != basename(path)) {
-      dir_path <- paste0(
+    dir_path <- paste0(
         dirname(path), 
         "/",
         strsplit(
           basename(path), 
           split = ".", 
           fixed = TRUE)[[1]][1]
-      )
-    } else {
-      dir_path <- dirname(path)
-    }
-
+    )
     
     # Create the directory
     dir.create(dir_path, showWarnings = FALSE)
