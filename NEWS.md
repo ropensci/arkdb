@@ -1,20 +1,23 @@
 # arkdb 0.0.14
 
-- Added ability to name output files directly
-- Add warning when users specify compression for parquet files
+- Added ability to name output files directly.
+- Add warning when users specify compression for parquet files.
+- Added callback functionality to the `ark` function. Allowing users to perform 
+  transformations or recodes before chunked data.frames are saved to disk.
 
 # arkdb 0.0.13 
 
 - Added ability to filter databases by allowing users to specify a "WHERE" clause. 
-- Added parquet as an streamable_table format, allowing users to `ark` to parquet instead of a text format. 
+- Added parquet as an streamable_table format, allowing users to `ark` to parquet 
+  instead of a text format. 
 
 # arkdb 0.0.12
 
-- bugfix for arkdb
+- Bugfix for arkdb
 
 # arkdb 0.0.11
 
-- make cached connection opt-out instead of applying only to read_only.  This
+- Make cached connection opt-out instead of applying only to read_only.  This
   allows cache to work on read-write connections by default.  This also avoids
   the condition of a connection being garbage-collected when functions call
   local_db internally.
@@ -23,24 +26,24 @@
 
 - Better handling of read_only vs read_write connections.  Only caches
   read_only connections.  
-- includes optional support for MonetDBLite
+- Includes optional support for MonetDBLite
 
 # arkdb 0.0.8
 
-- bugfix for dplyr 2.0.0 release
+- Bugfix for dplyr 2.0.0 release
 
 
 # arkdb 0.0.7
 
-- bugfix for upcoming dplyr 2.0.0 release
+- Bugfix for upcoming dplyr 2.0.0 release
 
 # arkdb 0.0.6
 
-- support vroom as an opt-in streamable table
-- export `process_chunks`
+- Support vroom as an opt-in streamable table
+- Export `process_chunks`
 - Add mechanism to attempt a bulk importer, when available (#27)
 - Bugfix for case when text contains `#` characters in base parser (#28)
-- lighten core dependencies.  Fully recursive dependencies include only 4
+- Lighten core dependencies.  Fully recursive dependencies include only 4
   non-base packages now, as `progress` is now optional.
 - Use "magic numbers" instead of extensions to guess compression type.
   (NOTE: requires that file is local and not a URL)
@@ -80,7 +83,7 @@
 
 # arkdb 0.0.1 2018-08-20
 
-* overwrite existing tables of same name (with warning and
+* Overwrite existing tables of same name (with warning and
   interactive proceed) in both DB and text-files to avoid
   appending.
 

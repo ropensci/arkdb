@@ -20,6 +20,9 @@
 #' dataset. (e.g., `WHERE year = 2013`) 
 #' @param filenames An optional vector of names that will be used to name the 
 #' files instead of using the tablename from the `tables` parameter. 
+#' @param callback An optional function that acts on the data.frame before it is
+#' written to disk by `streamable_table`. It is recommended to use this on a single 
+#' table at a 
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' Or other formats that have a `streamtable_table method`, like parquet. 
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
@@ -71,7 +74,8 @@ ark <- function(db_con,
                 method = c("keep-open", "window", "sql-window"),
                 overwrite = "ask",
                 filter_statement = NULL, 
-                filenames = NULL) {
+                filenames = NULL, 
+                callback = NULL) {
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
@@ -110,7 +114,8 @@ ark <- function(db_con,
       method = method,
       overwrite = overwrite, 
       filter_statement = filter_statement,
-      filename = filenames[i]
+      filename = filenames[i],
+      callback = callback
     )
 
   }
@@ -134,7 +139,7 @@ ark_file <- function(tablename,
                      method,
                      overwrite, 
                      filter_statement, 
-                     filename) {
+                     filename, callback) {
   
   ## Set up compressed connection
   ext <- switch(compress,
@@ -184,13 +189,13 @@ ark_file <- function(tablename,
  
   switch(method,
           "keep-open" = keep_open(db_con, streamable_table, lines, 
-                                  p, tablename, con, filter_statement),
+                                  p, tablename, con, filter_statement, callback),
              "window" = window(db_con, streamable_table, lines, 
-                               compress, p, tablename, con, filter_statement),
+                               compress, p, tablename, con, filter_statement, callback),
          "sql-window" = sql_window(db_con, streamable_table, lines, 
-                                   compress, p, tablename, con, filter_statement),
+                                   compress, p, tablename, con, filter_statement, callback),
          keep_open(db_con, streamable_table, lines, p, tablename, con, 
-                   filter_statement)
+                   filter_statement, callback)
   )
   
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
@@ -199,14 +204,14 @@ ark_file <- function(tablename,
 
 
 ## Generic way to get header
-get_header <- function(db, tablename){
+get_header <- function(db, tablename) {
   fields <- DBI::dbListFields(db, tablename)
   names(fields) <- fields
   as.data.frame(lapply(fields, function(x) character(0)))
 }
 
 keep_open <- function(db_con, streamable_table, lines, p, tablename, con, 
-                      filter_statement) {
+                      filter_statement, callback) {
   ## Create header to avoid duplicate column names
   
   if (!streamable_table$extension == "parquet") {
@@ -228,7 +233,13 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con,
   while (TRUE) {
     p$tick()
     data <- DBI::dbFetch(res, n = lines)
-    if (nrow(data) == 0) break
+    
+    if (!is.null(callback))
+      data <- callback(data)
+    
+    if (nrow(data) == 0) 
+      break
+    
     streamable_table$write(data, con, omit_header = TRUE)
   }
   
@@ -238,7 +249,7 @@ keep_open <- function(db_con, streamable_table, lines, p, tablename, con,
 
 windowing <- function(sql_supports_windows)
   function(db_con, streamable_table, lines, compress, p, tablename, con, 
-           filter_statement) {
+           filter_statement, callback) {
   
   if(is.null(filter_statement)) {
     size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
@@ -261,7 +272,8 @@ windowing <- function(sql_supports_windows)
               compress = compress, 
               con = con, 
               sql_supports_windows = sql_supports_windows,
-              filter_statement = filter_statement)
+              filter_statement = filter_statement,
+              callback = callback)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
       break
@@ -277,7 +289,8 @@ ark_chunk <- function(db_con,
                       compress,
                       con,
                       sql_supports_windows, 
-                      filter_statement = NULL){
+                      filter_statement,
+                      callback){
   
   if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
@@ -308,6 +321,9 @@ ark_chunk <- function(db_con,
 
   }
   data <- DBI::dbGetQuery(db_con, query)
+  
+  if (!is.null(callback))
+    data <- callback(data)
   
   omit_header <- start != 1
   
