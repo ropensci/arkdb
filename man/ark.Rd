@@ -50,7 +50,7 @@ files instead of using the tablename from the \code{tables} parameter.}
 
 \item{callback}{An optional function that acts on the data.frame before it is
 written to disk by \code{streamable_table}. It is recommended to use this on a single
-table at a}
+table at a time. Callback functions must return a data.frame.}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.

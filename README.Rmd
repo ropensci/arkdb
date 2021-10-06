@@ -114,7 +114,7 @@ ark(db, dir, lines = 50000, tables = "flights", filter_statement = "WHERE month 
 
 ## Using callbacks
 
-It is possible to use a callback to perform just-in-time data transformations before ark writes your data object to disk in your preferred format. In the example below, we write a simple transformation to convert the flights data `arr_delay` field, from minutes, to hours. It is recommended to use callbacks on a single table at a time.
+It is possible to use a callback to perform just-in-time data transformations before ark writes your data object to disk in your preferred format. In the example below, we write a simple transformation to convert the flights data `arr_delay` field, from minutes, to hours. It is recommended to use callbacks on a single table at a time. A callback function can be anything you can imagine so long as it returns a data.frame that can be written to disk.
 
 ```{r, eval=FALSE}
 mins_to_hours <- function(data) {
@@ -128,7 +128,7 @@ ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
 
 ## ETLs with arkdb
 
-The `arkdb` package can also be used to create a number of ETL pipelines involving text archives or databases given its ability to filter, and use callbacks. In the example below, we leverage `duckdb` to read a fictional folder of files by US state, filter by `var_filtered`, apply a callback transformation `transform_fun` to `var_transformed` save as parquet, and then load a folder of parquet files for analysis with Apache Arrow.
+The `arkdb` package can also be used to create a number of ETL pipelines involving text archives or databases given its ability to filter, and use callbacks. In the example below, we leverage `duckdb` to read a fictional folder of files by US state, filter by `var_filtered`, apply a callback transformation `transform_fun` to `var_transformed` save as parquet, and then load a folder of parquet files for analysis with Apache Arrow. 
 
 ```{r, eval = FALSE}
 library(arrow)
@@ -162,8 +162,6 @@ for(state in c("DC", state.abb)) {
 # The result is trivial to read in with arrow 
 ds <- open_dataset("output", partitioning = "state")
 ```
-
-
 
 -----
 

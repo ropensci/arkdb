@@ -22,7 +22,7 @@
 #' files instead of using the tablename from the `tables` parameter. 
 #' @param callback An optional function that acts on the data.frame before it is
 #' written to disk by `streamable_table`. It is recommended to use this on a single 
-#' table at a 
+#' table at a time. Callback functions must return a data.frame.
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
 #' Or other formats that have a `streamtable_table method`, like parquet. 
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
