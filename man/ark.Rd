@@ -14,7 +14,8 @@ ark(
   method = c("keep-open", "window", "sql-window"),
   overwrite = "ask",
   filter_statement = NULL,
-  filenames = NULL
+  filenames = NULL,
+  callback = NULL
 )
 }
 \arguments{
@@ -46,6 +47,10 @@ dataset. (e.g., \verb{WHERE year = 2013})}
 
 \item{filenames}{An optional vector of names that will be used to name the
 files instead of using the tablename from the \code{tables} parameter.}
+
+\item{callback}{An optional function that acts on the data.frame before it is
+written to disk by \code{streamable_table}. It is recommended to use this on a single
+table at a}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.
