@@ -249,12 +249,12 @@ streamable_parquet <- function() {
     # Store the parquet pieces in a directory named after the table 
     # for ease of use with arrow::open_dataset
     dir_path <- paste0(
-      dirname(path), 
-      "/",
-      strsplit(
-        basename(path), 
-        split = ".", 
-        fixed = TRUE)[[1]][1]
+        dirname(path), 
+        "/",
+        strsplit(
+          basename(path), 
+          split = ".", 
+          fixed = TRUE)[[1]][1]
     )
     
     # Create the directory

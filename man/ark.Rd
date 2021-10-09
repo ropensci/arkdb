@@ -13,7 +13,9 @@ ark(
   tables = list_tables(db_con),
   method = c("keep-open", "window", "sql-window"),
   overwrite = "ask",
-  filter_statement = NULL
+  filter_statement = NULL,
+  filenames = NULL,
+  callback = NULL
 )
 }
 \arguments{
@@ -42,6 +44,13 @@ always skip such tables.}
 
 \item{filter_statement}{Typically an SQL "WHERE" clause, specific to your
 dataset. (e.g., \verb{WHERE year = 2013})}
+
+\item{filenames}{An optional vector of names that will be used to name the
+files instead of using the tablename from the \code{tables} parameter.}
+
+\item{callback}{An optional function that acts on the data.frame before it is
+written to disk by \code{streamable_table}. It is recommended to use this on a single
+table at a time. Callback functions must return a data.frame.}
 }
 \value{
 the path to \code{dir} where output files are created (invisibly), for piping.
@@ -51,6 +60,7 @@ Archive tables from a database as flat files
 }
 \details{
 \code{ark} will archive tables from a database as (compressed) tsv files.
+Or other formats that have a \verb{streamtable_table method}, like parquet.
 \code{ark} does this by reading only chunks at a time into memory, allowing it to
 process tables that would be too large to read into memory all at once (which
 is probably why you are using a database in the first place!)  Compressed

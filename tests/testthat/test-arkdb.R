@@ -250,9 +250,9 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   unlink(paste0(dir, "/flights"), TRUE)
   
 
-  ark(db, dir, streamable_table = streamable_parquet(),
+  testthat::expect_warning(ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = "flights", overwrite = TRUE,
-      filter_statement = "WHERE month = 12")
+      filter_statement = "WHERE month = 12"), "Parquet is already compressed")
 
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
   testthat::expect_true(all(r$month == 12))
@@ -263,7 +263,7 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   
   ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = "flights", overwrite = TRUE,
-      filter_statement = "WHERE month = 12", method = "window")
+      filter_statement = "WHERE month = 12", method = "window", compress = "none")
   
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
   testthat::expect_true(all(r$month == 12))
@@ -278,7 +278,7 @@ testthat::test_that("Warns when applying filter to multiple tables", {
   expect_warning(
     ark(db, dir, streamable_table = streamable_parquet(),
       lines = 50000, tables = c("flights", "weather"), overwrite = TRUE,
-      filter_statement = "WHERE month = 12"), 
+      filter_statement = "WHERE month = 12", compress = "none"), 
     "Your filter statement will be applied to all tables"
   )
   
@@ -289,8 +289,67 @@ testthat::test_that("Warns when applying filter to multiple tables", {
 })
 
 
+context("callbacks")
+
+testthat::test_that("ark with keep-open and callback", {
+  
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  
+  # Callback to convert arr_delay in the flights
+  # data from minutes to hours
+  callback <- function(data) {
+    data$arr_delay <- as.numeric(data$arr_delay/60)
+    data
+  }
+  
+  suppressWarnings(
+    ark(db, dir, lines = 50000, tables = "flights", method = "keep-open", overwrite = TRUE, callback = callback)  
+  )
+  
+  
+  suppressWarnings(
+    myflights <- readr::read_tsv(file.path(dir, "flights.tsv.bz2"))
+  )
+  testthat::expect_equal(dim(myflights), 
+                         dim(nycflights13::flights))
+  
+  testthat::expect_equal(myflights$arr_delay, nycflights13::flights$arr_delay/60)
+  
+})
+
+testthat::test_that("ark with window and callback", {
+  
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  
+  # Callback to convert arr_delay in the flights
+  # data from minutes to hours
+  callback <- function(data) {
+    data$arr_delay <- as.numeric(data$arr_delay/60)
+    data
+  }
+  
+  suppressWarnings(
+    ark(db, dir, lines = 50000, tables = "flights", method = "window", overwrite = TRUE, callback = callback)
+  )
+  
+  
+  suppressWarnings(
+    myflights <- readr::read_tsv(file.path(dir, "flights.tsv.bz2"))
+  )
+  testthat::expect_equal(dim(myflights), 
+                         dim(nycflights13::flights))
+  
+  testthat::expect_equal(myflights$arr_delay, nycflights13::flights$arr_delay/60)
+  
+})
+
+
   disconnect(db)
   disconnect(new_db)
-  unlink(dir, TRUE) # ark'd text/parquet files
+  unlink(dir, recursive = TRUE) # ark'd text/parquet files
 
 
