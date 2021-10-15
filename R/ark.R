@@ -16,8 +16,15 @@
 #' default is "ask", which will ask for confirmation in an interactive session, and
 #' overwrite in a non-interactive script.  TRUE will always overwrite, FALSE will
 #' always skip such tables.
-
+#' @param filter_statement Typically an SQL "WHERE" clause, specific to your
+#' dataset. (e.g., `WHERE year = 2013`) 
+#' @param filenames An optional vector of names that will be used to name the 
+#' files instead of using the tablename from the `tables` parameter. 
+#' @param callback An optional function that acts on the data.frame before it is
+#' written to disk by `streamable_table`. It is recommended to use this on a single 
+#' table at a time. Callback functions must return a data.frame.
 #' @details `ark` will archive tables from a database as (compressed) tsv files.
+#' Or other formats that have a `streamtable_table method`, like parquet. 
 #' `ark` does this by reading only chunks at a time into memory, allowing it to
 #' process tables that would be too large to read into memory all at once (which
 #' is probably why you are using a database in the first place!)  Compressed
@@ -65,31 +72,54 @@ ark <- function(db_con,
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
                 method = c("keep-open", "window", "sql-window"),
-                overwrite = "ask"){
+                overwrite = "ask",
+                filter_statement = NULL, 
+                filenames = NULL, 
+                callback = NULL) {
   
   assert_dbi(db_con)
   assert_dir_exists(dir)
   assert_streamable(streamable_table)
-
   
+  if(!is.null(filter_statement) & length(tables) > 1)
+    warning("Your filter statement will be applied to all tables.")
+
+  if (!is.null(filenames)) {
+    if(length(tables) != length(filenames))
+      stop("The number of filenames should be equal to the number of tables")
+  }
+
+ 
   method <- match.arg(method)
   compress <- match.arg(compress)
   lines <- as.integer(lines)
   
   stopifnot(inherits(streamable_table, "streamable_table"))
   
+  if(streamable_table$extension == "parquet" & compress != "none")
+    warning("Parquet is already compressed. Additional compression may not be effective")
+    
+  
   ## exclude sqlite's internal tables
   tables <- tables[!grepl("sqlite_", tables)]
   
-  lapply(tables, 
-         ark_file, 
-         db_con = normalize_con(db_con),
-         streamable_table = streamable_table,
-         lines = lines, 
-         dir = dir, 
-         compress = compress,
-         method = method,
-         overwrite = overwrite)
+  for(i in seq_along(tables)) { # Need to iterate over 
+    ark_file(
+      tablename = tables[i],
+      db_con = normalize_con(db_con),
+      streamable_table = streamable_table,
+      lines = lines, 
+      dir = dir, 
+      compress = compress,
+      method = method,
+      overwrite = overwrite, 
+      filter_statement = filter_statement,
+      filename = filenames[i],
+      callback = callback
+    )
+
+  }
+         
   
   invisible(dir)
 }
@@ -107,7 +137,9 @@ ark_file <- function(tablename,
                      dir, 
                      compress,
                      method,
-                     overwrite){
+                     overwrite, 
+                     filter_statement, 
+                     filename, callback) {
   
   ## Set up compressed connection
   ext <- switch(compress,
@@ -117,16 +149,38 @@ ark_file <- function(tablename,
                 "none" = "",
                 ".bz2")
   
-  dest <- sprintf("%s.%s%s", tablename, streamable_table$extension, ext)
+  # Used as a switch when a filename is provided to the function
+  # This allows us to unlink
+  if (!is.null(filename)) {
+    tmp_tablename <- filename
+  } else {
+    tmp_tablename <- tablename
+  }
+
+  dest <- sprintf("%s.%s%s", tmp_tablename, streamable_table$extension, ext)
   filename <- file.path(dir, dest)
   
   ## Handle case in which file already exists. Otherwise, we'll append to it
-  if(!assert_overwrite(filename, overwrite)){
+  if(!assert_overwrite(filename, overwrite)) {
     return(NULL)
   }
   
-  con <- generic_connection(filename, "wb")
-  on.exit(close(con))
+  if (streamable_table$extension == "parquet") {
+    # Parquet files need a sink. 
+    con <- filename
+    
+    # Parquet writes chunks, need to unlink directory to delete files. 
+    if (overwrite != "ask") {
+      if (overwrite)
+        unlink(paste0(dir, "/",tmp_tablename), recursive= TRUE)
+    }
+    
+  } else {
+    # Text files need a connection
+    con <- generic_connection(filename, "wb")
+    on.exit(close(con))
+  }
+
   
   ## Progress reporting
   message(sprintf("Exporting %s in %d line chunks:", tablename, lines))
@@ -135,12 +189,13 @@ ark_file <- function(tablename,
  
   switch(method,
           "keep-open" = keep_open(db_con, streamable_table, lines, 
-                                  p, tablename, con),
+                                  p, tablename, con, filter_statement, callback),
              "window" = window(db_con, streamable_table, lines, 
-                               compress, p, tablename, con),
+                               compress, p, tablename, con, filter_statement, callback),
          "sql-window" = sql_window(db_con, streamable_table, lines, 
-                                   compress, p, tablename, con),
-         keep_open(db_con, streamable_table, lines, p, tablename, con)
+                                   compress, p, tablename, con, filter_statement, callback),
+         keep_open(db_con, streamable_table, lines, p, tablename, con, 
+                   filter_statement, callback)
   )
   
   message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
@@ -149,36 +204,61 @@ ark_file <- function(tablename,
 
 
 ## Generic way to get header
-get_header <- function(db, tablename){
+get_header <- function(db, tablename) {
   fields <- DBI::dbListFields(db, tablename)
   names(fields) <- fields
   as.data.frame(lapply(fields, function(x) character(0)))
 }
 
-keep_open <- function(db_con, streamable_table, lines, p, tablename, con){
+keep_open <- function(db_con, streamable_table, lines, p, tablename, con, 
+                      filter_statement, callback) {
   ## Create header to avoid duplicate column names
-  header <- get_header(db_con, tablename)
-  streamable_table$write(header, con, omit_header = FALSE)
+  
+  if (!streamable_table$extension == "parquet") {
+    # Parquet has no append=TRUE method in R
+    header <- get_header(db_con, tablename)
+    streamable_table$write(header, con, omit_header = FALSE)
+  }
   
   ## 
-  res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
+  if(is.null(filter_statement)) {
+    res <- DBI::dbSendQuery(db_con, paste("SELECT * FROM", tablename))
+  } else {
+    res <- DBI::dbSendQuery(
+      db_con, 
+      paste("SELECT * FROM", tablename, filter_statement)
+    )
+  }
+
   while (TRUE) {
     p$tick()
     data <- DBI::dbFetch(res, n = lines)
-    if (nrow(data) == 0) break
+    
+    if (!is.null(callback))
+      data <- callback(data)
+    
+    if (nrow(data) == 0) 
+      break
+    
     streamable_table$write(data, con, omit_header = TRUE)
   }
+  
   DBI::dbClearResult(res)
 }
 
 
-
-
-
 windowing <- function(sql_supports_windows)
-  function(db_con, streamable_table, lines, compress, p, tablename, con){
+  function(db_con, streamable_table, lines, compress, p, tablename, con, 
+           filter_statement, callback) {
   
-  size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
+  if(is.null(filter_statement)) {
+    size <- DBI::dbGetQuery(db_con, paste("SELECT COUNT(*) FROM", tablename))
+  } else {
+    size <- DBI::dbGetQuery(
+      db_con, 
+      paste("SELECT COUNT(*) FROM", tablename, filter_statement))
+  }
+
   end <- size[[1]][[1]]
   start <- 1
   repeat {
@@ -191,7 +271,9 @@ windowing <- function(sql_supports_windows)
               lines = lines,
               compress = compress, 
               con = con, 
-              sql_supports_windows = sql_supports_windows)
+              sql_supports_windows = sql_supports_windows,
+              filter_statement = filter_statement,
+              callback = callback)
     start <- start + 1  
     if ( (start - 1)*lines > end) {
       break
@@ -206,25 +288,46 @@ ark_chunk <- function(db_con,
                       lines, 
                       compress,
                       con,
-                      sql_supports_windows){
+                      sql_supports_windows, 
+                      filter_statement,
+                      callback){
   
   if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
-    query <- paste("SELECT * FROM", tablename, "WHERE rownum BETWEEN",
-             sql_int((start - 1) * lines), "AND", sql_int(start * lines))
+    if(is.null(filter_statement)) {
+      query <- paste("SELECT * FROM", tablename, 
+                     "WHERE rownum BETWEEN", sql_int((start - 1) * lines), 
+                     "AND", sql_int(start * lines))
+    } else {
+      query <- paste("SELECT * FROM", tablename, filter_statement, "AND rownum BETWEEN",
+                     sql_int((start - 1) * lines), "AND", sql_int(start * lines))      
+    }
+
   } else { 
     ## Any SQL DB can do offset
-    query <- paste("SELECT * FROM", tablename, "LIMIT", 
-                   sql_int(lines), 
-                   "OFFSET", 
-                   sql_int((start-1)*lines))
+    if(is.null(filter_statement)) {
+      query <- paste("SELECT * FROM", tablename, "LIMIT", 
+                     sql_int(lines), 
+                     "OFFSET", 
+                     sql_int((start-1)*lines))
+    } else {
+      query <- paste("SELECT * FROM", tablename, filter_statement, "LIMIT", 
+                     sql_int(lines), 
+                     "OFFSET", 
+                     sql_int((start-1)*lines))      
+
+    }
+
 
   }
   data <- DBI::dbGetQuery(db_con, query)
   
-  omit_header <- start != 1
-  streamable_table$write(data, con, omit_header = omit_header)
+  if (!is.null(callback))
+    data <- callback(data)
   
+  omit_header <- start != 1
+  
+  streamable_table$write(data, con, omit_header = omit_header)
 }
 
 ## need to convert large integers to characters

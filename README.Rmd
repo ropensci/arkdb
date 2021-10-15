@@ -24,7 +24,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-The goal of `arkdb` is to provide a convenient way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. The key feature of `arkdb` is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much too large to read into memory all at once.    
+The goal of `arkdb` is to provide a convenient way to move data from large compressed text files (tsv, csv, etc) into any DBI-compliant database connection (e.g. MYSQL, Postgres, SQLite; see [DBI](https://db.rstudio.com/dbi/)), and move tables out of such databases into text files. The key feature of `arkdb` is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much too large to read into memory all at once. There is also functionality for filtering and applying transformation to data as it is extracted from the database.  
+
+The `arkdb` package is easily extended to use custom read and write methods allowing you to dictate your own output formats. See `R/streamable_table.R` for examples that include using: 
+
+- Base c/tsv
+- Apache arrow's parquet
+- The `readr` package for c/tsv
 
 ## Links
 
@@ -83,8 +89,6 @@ unark(files, new_db, lines = 50000)
 
 
 ```{r include=FALSE}
-
-
 disconnect <- function(db){
   ## Cleanup 
   if(inherits(db, "DBIConnection")){
@@ -98,6 +102,65 @@ DBI::dbDisconnect(db)
 DBI::dbDisconnect(new_db)
 
 codemeta::write_codemeta()
+```
+
+## Using filters
+
+This package can also be used to generate slices of data that are required for analytical or operational purposes. In the example below we archive to disk only the flight data that occured in the month of December. It is recommended to use filters on a single table at a time. 
+
+```{r, eval=FALSE}
+ark(db, dir, lines = 50000, tables = "flights", filter_statement = "WHERE month = 12")
+```
+
+## Using callbacks
+
+It is possible to use a callback to perform just-in-time data transformations before ark writes your data object to disk in your preferred format. In the example below, we write a simple transformation to convert the flights data `arr_delay` field, from minutes, to hours. It is recommended to use callbacks on a single table at a time. A callback function can be anything you can imagine so long as it returns a data.frame that can be written to disk.
+
+```{r, eval=FALSE}
+mins_to_hours <- function(data) {
+  data$arr_delay <- data$arr_delay/60
+  data
+}
+
+ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
+```
+
+
+## ETLs with arkdb
+
+The `arkdb` package can also be used to create a number of ETL pipelines involving text archives or databases given its ability to filter, and use callbacks. In the example below, we leverage `duckdb` to read a fictional folder of files by US state, filter by `var_filtered`, apply a callback transformation `transform_fun` to `var_transformed` save as parquet, and then load a folder of parquet files for analysis with Apache Arrow. 
+
+```{r, eval = FALSE}
+library(arrow)
+library(duckdb)
+
+db <- dbConnect(duckdb::duckdb())
+
+transform_fun <- function(data) {
+  data$var_transformed <- sqrt(data$var_transformed)
+  data
+}
+
+for(state in c("DC", state.abb)) {
+  path <- paste0("path/to/archives/", state, ".gz")
+  
+  ark(
+    db,
+    dir = paste0("output/", state),
+    streamable_table = streamable_parquet(), # parquet files of nline rows
+    lines = 100000,
+    # See: https://duckdb.org/docs/data/csv
+    tables = sprintf("read_csv_auto('%s')", path), 
+    compress = "none", # Compression meaningless for parquet as it's already compressed
+    overwrite = T, 
+    filenames = state, # Overload tablename
+    filter_statement = "WHERE var_filtered = 1",
+    callback = transform_fun
+  )
+}
+
+# The result is trivial to read in with arrow 
+ds <- open_dataset("output", partitioning = "state")
 ```
 
 -----

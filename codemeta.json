@@ -10,13 +10,13 @@
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.6",
+  "version": "0.0.13",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.2 (2020-06-22)",
+  "runtimePlatform": "R version 4.0.3 (2020-10-10)",
   "author": [
     {
       "@type": "Person",
@@ -31,6 +31,12 @@
       "@type": "Person",
       "givenName": "Richard",
       "familyName": "FitzJohn"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Brandon",
+      "familyName": "Bertelsen",
+      "email": "brandon@bertelsen.ca"
     }
   ],
   "copyrightHolder": [
@@ -52,6 +58,30 @@
     }
   ],
   "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "arrow",
+      "name": "arrow",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=arrow"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "R.utils",
+      "name": "R.utils",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=R.utils"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "progress",
@@ -198,12 +228,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "MonetDBLite",
-      "name": "MonetDBLite",
-      "version": ">= 0.5.0"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "duckdb",
       "name": "duckdb",
       "provider": {
@@ -225,9 +249,32 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=vroom"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "utf8",
+      "name": "utf8",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=utf8"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "MonetDBLite",
+      "name": "MonetDBLite"
     }
   ],
   "softwareRequirements": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.0"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "DBI",
@@ -249,34 +296,10 @@
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "R.utils",
-      "name": "R.utils",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=R.utils"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "rappdirs",
-      "name": "rappdirs",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=rappdirs"
     }
   ],
   "releaseNotes": "https://github.com/ropensci/arkdb/blob/master/NEWS.md",
-  "fileSize": "557.519KB",
+  "fileSize": "207.747KB",
   "contIntegration": ["https://travis-ci.org/ropensci/arkdb", "https://codecov.io/github/ropensci/arkdb?branch=master"],
   "keywords": [
     "database",
@@ -287,7 +310,7 @@
     "peer-reviewed",
     "r-package"
   ],
-  "developmentStatus": "https://www.tidyverse.org/lifecycle/#stable",
+  "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",

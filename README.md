@@ -24,14 +24,24 @@ database connection (e.g. MYSQL, Postgres, SQLite; see
 databases into text files. The key feature of `arkdb` is that files are
 moved between databases and text files in chunks of a fixed size,
 allowing the package functions to work with tables that would be much
-too large to read into memory all at once.
+too large to read into memory all at once. There is also functionality
+for filtering and applying transformation to data as it is extracted
+from the database.
+
+The `arkdb` package is easily extended to use custom read and write
+methods allowing you to dictate your own output formats. See
+`R/streamable_table.R` for examples that include using:
+
+-   Base c/tsv
+-   Apache arrow’s parquet
+-   The `readr` package for c/tsv
 
 ## Links
 
-  - A more detailed introduction to package design and use can be found
+-   A more detailed introduction to package design and use can be found
     in the package
     [Vignette](https://docs.ropensci.org/arkdb/articles/arkdb.html)
-  - [Online versions of package
+-   [Online versions of package
     documentation](https://docs.ropensci.org/arkdb/)
 
 ## Installation
@@ -61,7 +71,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/Rtmp3Ebd1H/nycflights13.sqlite
+#> Caching nycflights db at /tmp/RtmpaPIZtd/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -75,15 +85,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.008990765 secs)
+#>  ...Done! (in 0.005835295 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.03013897 secs)
+#>  ...Done! (in 0.02616954 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 8.753164 secs)
+#>  ...Done! (in 11.06295 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02437472 secs)
+#>  ...Done! (in 0.02628589 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.6173553 secs)
+#>  ...Done! (in 0.7931433 secs)
 ```
 
 ## Unarchive
@@ -96,19 +106,90 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01028419 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01863098 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 5.179139 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.0276711 secs)
-#> Importing /tmp/Rtmp3Ebd1H/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.202945 secs)
+#> Importing /tmp/RtmpaPIZtd/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.009098053 secs)
+#> Importing /tmp/RtmpaPIZtd/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0235734 secs)
+#> Importing /tmp/RtmpaPIZtd/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 9.909053 secs)
+#> Importing /tmp/RtmpaPIZtd/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0334425 secs)
+#> Importing /tmp/RtmpaPIZtd/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.2259054 secs)
 ```
 
------
+## Using filters
+
+This package can also be used to generate slices of data that are
+required for analytical or operational purposes. In the example below we
+archive to disk only the flight data that occured in the month of
+December. It is recommended to use filters on a single table at a time.
+
+``` r
+ark(db, dir, lines = 50000, tables = "flights", filter_statement = "WHERE month = 12")
+```
+
+## Using callbacks
+
+It is possible to use a callback to perform just-in-time data
+transformations before ark writes your data object to disk in your
+preferred format. In the example below, we write a simple transformation
+to convert the flights data `arr_delay` field, from minutes, to hours.
+It is recommended to use callbacks on a single table at a time.
+
+``` r
+mins_to_hours <- function(data) {
+  data$arr_delay <- data$arr_delay/60
+  data
+}
+
+ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
+```
+
+## ETLs with arkdb
+
+The `arkdb` package can also be used to create a number of ETL pipelines
+involving text archives or databases given its ability to filter, and
+use callbacks. In the example below, we leverage `duckdb` to read a
+fictional folder of files by US state, filter by `var_filtered`, apply a
+callback transformation `transform_fun` to `var_transformed` save as
+parquet, and then load a folder of parquet files for analysis with
+Apache Arrow.
+
+``` r
+library(arrow)
+library(duckdb)
+
+db <- dbConnect(duckdb::duckdb())
+
+transform_fun <- function(data) {
+  data$var_transformed <- sqrt(data$var_transformed)
+  data
+}
+
+for(state in c("DC", state.abb)) {
+  path <- paste0("path/to/archives/", state, ".gz")
+  
+  ark(
+    db,
+    dir = paste0("output/", state),
+    streamable_table = streamable_parquet(), # parquet files of nline rows
+    lines = 100000,
+    # See: https://duckdb.org/docs/data/csv
+    tables = sprintf("read_csv_auto('%s')", path), 
+    compress = "none", # Compression meaningless for parquet as it's already compressed
+    overwrite = T, 
+    filenames = state, # Overload tablename
+    filter_statement = "WHERE var_filtered = 1",
+    callback = transform_fun
+  )
+}
+
+# The result is trivial to read in with arrow 
+ds <- open_dataset("output", partitioning = "state")
+```
+
+------------------------------------------------------------------------
 
 Please note that this project is released with a [Contributor Code of
 Conduct](https://ropensci.org/code-of-conduct/). By participating in
