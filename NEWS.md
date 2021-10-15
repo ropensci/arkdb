@@ -1,12 +1,9 @@
-# arkdb 0.0.14
+# arkdb 0.0.13
 
 - Added ability to name output files directly.
 - Add warning when users specify compression for parquet files.
 - Added callback functionality to the `ark` function. Allowing users to perform 
   transformations or recodes before chunked data.frames are saved to disk.
-
-# arkdb 0.0.13 
-
 - Added ability to filter databases by allowing users to specify a "WHERE" clause. 
 - Added parquet as an streamable_table format, allowing users to `ark` to parquet 
   instead of a text format. 
