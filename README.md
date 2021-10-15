@@ -71,7 +71,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/RtmpaPIZtd/nycflights13.sqlite
+#> Caching nycflights db at /tmp/RtmpoqsIiq/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -85,15 +85,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.005835295 secs)
+#>  ...Done! (in 0.002958298 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.02616954 secs)
+#>  ...Done! (in 0.01185942 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 11.06295 secs)
+#>  ...Done! (in 6.424041 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02628589 secs)
+#>  ...Done! (in 0.01805758 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.7931433 secs)
+#>  ...Done! (in 0.4436579 secs)
 ```
 
 ## Unarchive
@@ -106,16 +106,16 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/RtmpaPIZtd/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.009098053 secs)
-#> Importing /tmp/RtmpaPIZtd/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.0235734 secs)
-#> Importing /tmp/RtmpaPIZtd/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 9.909053 secs)
-#> Importing /tmp/RtmpaPIZtd/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.0334425 secs)
-#> Importing /tmp/RtmpaPIZtd/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.2259054 secs)
+#> Importing /tmp/RtmpoqsIiq/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.006127834 secs)
+#> Importing /tmp/RtmpoqsIiq/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01151252 secs)
+#> Importing /tmp/RtmpoqsIiq/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 3.744042 secs)
+#> Importing /tmp/RtmpoqsIiq/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01825166 secs)
+#> Importing /tmp/RtmpoqsIiq/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.1292217 secs)
 ```
 
 ## Using filters
@@ -135,7 +135,9 @@ It is possible to use a callback to perform just-in-time data
 transformations before ark writes your data object to disk in your
 preferred format. In the example below, we write a simple transformation
 to convert the flights data `arr_delay` field, from minutes, to hours.
-It is recommended to use callbacks on a single table at a time.
+It is recommended to use callbacks on a single table at a time. A
+callback function can be anything you can imagine so long as it returns
+a data.frame that can be written to disk.
 
 ``` r
 mins_to_hours <- function(data) {
