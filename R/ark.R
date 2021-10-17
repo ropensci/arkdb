@@ -71,13 +71,19 @@ ark <- function(db_con,
                 lines = 50000L, 
                 compress = c("bzip2", "gzip", "xz", "none"),
                 tables = list_tables(db_con),
-                method = c("keep-open", "window", "sql-window"),
+                method = c("keep-open", "window", "window-parallel","sql-window"),
                 overwrite = "ask",
                 filter_statement = NULL, 
                 filenames = NULL, 
                 callback = NULL) {
   
-  assert_dbi(db_con)
+  if(!is.function(db_con)) {
+    assert_dbi(db_con)
+  }
+  
+  if(!is.function(db_con) & method == "window-parallel")
+    stop("For window-parallel, you must provide a function that returns a database connection")
+
   assert_dir_exists(dir)
   assert_streamable(streamable_table)
   
@@ -192,6 +198,8 @@ ark_file <- function(tablename,
                                   p, tablename, con, filter_statement, callback),
              "window" = window(db_con, streamable_table, lines, 
                                compress, p, tablename, con, filter_statement, callback),
+         "window-parallel" = window_parallel(db_con, streamable_table, lines, 
+                                    compress, p, tablename, con, filter_statement, callback),
          "sql-window" = sql_window(db_con, streamable_table, lines, 
                                    compress, p, tablename, con, filter_statement, callback),
          keep_open(db_con, streamable_table, lines, p, tablename, con, 
@@ -279,7 +287,43 @@ windowing <- function(sql_supports_windows)
       break
     }
   }
-}
+  }
+
+windowing_parallel <- function(sql_supports_windows)
+  function(db_con, streamable_table, lines, compress, p, tablename, con, 
+           filter_statement, callback) {
+    
+    a_db_con <- db_con() # It's a function!
+    if(is.null(filter_statement)) {
+      size <- DBI::dbGetQuery(a_db_con, paste("SELECT COUNT(*) FROM", tablename))
+    } else {
+      size <- DBI::dbGetQuery(
+        a_db_con, 
+        paste("SELECT COUNT(*) FROM", tablename, filter_statement))
+    }
+    
+    end <- size[[1]][[1]]
+    
+    invisible(future.apply::future_lapply(
+      seq(from=1, to=end, by=lines),
+      function(x) {
+        a_db_con <- db_con() 
+        ark_chunk(
+          a_db_con, 
+          streamable_table = streamable_table,
+          tablename = tablename, 
+          start = x, 
+          lines = lines,
+          compress = compress, 
+          con = con, 
+          sql_supports_windows = sql_supports_windows,
+          filter_statement = filter_statement,
+          callback = callback
+        )
+        DBI::dbDisconnect(con)
+      }
+    ))
+  }
   
 ark_chunk <- function(db_con,
                       streamable_table,
@@ -336,6 +380,7 @@ sql_int <- function(x){
 }
 
 window <- windowing(FALSE)
+window_parallel <- windowing_parallel(FALSE)
 sql_window <- windowing(TRUE)
 
 
