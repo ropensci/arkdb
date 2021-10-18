@@ -1,3 +1,10 @@
+# arkdb 0.0.14
+
+- Patch for test suite for Solaris. `arrow` package installs on Solaris, but
+  functions do not actually run correctly since the C++ libraries have not
+  been set up properly on Solaris. 
+
+
 # arkdb 0.0.13
 
 - Added ability to name output files directly.

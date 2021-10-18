@@ -1,6 +1,23 @@
 Dear CRAN maintainers,
 
-Changes in this release are described in NEWS.md
+Changes in this release are described in NEWS.md.
+
+This release (0.0.14) follows right behind the earlier release (0.0.13), 
+because our previous release introduced new optional features that leverage
+the arrow library, and these tests fail on Solaris. We apologize for not
+catching this, but our tests did assert that they should only be run if 
+arrow was available.  However, the arrow package is not properly installed 
+and configured on solaris, as described in the error message that results:
+as described in https://arrow.apache.org/docs/r/articles/install.html 
+
+Until the CRAN Solaris machine is properly set up to use the arrow package,
+we now gracefully skip the tests on that machine. 
+ 
+
+
+
+
+
 Thanks!
 
 Note that winbuilder will always throw a NOTE on this package due to the continued
