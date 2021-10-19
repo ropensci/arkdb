@@ -305,7 +305,7 @@ windowing_parallel <- function(sql_supports_windows)
     end <- size[[1]][[1]]
     
     invisible(future.apply::future_lapply(
-      seq(from=1, to=end, by=lines),
+      seq_along(seq(from=1, to=end, by=lines)),
       function(x) {
         a_db_con <- db_con() 
         ark_chunk(
@@ -320,7 +320,7 @@ windowing_parallel <- function(sql_supports_windows)
           filter_statement = filter_statement,
           callback = callback
         )
-        DBI::dbDisconnect(con)
+        DBI::dbDisconnect(a_db_con)
       }
     ))
   }
@@ -365,6 +365,7 @@ ark_chunk <- function(db_con,
 
   }
   data <- DBI::dbGetQuery(db_con, query)
+  message(nrow(data))
   
   if (!is.null(callback))
     data <- callback(data)
