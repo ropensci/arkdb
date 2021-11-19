@@ -318,7 +318,8 @@ windowing_parallel <- function(sql_supports_windows)
           con = con, 
           sql_supports_windows = sql_supports_windows,
           filter_statement = filter_statement,
-          callback = callback
+          callback = callback,
+          filename = x
         )
         DBI::dbDisconnect(a_db_con)
       }
@@ -334,7 +335,8 @@ ark_chunk <- function(db_con,
                       con,
                       sql_supports_windows, 
                       filter_statement,
-                      callback){
+                      callback,
+                      filename = NULL) {
   
   if (sql_supports_windows) {
     ## Windowed queries are faster but not universally supported
@@ -372,7 +374,7 @@ ark_chunk <- function(db_con,
   
   omit_header <- start != 1
   
-  streamable_table$write(data, con, omit_header = omit_header)
+  streamable_table$write(data, con, omit_header = omit_header, filename = filename)
 }
 
 ## need to convert large integers to characters
