@@ -11,7 +11,7 @@ ark(
   lines = 50000L,
   compress = c("bzip2", "gzip", "xz", "none"),
   tables = list_tables(db_con),
-  method = c("keep-open", "window", "sql-window"),
+  method = c("keep-open", "window", "window-parallel", "sql-window"),
   overwrite = "ask",
   filter_statement = NULL,
   filenames = NULL,
@@ -81,21 +81,23 @@ support windowing natively (i.e. \code{BETWEEN} queries).
 \donttest{
 # setup
 library(dplyr)
-dir <- tempdir() 
+dir <- tempdir()
 db <- dbplyr::nycflights13_sqlite(tempdir())
 
 ## And here we go:
 ark(db, dir)
-} 
+}
 \dontrun{
 
 ## For a Postgres DB with schema, we can append schema names first
-## to each of the table names, like so: 
+## to each of the table names, like so:
 schema_tables <- dbGetQuery(db, sqlInterpolate(db,
-"SELECT table_name FROM information_schema.tables 
-WHERE table_schema = ?schema", schema = "schema_name"))
+  "SELECT table_name FROM information_schema.tables
+WHERE table_schema = ?schema",
+  schema = "schema_name"
+))
 
-ark(db, dir, tables = paste0("schema_name",".", schema_tables$table_name))
+ark(db, dir, tables = paste0("schema_name", ".", schema_tables$table_name))
 }
 
 }

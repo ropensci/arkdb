@@ -68,10 +68,9 @@ having to edit database calls directly.
 \donttest{
 ## OPTIONAL: you can first set an alternative home location,
 ## such as a temporary directory:
-Sys.setenv(ARKDB_HOME=tempdir())
+Sys.setenv(ARKDB_HOME = tempdir())
 
 ## Connect to the database:
 db <- local_db()
-
 }
 }

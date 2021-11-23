@@ -322,6 +322,14 @@ windowing <- function(sql_supports_windows) {
 windowing_parallel <- function(sql_supports_windows) {
   function(db_con, streamable_table, lines, compress, p, tablename, con,
            filter_statement, callback) {
+    
+    if (!requireNamespace("future.apply", quietly = TRUE)) {
+      stop("future.apply package must be installed to use window-parallel",
+           call. = FALSE
+      )
+    }
+    future_lapply <- getExportedValue("future.apply", "future_lapply")
+    
     a_db_con <- db_con() # It's a function!
     if (is.null(filter_statement)) {
       size <- DBI::dbGetQuery(a_db_con, paste("SELECT COUNT(*) FROM", tablename))
@@ -333,8 +341,9 @@ windowing_parallel <- function(sql_supports_windows) {
     }
 
     end <- size[[1]][[1]]
+    
 
-    invisible(future.apply::future_lapply(
+    invisible(future_lapply(
       seq_along(seq(from = 1, to = end, by = lines)),
       function(x) {
         a_db_con <- db_con()

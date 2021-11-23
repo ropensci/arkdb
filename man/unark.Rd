@@ -67,10 +67,10 @@ files.
 \donttest{
 ## Setup: create an archive.
 library(dplyr)
-dir <- tempdir() 
+dir <- tempdir()
 db <- dbplyr::nycflights13_sqlite(tempdir())
 
-## database -> .tsv.bz2 
+## database -> .tsv.bz2
 ark(db, dir)
 
 ## list all files in archive (full paths)
@@ -82,6 +82,5 @@ unark(files, new_db)
 
 ## Prove table is returned successfully.
 tbl(new_db, "flights")
-
 }
 }
