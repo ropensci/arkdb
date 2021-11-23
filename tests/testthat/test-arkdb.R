@@ -210,8 +210,6 @@ testthat::test_that("try with parquet & alternate method", {
     dbGetQuery(db, "SELECT COUNT(*) FROM airports")[[1]]
   )
 
-  print(list.files(paste0(dir, "/", "flights")))
-
   # flights
   testthat::expect_true("part-00001.parquet" %in% list.files(paste0(dir, "/", "flights")))
   testthat::expect_true("part-00014.parquet" %in% list.files(paste0(dir, "/", "flights")))
@@ -258,7 +256,7 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   skip_if_not_installed("arrow")
 
   # clean up previous test
-  unlink(paste0(dir, "/flights"), TRUE)
+  # unlink(paste0(dir, "/flights"), TRUE)
 
 
   testthat::expect_warning(ark(db, dir,
@@ -272,7 +270,7 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
 
   # clean up previous test
-  unlink(paste0(dir, "/flights"), TRUE)
+  # unlink(paste0(dir, "/flights"), TRUE)
 
   ark(db, dir,
     streamable_table = streamable_parquet(),
@@ -288,8 +286,8 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
 
 testthat::test_that("Warns when applying filter to multiple tables", {
   # clean up previous test
-  unlink(paste0(dir, "/flights"), TRUE)
-  unlink(paste0(dir, "/weather"), TRUE)
+  #unlink(paste0(dir, "/flights"), TRUE)
+  #unlink(paste0(dir, "/weather"), TRUE)
   expect_warning(
     ark(db, dir,
       streamable_table = streamable_parquet(),

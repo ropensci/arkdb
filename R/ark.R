@@ -297,7 +297,6 @@ windowing <- function(sql_supports_windows) {
     start <- 1
     repeat {
       p$tick()
-      start <- start + 1
 
       ark_chunk(db_con,
         streamable_table = streamable_table,
@@ -310,6 +309,8 @@ windowing <- function(sql_supports_windows) {
         filter_statement = filter_statement,
         callback = callback
       )
+      
+      start <- start + 1
 
       if ((start - 1) * lines > end) {
         break
