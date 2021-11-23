@@ -1,42 +1,42 @@
 
 #' process a table in chunks
-#' 
+#'
 #' @inheritParams unark
 #' @param file path to a file
 #' @param process_fn a function of a `chunk`
-#' @export 
-#' 
+#' @export
+#'
 #' @examples
-#' con <- system.file("extdata/mtcars.tsv.gz", package="arkdb")
+#' con <- system.file("extdata/mtcars.tsv.gz", package = "arkdb")
 #' dummy <- function(x) message(paste(dim(x), collapse = " x "))
 #' process_chunks(con, dummy, lines = 8)
-#' 
-process_chunks <- function(file, 
+process_chunks <- function(file,
                            process_fn,
                            streamable_table = NULL,
-                           lines = 5e4L, 
+                           lines = 5e4L,
                            encoding = Sys.getenv("encoding", "UTF-8"),
-                           ...
-                           ){
-  
+                           ...) {
+
   ## Guess streamable table
-  if(is.null(streamable_table)){
+  if (is.null(streamable_table)) {
     streamable_table <- guess_stream(file)
   }
   con <- generic_connection(file, "rb", encoding = encoding)
   on.exit(close(con))
-  
-  
+
+
   header <- readLines(con, n = 1L, encoding = encoding, warn = FALSE)
-  if(length(header) == 0){ # empty file, would throw error
+  if (length(header) == 0) { # empty file, would throw error
     return(NULL)
   }
   reader <- read_chunked(con, lines, encoding)
-  
+
   # May throw an error if we need to read more than 'total' chunks?
   p <- progress("[:spin] chunk :current", total = 100000)
-  message(sprintf("Importing %s in %d line chunks:",
-                  summary(con)$description, lines))
+  message(sprintf(
+    "Importing %s in %d line chunks:",
+    summary(con)$description, lines
+  ))
   t0 <- Sys.time()
   repeat {
     d <- reader()
@@ -44,7 +44,7 @@ process_chunks <- function(file,
     p$tick()
     chunk <- streamable_table$read(body, ...)
     process_fn(chunk)
-    
+
     if (d$complete) {
       break
     }
@@ -72,4 +72,3 @@ read_chunked <- function(con, n, encoding) {
     list(data = data, complete = complete)
   }
 }
-
