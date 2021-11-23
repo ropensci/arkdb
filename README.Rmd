@@ -130,12 +130,29 @@ ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
 There are two strategies for using `ark` in parallel. One is to loop over the tables, re-using the ark function per table in parallel. The other, introduced in 0.0.15, is to use the "window-parallel" method. This is particularly useful if your tables are very large and can speed up the process significantly. 
 
 ```{r, eval = FALSE}
+# Strategy 1
+library(arkdb)
+library(future.apply)
+
+plan(multisession)
+
+future_lapply(vector_of_tables, function(x) ark(db, dir, lines, tables = x))
+
+# Strategy 2
 library(arkdb)
 library(future.apply)
 
 plan(multisession)
 
 ark(db, dir, lines = 50000, tables = "flights", method = "window-parallel")
+
+# Both
+library(arkdb)
+library(future.apply)
+# 16 core machine for example
+plan(list(tweak(multisession, n = 4), tweak(multisession, n = 4))
+# 4 tables at a time, 4 threads per table
+future_lapply(vector_of_tables, function(x) ark(db, dir, lines, tables = x, method = "window-parallel"))
 ```
 
 ## ETLs with arkdb

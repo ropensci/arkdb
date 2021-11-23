@@ -71,7 +71,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/Rtmpufa1GX/nycflights13.sqlite
+#> Caching nycflights db at /tmp/RtmpeComJD/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -85,15 +85,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.008796453 secs)
+#>  ...Done! (in 0.00697875 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.0250783 secs)
+#>  ...Done! (in 0.02570009 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 11.1926 secs)
+#>  ...Done! (in 12.48277 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02586102 secs)
+#>  ...Done! (in 0.02917528 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.8782985 secs)
+#>  ...Done! (in 0.7789948 secs)
 ```
 
 ## Unarchive
@@ -106,16 +106,16 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/Rtmpufa1GX/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01710987 secs)
-#> Importing /tmp/Rtmpufa1GX/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.03264403 secs)
-#> Importing /tmp/Rtmpufa1GX/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 7.598506 secs)
-#> Importing /tmp/Rtmpufa1GX/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.03590822 secs)
-#> Importing /tmp/Rtmpufa1GX/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.2713075 secs)
+#> Importing /tmp/RtmpeComJD/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.01047921 secs)
+#> Importing /tmp/RtmpeComJD/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0187602 secs)
+#> Importing /tmp/RtmpeComJD/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 7.23382 secs)
+#> Importing /tmp/RtmpeComJD/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.02560472 secs)
+#> Importing /tmp/RtmpeComJD/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.2310131 secs)
 ```
 
 ## Using filters
@@ -157,12 +157,29 @@ This is particularly useful if your tables are very large and can speed
 up the process significantly.
 
 ``` r
+# Strategy 1
+library(arkdb)
+library(future.apply)
+
+plan(multisession)
+
+future_lapply(vector_of_tables, function(x) ark(db, dir, lines, tables = x))
+
+# Strategy 2
 library(arkdb)
 library(future.apply)
 
 plan(multisession)
 
 ark(db, dir, lines = 50000, tables = "flights", method = "window-parallel")
+
+# Both
+library(arkdb)
+library(future.apply)
+# 16 core machine for example
+plan(list(tweak(multisession, n = 4), tweak(multisession, n = 4))
+# 4 tables at a time, 4 threads per table
+future_lapply(vector_of_tables, function(x) ark(db, dir, lines, tables = x, method = "window-parallel"))
 ```
 
 ## ETLs with arkdb
