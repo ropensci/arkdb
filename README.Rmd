@@ -101,7 +101,7 @@ disconnect <- function(db){
 DBI::dbDisconnect(db)
 DBI::dbDisconnect(new_db)
 
-codemetar::write_codemeta()
+codemeta::write_codemeta()
 ```
 
 ## Using filters
