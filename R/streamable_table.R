@@ -284,12 +284,18 @@ streamable_parquet <- function() {
         ".parquet"
       )
     } else {
-      # May no longer be necessary
-      path <- tempfile(
-        pattern = "part-",
-        tmpdir = dir_path,
-        fileext = ".parquet"
-      )
+      fls <- list.files(dir_path)
+      
+      if(length(fls) == 0) {
+        n <- 1
+      } else {
+        # Find max part number, and increment
+        n <- max(as.integer(gsub(".*?([0-9]+).*", "\\1", fls))) + 1
+      }
+      
+      # Overload path accordingly
+      path <- paste0(
+        dir_path, "/part-", formatC(n, width=5, flag="0"), ".parquet")
     }
 
 
