@@ -125,6 +125,18 @@ mins_to_hours <- function(data) {
 ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
 ```
 
+## ark() in parallel
+
+There are two strategies for using `ark` in parallel. One is to loop over the tables, re-using the ark function per table in parallel. The other, introduced in 0.0.15, is to use the "window-parallel" method. This is particularly useful if your tables are very large and can speed up the process significantly. 
+
+```{r, eval = FALSE}
+library(arkdb)
+library(future.apply)
+
+plan(multisession)
+
+ark(db, dir, lines = 50000, tables = "flights", method = "window-parallel")
+```
 
 ## ETLs with arkdb
 

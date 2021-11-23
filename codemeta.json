@@ -7,7 +7,7 @@
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -269,6 +269,18 @@
       "@type": "SoftwareApplication",
       "identifier": "MonetDBLite",
       "name": "MonetDBLite"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "future.apply",
+      "name": "future.apply",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=future.apply"
     }
   ],
   "softwareRequirements": {
@@ -302,5 +314,5 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "5904.726KB"
+  "fileSize": "209.591KB"
 }
