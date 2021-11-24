@@ -292,7 +292,7 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
 
 testthat::test_that("Errors on window-parallel and not streamable parquet", {
   testthat::expect_error(
-    ark(db, dir, method = "window-parallel"), "only compatible with parquet"
+    ark(db = function(x) return(new_db), dir, method = "window-parallel"), "only compatible with parquet"
   )
 })
 
