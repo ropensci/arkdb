@@ -39,7 +39,8 @@
 #' full results to the client immediately rather than supporting chunking with `n`
 #' parameter, you may want to use "window" method, which is the most generic.  The
 #' "sql-window" method provides a faster alternative for databases like PostgreSQL that
-#' support windowing natively (i.e. `BETWEEN` queries).
+#' support windowing natively (i.e. `BETWEEN` queries). Note that "window-parallel"
+#' only works with `streamable_parquet`.
 #'
 #' @importFrom DBI dbListTables
 #' @export
@@ -106,11 +107,12 @@ ark <- function(db_con,
 
   stopifnot(inherits(streamable_table, "streamable_table"))
 
-  if (streamable_table$extension == "parquet" & compress != "none") {
+  if (streamable_table$extension == "parquet" & compress != "none")
     warning("Parquet is already compressed. Additional compression will not be effective")
-  }
-
-
+  
+  if (all(method == "window-parallel") & streamable_table$extension != "parquet")
+    stop("window-parallel is only compatible with parquet")
+      
   ## exclude sqlite's internal tables
   tables <- tables[!grepl("sqlite_", tables)]
 

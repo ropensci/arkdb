@@ -75,7 +75,8 @@ If the \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} implementation for your
 full results to the client immediately rather than supporting chunking with \code{n}
 parameter, you may want to use "window" method, which is the most generic.  The
 "sql-window" method provides a faster alternative for databases like PostgreSQL that
-support windowing natively (i.e. \code{BETWEEN} queries).
+support windowing natively (i.e. \code{BETWEEN} queries). Note that "window-parallel"
+only works with \code{streamable_parquet}.
 }
 \examples{
 \donttest{

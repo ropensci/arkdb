@@ -290,6 +290,12 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
 })
 
+testthat::test_that("Errors on window-parallel and not streamable parquet", {
+  testthat::expect_error(
+    ark(db, dir, method = "window-parallel"), "only compatible with parquet"
+  )
+})
+
 
 testthat::test_that("Warns when applying filter to multiple tables", {
   
