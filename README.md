@@ -7,7 +7,7 @@ status](https://github.com/ropensci/arkdb/workflows/R-CMD-check/badge.svg)](http
 status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
 [![Coverage
 status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/software-review/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![CRAN RStudio mirror
@@ -71,7 +71,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/RtmpQBYZTa/nycflights13.sqlite
+#> Caching nycflights db at /tmp/RtmpKGu2Ay/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -85,15 +85,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.004484177 secs)
+#>  ...Done! (in 0.006583929 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.01509285 secs)
+#>  ...Done! (in 0.02108455 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 7.508417 secs)
+#>  ...Done! (in 8.810824 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.01992035 secs)
+#>  ...Done! (in 0.02794719 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.5321391 secs)
+#>  ...Done! (in 0.6644697 secs)
 ```
 
 ## Unarchive
@@ -106,16 +106,16 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/RtmpQBYZTa/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.008596182 secs)
-#> Importing /tmp/RtmpQBYZTa/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.01579309 secs)
-#> Importing /tmp/RtmpQBYZTa/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 5.105555 secs)
-#> Importing /tmp/RtmpQBYZTa/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.02346087 secs)
-#> Importing /tmp/RtmpQBYZTa/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.1691854 secs)
+#> Importing /tmp/RtmpKGu2Ay/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0117662 secs)
+#> Importing /tmp/RtmpKGu2Ay/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.02637362 secs)
+#> Importing /tmp/RtmpKGu2Ay/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 6.802646 secs)
+#> Importing /tmp/RtmpKGu2Ay/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.03848696 secs)
+#> Importing /tmp/RtmpKGu2Ay/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.3772023 secs)
 ```
 
 ## Using filters
@@ -152,9 +152,12 @@ ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
 
 There are two strategies for using `ark` in parallel. One is to loop
 over the tables, re-using the ark function per table in parallel. The
-other, introduced in 0.0.15, is to use the “window-parallel” method.
-This is particularly useful if your tables are very large and can speed
-up the process significantly.
+other, introduced in 0.0.15, is to use the “window-parallel” method
+which loops over chunks of your table. This is particularly useful if
+your tables are very large and can speed up the process significantly.
+
+Note: `window-parallel` currently only works in conjunction with
+`streamable_parquet`
 
 ``` r
 # Strategy 1: Parallel over tables
@@ -163,6 +166,7 @@ library(future.apply)
 
 plan(multisession)
 
+# Any streamable_table method is acceptable
 future_lapply(vector_of_tables, function(x) ark(db, dir, lines, tables = x))
 
 # Strategy 2: Parallel over chunks of a table
@@ -174,7 +178,7 @@ plan(multisession)
 ark(
   db, 
   dir, 
-  streamable_table = streamable_parquet(), 
+  streamable_table = streamable_parquet(), # required for window-parallel
   lines = 50000, 
   tables = "flights", 
   method = "window-parallel"
@@ -191,7 +195,7 @@ future_lapply(vector_of_tables, function(x) {
   ark(
     db, 
     dir, 
-    streamable_table = streamable_parquet(), 
+    streamable_table = streamable_parquet(), # required for window-parallel
     lines = 50000, 
     tables = x, 
     method = "window-parallel")
@@ -248,4 +252,4 @@ Please note that this project is released with a [Contributor Code of
 Conduct](https://ropensci.org/code-of-conduct/). By participating in
 this project you agree to abide by its terms.
 
-[![ropensci\_footer](https://ropensci.org/public_images/ropensci_footer.png)](https://ropensci.org)
+[![ropensci_footer](https://ropensci.org/public_images/ropensci_footer.png)](https://ropensci.org)

@@ -127,7 +127,9 @@ ark(db, dir, lines = 50000, tables = "flights", callback = mins_to_hours)
 
 ## ark() in parallel
 
-There are two strategies for using `ark` in parallel. One is to loop over the tables, re-using the ark function per table in parallel. The other, introduced in 0.0.15, is to use the "window-parallel" method. This is particularly useful if your tables are very large and can speed up the process significantly. 
+There are two strategies for using `ark` in parallel. One is to loop over the tables, re-using the ark function per table in parallel. The other, introduced in 0.0.15, is to use the "window-parallel" method which loops over chunks of your table. This is particularly useful if your tables are very large and can speed up the process significantly. 
+
+Note: `window-parallel` currently only works in conjunction with `streamable_parquet`
 
 ```{r, eval = FALSE}
 # Strategy 1: Parallel over tables
@@ -136,6 +138,7 @@ library(future.apply)
 
 plan(multisession)
 
+# Any streamable_table method is acceptable
 future_lapply(vector_of_tables, function(x) ark(db, dir, lines, tables = x))
 
 # Strategy 2: Parallel over chunks of a table
@@ -147,7 +150,7 @@ plan(multisession)
 ark(
   db, 
   dir, 
-  streamable_table = streamable_parquet(), 
+  streamable_table = streamable_parquet(), # required for window-parallel
   lines = 50000, 
   tables = "flights", 
   method = "window-parallel"
@@ -164,7 +167,7 @@ future_lapply(vector_of_tables, function(x) {
   ark(
     db, 
     dir, 
-    streamable_table = streamable_parquet(), 
+    streamable_table = streamable_parquet(), # required for window-parallel
     lines = 50000, 
     tables = x, 
     method = "window-parallel")
