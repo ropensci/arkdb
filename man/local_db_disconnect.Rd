@@ -22,6 +22,5 @@ This function manually closes a connection to the \code{arkdb} database.
 
 ## Disconnect from the database:
 local_db_disconnect()
-
 }
 }

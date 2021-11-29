@@ -1,3 +1,7 @@
+# arkdb 0.0.15
+
+- Added window-parallel option for ark'ing large tables in parallel
+
 # arkdb 0.0.14
 
 - Patch for test suite for Solaris. `arrow` package installs on Solaris, but

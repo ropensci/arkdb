@@ -30,8 +30,7 @@ process_chunks(
 process a table in chunks
 }
 \examples{
-con <- system.file("extdata/mtcars.tsv.gz", package="arkdb")
+con <- system.file("extdata/mtcars.tsv.gz", package = "arkdb")
 dummy <- function(x) message(paste(dim(x), collapse = " x "))
 process_chunks(con, dummy, lines = 8)
-
 }

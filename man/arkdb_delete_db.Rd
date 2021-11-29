@@ -27,6 +27,4 @@ db <- local_db(dir)
 
 # Delete it
 arkdb_delete_db(dir, ask = FALSE)
-
-
 }

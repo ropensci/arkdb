@@ -11,7 +11,7 @@ ark(
   lines = 50000L,
   compress = c("bzip2", "gzip", "xz", "none"),
   tables = list_tables(db_con),
-  method = c("keep-open", "window", "sql-window"),
+  method = c("keep-open", "window", "window-parallel", "sql-window"),
   overwrite = "ask",
   filter_statement = NULL,
   filenames = NULL,
@@ -75,27 +75,30 @@ If the \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}} implementation for your
 full results to the client immediately rather than supporting chunking with \code{n}
 parameter, you may want to use "window" method, which is the most generic.  The
 "sql-window" method provides a faster alternative for databases like PostgreSQL that
-support windowing natively (i.e. \code{BETWEEN} queries).
+support windowing natively (i.e. \code{BETWEEN} queries). Note that "window-parallel"
+only works with \code{streamable_parquet}.
 }
 \examples{
 \donttest{
 # setup
 library(dplyr)
-dir <- tempdir() 
+dir <- tempdir()
 db <- dbplyr::nycflights13_sqlite(tempdir())
 
 ## And here we go:
 ark(db, dir)
-} 
+}
 \dontrun{
 
 ## For a Postgres DB with schema, we can append schema names first
-## to each of the table names, like so: 
+## to each of the table names, like so:
 schema_tables <- dbGetQuery(db, sqlInterpolate(db,
-"SELECT table_name FROM information_schema.tables 
-WHERE table_schema = ?schema", schema = "schema_name"))
+  "SELECT table_name FROM information_schema.tables
+WHERE table_schema = ?schema",
+  schema = "schema_name"
+))
 
-ark(db, dir, tables = paste0("schema_name",".", schema_tables$table_name))
+ark(db, dir, tables = paste0("schema_name", ".", schema_tables$table_name))
 }
 
 }
