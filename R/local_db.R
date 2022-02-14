@@ -173,10 +173,10 @@ db_driver <- function(dbname,
     drivers <- c("RSQLite", drivers)
   }
 
-  if (requireNamespace("MonetDBLite", quietly = TRUE)) {
-    MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
-    drivers <- c("MonetDBLite", drivers)
-  }
+  #if (requireNamespace("MonetDBLite", quietly = TRUE)) {
+  #  MonetDBLite <- getExportedValue("MonetDBLite", "MonetDBLite")
+  #  drivers <- c("MonetDBLite", drivers)
+  #}
 
   if (requireNamespace("duckdb", quietly = TRUE)) {
     duckdb <- getExportedValue("duckdb", "duckdb")
@@ -193,7 +193,7 @@ db_driver <- function(dbname,
       file.path(dbname, driver),
       read_only = read_only
     ),
-    MonetDBLite = monetdblite_connect(file.path(dbname, driver)),
+    # MonetDBLite = monetdblite_connect(file.path(dbname, driver)),
     RSQLite = DBI::dbConnect(
       SQLite(),
       file.path(dbname, "sqlite.sqlite")

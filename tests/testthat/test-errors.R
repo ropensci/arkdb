@@ -1,5 +1,11 @@
 context("test-errors")
 
+
+skip_if_not_installed("dbplyr")
+skip_if_not_installed("nycflights13")
+skip_if_not_installed("RSQLite")
+skip_if_not_installed("duckdb")
+
 test_that("we can detect errors on types", {
   x <- NULL
   #  testthat::expect_warning(assert_files_exist("not-a-file"), "not found")
@@ -14,7 +20,9 @@ test_that("we can detect errors on types", {
 })
 
 testthat::test_that("we can handle cases overwriting a file, with a warning", {
+  
   filename <- tempfile(fileext = ".txt")
+  skip_if_not(dir.exists(dirname(filename)))
   data <- datasets::iris
 
   testthat::expect_silent(assert_overwrite(filename, TRUE))
@@ -28,11 +36,16 @@ testthat::test_that("we can handle cases overwriting a file, with a warning", {
 
 
 testthat::test_that("we can handle cases overwriting a table, with a warning", {
+
+  skip_if_not_installed("datasets")
+  skip_if_not_installed("fs")
+  skip_if_not_installed("RSQLite")
+  
   data <- datasets::iris
   dir <- tempdir()
 
   dbdir <- fs::path(dir, "local.sqlite")
-  db <- DBI::dbConnect(RSQLite::SQLite(), dbdir)
+  db <- arkdb::local_db(dbdir)
   tbl <- "iris"
 
   testthat::expect_silent(assert_overwrite_db(db, tbl, FALSE))
