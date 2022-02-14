@@ -1,6 +1,8 @@
+
 # arkdb 0.0.15
 
 - Added window-parallel option for ark'ing large tables in parallel
+- More conditional testing on M1/arm Mac
 
 # arkdb 0.0.14
 

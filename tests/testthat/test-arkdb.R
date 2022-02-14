@@ -11,11 +11,12 @@ new_db <- DBI::dbConnect(RSQLite::SQLite(), dbdir)
 ## Note: later tests will overwrite existing tables and files, throwing warnings
 
 testthat::test_that("we can ark and unark a db", {
+  
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
   skip_on_os("solaris")
-  
+
   ark(db, dir, lines = 50000, overwrite = TRUE)
 
 
@@ -85,6 +86,7 @@ testthat::test_that("we can ark and unark a db in plain text", {
 testthat::context("alternate method")
 
 testthat::test_that("alternate method for ark", {
+  
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
@@ -122,12 +124,14 @@ testthat::test_that("alternate method for ark", {
 
 testthat::context("MonetDB")
 testthat::test_that("try with MonetDB & alternate method", {
+  
   skip_if_not_installed("MonetDBLite")
   skip_if_not_installed("dplyr")
   skip_if_not_installed("fs")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
   skip_on_os("solaris")
+  skip_on_cran()
   
   ## SETUP, with text files. (Could skip as these now exist from above tests)
   data <- list(
@@ -173,13 +177,23 @@ testthat::test_that("try with MonetDB & alternate method", {
   unlink(monet_dir, TRUE)
 })
 
+
+
+
+
+
+
 testthat::context("parquet")
 testthat::test_that("try with parquet & alternate method", {
+  
+  
   skip_if_not_installed("arrow") # Arrow installs on solaris, it just doesn't work
   skip_if_not_installed("dplyr")
   skip_if_not_installed("fs")
   skip_if_not_installed("nycflights13")
   skip_on_os("solaris")
+
+  
   # test ark to parquet from sqlite
   ark(
     db,
@@ -232,10 +246,14 @@ testthat::test_that("try with parquet & alternate method", {
   )
 })
 
+
+
+
 testthat::context("inject filters")
 
 testthat::test_that("e2e with filter for flights month = 2: readr tsv", {
   # summary(factor(nycflights13::flights$month)) filter month == 2, 24951 records
+  
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
@@ -253,6 +271,9 @@ testthat::test_that("e2e with filter for flights month = 2: readr tsv", {
   testthat::expect_true(all(r$month == 2))
   testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 2, ]))
 })
+
+
+
 
 testthat::test_that("e2e with filter for flights month = 12: parquet", {
   # summary(factor(nycflights13::flights$month)) filter month = 12, 28132 records
@@ -300,6 +321,11 @@ testthat::test_that("Errors on window-parallel and not streamable parquet", {
 testthat::test_that("Warns when applying filter to multiple tables", {
   
   skip_on_os("solaris")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("readr")
+  skip_if_not_installed("arrow")
+  
   
   # clean up previous test
   #unlink(paste0(dir, "/flights"), TRUE)
@@ -327,6 +353,7 @@ testthat::test_that("ark with keep-open and callback", {
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
+  skip_if_not_installed("arrow")
   skip_on_os("solaris")
   
   # Callback to convert arr_delay in the flights
@@ -352,7 +379,12 @@ testthat::test_that("ark with keep-open and callback", {
   testthat::expect_equal(myflights$arr_delay, nycflights13::flights$arr_delay / 60)
 })
 
+
+
+
 testthat::test_that("ark with window and callback", {
+  
+  
   skip_if_not_installed("dplyr")
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("readr")
