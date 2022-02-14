@@ -43,7 +43,5 @@ Suggests:
     duckdb,
     vroom,
     utf8,
-    MonetDBLite,
     future.apply
 Language: en-US
-Additional_repositories: https://cboettig.github.io/drat

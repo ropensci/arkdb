@@ -106,7 +106,7 @@ codemeta::write_codemeta()
 
 ## Using filters
 
-This package can also be used to generate slices of data that are required for analytical or operational purposes. In the example below we archive to disk only the flight data that occured in the month of December. It is recommended to use filters on a single table at a time. 
+This package can also be used to generate slices of data that are required for analytical or operational purposes. In the example below we archive to disk only the flight data that occurred in the month of December. It is recommended to use filters on a single table at a time. 
 
 ```{r, eval=FALSE}
 ark(db, dir, lines = 50000, tables = "flights", filter_statement = "WHERE month = 12")
