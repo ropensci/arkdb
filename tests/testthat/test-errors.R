@@ -1,12 +1,16 @@
 context("test-errors")
 
 
-skip_if_not_installed("dbplyr")
-skip_if_not_installed("nycflights13")
-skip_if_not_installed("RSQLite")
-skip_if_not_installed("duckdb")
 
 test_that("we can detect errors on types", {
+
+  
+  skip_if_not_installed("dbplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("duckdb")
+  skip_on_cran()
+  
   x <- NULL
   #  testthat::expect_warning(assert_files_exist("not-a-file"), "not found")
   #  testthat::expect_warning(assert_files_exist(
@@ -20,6 +24,15 @@ test_that("we can detect errors on types", {
 })
 
 testthat::test_that("we can handle cases overwriting a file, with a warning", {
+  
+  
+  
+  skip_if_not_installed("dbplyr")
+  skip_if_not_installed("nycflights13")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("duckdb")
+  skip_on_cran()
+  
   
   filename <- tempfile(fileext = ".txt")
   skip_if_not(dir.exists(dirname(filename)))
@@ -37,6 +50,7 @@ testthat::test_that("we can handle cases overwriting a file, with a warning", {
 
 testthat::test_that("we can handle cases overwriting a table, with a warning", {
 
+  skip_on_cran()
   skip_if_not_installed("datasets")
   skip_if_not_installed("fs")
   skip_if_not_installed("RSQLite")
