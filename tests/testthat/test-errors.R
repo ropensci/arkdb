@@ -42,9 +42,9 @@ testthat::test_that("we can handle cases overwriting a table, with a warning", {
   skip_if_not_installed("RSQLite")
   
   data <- datasets::iris
-  dir <- tempdir()
+  dir2 <- tempdir()
 
-  dbdir <- fs::path(dir, "local.sqlite")
+  dbdir <- fs::path(dir2, "local.sqlite")
   db <- arkdb::local_db(dbdir)
   tbl <- "iris"
 
