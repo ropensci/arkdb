@@ -18,7 +18,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 ByteCompile: true
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.0)
 Imports: 

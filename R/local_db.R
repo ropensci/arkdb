@@ -239,5 +239,6 @@ reg.finalizer(arkdb_cache, local_db_disconnect, onexit = TRUE)
 
 
 arkdb_dir <- function() {
-  Sys.getenv("ARKDB_HOME", tools::R_user_dir("arkdb"))
+  Sys.getenv("ARKDB_HOME", 
+             file.path(tools::R_user_dir("arkdb"), "db"))
 }

@@ -10,8 +10,8 @@ db <- dbplyr::nycflights13_sqlite(tmp)
 dir <- file.path(tmp, "nycflights")
 dir.create(dir, showWarnings = FALSE)
 dbdir <- fs::path(tmp, "local.sqlite")
-new_db <- DBI::dbConnect(RSQLite::SQLite(), dbdir)
-
+#new_db <- DBI::dbConnect(RSQLite::SQLite(), dbdir)
+new_db <- local_db()
 ## Note: later tests will overwrite existing tables and files, throwing warnings
 
 test_that("we can ark and unark a db", {
