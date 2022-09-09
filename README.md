@@ -20,13 +20,13 @@ downloads](http://cranlogs.r-pkg.org/badges/grand-total/arkdb)](https://CRAN.R-p
 The goal of `arkdb` is to provide a convenient way to move data from
 large compressed text files (tsv, csv, etc) into any DBI-compliant
 database connection (e.g. MYSQL, Postgres, SQLite; see
-[DBI](https://db.rstudio.com/dbi/)), and move tables out of such
-databases into text files. The key feature of `arkdb` is that files are
-moved between databases and text files in chunks of a fixed size,
-allowing the package functions to work with tables that would be much
-too large to read into memory all at once. There is also functionality
-for filtering and applying transformation to data as it is extracted
-from the database.
+[DBI](https://solutions.rstudio.com/db/r-packages/DBI/)), and move
+tables out of such databases into text files. The key feature of `arkdb`
+is that files are moved between databases and text files in chunks of a
+fixed size, allowing the package functions to work with tables that
+would be much too large to read into memory all at once. There is also
+functionality for filtering and applying transformation to data as it is
+extracted from the database.
 
 The `arkdb` package is easily extended to use custom read and write
 methods allowing you to dictate your own output formats. See
@@ -71,7 +71,7 @@ Consider the `nycflights` database in SQLite:
 ``` r
 tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
-#> Caching nycflights db at /tmp/RtmpKGu2Ay/nycflights13.sqlite
+#> Caching nycflights db at /tmp/Rtmpm6YZ0e/nycflights13.sqlite
 #> Creating table: airlines
 #> Creating table: airports
 #> Creating table: flights
@@ -85,15 +85,15 @@ Create an archive of the database:
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 ark(db, dir, lines = 50000)
 #> Exporting airlines in 50000 line chunks:
-#>  ...Done! (in 0.006583929 secs)
+#>  ...Done! (in 0.005531788 secs)
 #> Exporting airports in 50000 line chunks:
-#>  ...Done! (in 0.02108455 secs)
+#>  ...Done! (in 0.02239442 secs)
 #> Exporting flights in 50000 line chunks:
-#>  ...Done! (in 8.810824 secs)
+#>  ...Done! (in 11.78997 secs)
 #> Exporting planes in 50000 line chunks:
-#>  ...Done! (in 0.02794719 secs)
+#>  ...Done! (in 0.03349638 secs)
 #> Exporting weather in 50000 line chunks:
-#>  ...Done! (in 0.6644697 secs)
+#>  ...Done! (in 0.8155148 secs)
 ```
 
 ## Unarchive
@@ -106,23 +106,23 @@ files <- fs::dir_ls(dir)
 new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 
 unark(files, new_db, lines = 50000)
-#> Importing /tmp/RtmpKGu2Ay/nycflights/airlines.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.0117662 secs)
-#> Importing /tmp/RtmpKGu2Ay/nycflights/airports.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.02637362 secs)
-#> Importing /tmp/RtmpKGu2Ay/nycflights/flights.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 6.802646 secs)
-#> Importing /tmp/RtmpKGu2Ay/nycflights/planes.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.03848696 secs)
-#> Importing /tmp/RtmpKGu2Ay/nycflights/weather.tsv.bz2 in 50000 line chunks:
-#>  ...Done! (in 0.3772023 secs)
+#> Importing /tmp/Rtmpm6YZ0e/nycflights/airlines.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0131464 secs)
+#> Importing /tmp/Rtmpm6YZ0e/nycflights/airports.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.02401853 secs)
+#> Importing /tmp/Rtmpm6YZ0e/nycflights/flights.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 7.150884 secs)
+#> Importing /tmp/Rtmpm6YZ0e/nycflights/planes.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.0348866 secs)
+#> Importing /tmp/Rtmpm6YZ0e/nycflights/weather.tsv.bz2 in 50000 line chunks:
+#>  ...Done! (in 0.2378168 secs)
 ```
 
 ## Using filters
 
 This package can also be used to generate slices of data that are
 required for analytical or operational purposes. In the example below we
-archive to disk only the flight data that occured in the month of
+archive to disk only the flight data that occurred in the month of
 December. It is recommended to use filters on a single table at a time.
 
 ``` r
