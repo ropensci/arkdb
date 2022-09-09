@@ -1,4 +1,4 @@
-# arkdb 0.0.15.9
+# arkdb 0.0.16
 
 - patch for `local_db()` by defaulting path to subdir.
 - update roxygen
