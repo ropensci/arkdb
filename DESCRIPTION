@@ -1,5 +1,5 @@
 Package: arkdb
-Version: 0.0.14
+Version: 0.0.16
 Title: Archive and Unarchive Databases Using Flat Files
 Description: Flat text files provide a robust, compressible, and portable
   way to store tables from databases.  This package provides convenient
@@ -18,7 +18,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 ByteCompile: true
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.0)
 Imports: 
@@ -43,7 +43,5 @@ Suggests:
     duckdb,
     vroom,
     utf8,
-    MonetDBLite,
     future.apply
 Language: en-US
-Additional_repositories: https://cboettig.github.io/drat

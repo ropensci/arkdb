@@ -1,6 +1,8 @@
 Bugfix
 DBs
 DOI
+ETL
+ETLs
 IANA
 MonetDBLite
 ORCID
@@ -11,9 +13,9 @@ RStudio
 TSV
 Unarchive
 Zenodo
+ark'ing
 askYesNo
 behaviour
-bugfix
 bzip
 citable
 csv
@@ -24,13 +26,16 @@ gzip
 ish
 lifecycle
 natively
+occured
 pluggable
+recodes
 repo
 ropensci
 scalable
 sql
 src
 streamable
+tablename
 tablenames
 tsv
 uncompress

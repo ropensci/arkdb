@@ -2,18 +2,18 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "arkdb",
-  "description": "Flat text files provide a robust, compressible, and portable\n  way to store tables from databases.  This package provides convenient\n  functions for exporting tables from relational database connections\n  into compressed text files and streaming those text files back into\n  a database without requiring the whole table to fit in working memory.",
+  "description": "Flat text files provide a robust, compressible, and portable way to store tables from databases. This package provides convenient functions for exporting tables from relational database connections into compressed text files and streaming those text files back into a database without requiring the whole table to fit in working memory.",
   "name": "arkdb: Archive and Unarchive Databases Using Flat Files",
   "codeRepository": "https://github.com/ropensci/arkdb",
   "issueTracker": "https://github.com/ropensci/arkdb/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.4 (2021-02-15)",
+  "runtimePlatform": "R version 4.2.1 (2022-06-23)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -267,11 +267,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "MonetDBLite",
-      "name": "MonetDBLite"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "future.apply",
       "name": "future.apply",
       "provider": {
@@ -314,5 +309,5 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "212.627KB"
+  "fileSize": "187.124KB"
 }
