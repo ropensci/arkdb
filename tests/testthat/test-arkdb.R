@@ -261,33 +261,45 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("arrow")
   skip_on_os("solaris")
+
+  ark(db, dir,
+      streamable_table = streamable_parquet(),
+      lines = 50000, tables = "flights", overwrite = TRUE,
+      filter_statement = "WHERE month = 12", method = "window", compress = "none"
+  )
   
+  r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
+  testthat::expect_true(all(r$month == 12))
+  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
+
   # clean up previous test
-  # unlink(paste0(dir, "/flights"), TRUE)
-
-
+  unlink(paste0(dir, "/flights"), TRUE)
+  
+  # No warning!
   testthat::expect_warning(ark(db, dir,
     streamable_table = streamable_parquet(),
-    lines = 50000, tables = "flights", overwrite = TRUE,
+    lines = 20000, tables = "flights", overwrite = TRUE,
     filter_statement = "WHERE month = 12"
   ), "Parquet is already compressed")
 
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
+  testthat::expect_equal(length(list.files(paste0(dir, "/flights"))), 2)
   testthat::expect_true(all(r$month == 12))
-  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
+  testthat::expect_true(nrow(r) == 20000) # expect split into chunks of 20k
 
-  # clean up previous test
-  # unlink(paste0(dir, "/flights"), TRUE)
-
-  ark(db, dir,
-    streamable_table = streamable_parquet(),
-    lines = 50000, tables = "flights", overwrite = TRUE,
-    filter_statement = "WHERE month = 12", method = "window", compress = "none"
+  
+  files <- list.files(paste0(dir, "/flights"), full.names = T)
+  suppressWarnings( # ignore overwrite warning
+    unark(files, new_db,streamable_table = streamable_parquet(), lines = 50000, overwrite = TRUE, tablenames = "flights")
   )
-
-  r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
-  testthat::expect_true(all(r$month == 12))
-  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
+  myflights <- dplyr::tbl(new_db, "flights")
+  testthat::expect_is(myflights, "tbl_dbi")
+  
+  myflights <- dplyr::collect(myflights)
+  testthat::expect_equal(
+    dim(myflights),
+    dim(nycflights13::flights %>% filter(month == 12))
+  )
 })
 
 testthat::test_that("Errors on window-parallel and not streamable parquet", {
