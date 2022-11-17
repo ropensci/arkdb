@@ -298,7 +298,7 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
   myflights <- dplyr::collect(myflights)
   testthat::expect_equal(
     dim(myflights),
-    dim(nycflights13::flights %>% filter(month == 12))
+    28135
   )
 })
 
