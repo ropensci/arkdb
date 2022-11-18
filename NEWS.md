@@ -1,6 +1,12 @@
+# arkdb 0.0.16
+
+- patch for `local_db()` by defaulting path to subdir.
+- update roxygen
+
 # arkdb 0.0.15
 
 - Added window-parallel option for ark'ing large tables in parallel
+- More conditional testing on M1/arm Mac
 
 # arkdb 0.0.14
 
