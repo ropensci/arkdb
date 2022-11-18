@@ -289,12 +289,12 @@ testthat::test_that("e2e with filter for flights month = 12: parquet", {
 
   
   files <- list.files(paste0(dir, "/flights"), full.names = T)
-  DBI::dbRemoveTable(new_db, "flights")
   suppressWarnings( # ignore overwrite warning
-    unark(files, new_db, streamable_table = streamable_parquet(), overwrite = TRUE, tablenames = "flights")
+    unark(files, new_db, streamable_table = streamable_parquet(), overwrite = TRUE, 
+          tablenames = "flights2")
   )
   
-  myflights <- dplyr::tbl(new_db, "flights")
+  myflights <- dplyr::tbl(new_db, "flights2")
   testthat::expect_is(myflights, "tbl_dbi")
   
   myflights <- dplyr::collect(myflights)
