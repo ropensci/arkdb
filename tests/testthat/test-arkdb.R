@@ -188,6 +188,7 @@ test_that("try with MonetDB & alternate method", {
 
 
 context("parquet")
+
 test_that("try with parquet & alternate method", {
   
   
@@ -248,6 +249,9 @@ test_that("try with parquet & alternate method", {
     dim(arrow::open_dataset(paste0(dir, "/", "flights"))),
     dim(nycflights13::flights)
   )
+  
+  # Clean up!
+  unlink(paste0(dir, "/flights"), recursive = T, force = T)
 })
 
 
@@ -263,7 +267,7 @@ test_that("e2e with filter for flights month = 2: readr tsv", {
   skip_if_not_installed("readr")
   skip_on_os("solaris")
   
-  file.remove(paste0(dir, "/flights.tsv.bz2"))
+  suppressWarnings(file.remove(paste0(dir, "/flights.tsv.bz2")))
 
   ark(db, dir,
     streamable_table = streamable_readr_tsv(),
@@ -276,7 +280,26 @@ test_that("e2e with filter for flights month = 2: readr tsv", {
   expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 2, ]))
 })
 
+# ark and unark parquet ----
 
+test_that("We can ark and unark parquet", {
+  
+  ark(db, dir,
+      streamable_table = streamable_parquet(),
+      lines = 50000, tables = "flights", overwrite = TRUE, 
+      method = "window", compress = "none"
+  )
+  
+  fls <- list.files(paste0(dir, "/flights"), pattern = "parquet", full.names = T)
+  DBI::dbRemoveTable(new_db, "flights")
+  unark(fls, new_db, streamable_table = streamable_parquet(), tablenames = "flights", overwrite = TRUE)
+  
+  expect_equal(
+    nrow(DBI::dbReadTable(db, "flights")), 
+    nrow(DBI::dbReadTable(new_db, "flights"))
+  )
+  expect_equal(DBI::dbReadTable(db, "flights")$flight, DBI::dbReadTable(new_db, "flights")$flight)
+})
 
 
 test_that("e2e with filter for flights month = 12: parquet", {
@@ -287,32 +310,31 @@ test_that("e2e with filter for flights month = 12: parquet", {
   skip_if_not_installed("arrow")
   skip_on_os("solaris")
   
+  ark(db, dir,
+      streamable_table = streamable_parquet(),
+      lines = 50000, tables = "flights", overwrite = TRUE,
+      filter_statement = "WHERE month = 12", method = "window", compress = "none"
+  )
+  
+  r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
+  testthat::expect_true(all(r$month == 12))
+  testthat::expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
+
   # clean up previous test
-  # unlink(paste0(dir, "/flights"), TRUE)
-
-
-  expect_warning(ark(db, dir,
+  unlink(paste0(dir, "/flights"), TRUE)
+  
+  # No warning!
+  testthat::expect_warning(ark(db, dir,
     streamable_table = streamable_parquet(),
-    lines = 50000, tables = "flights", overwrite = TRUE,
+    lines = 20000, tables = "flights", overwrite = TRUE,
     filter_statement = "WHERE month = 12"
   ), "Parquet is already compressed")
 
   r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
-  expect_true(all(r$month == 12))
-  expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
 
-  # clean up previous test
-  # unlink(paste0(dir, "/flights"), TRUE)
-
-  ark(db, dir,
-    streamable_table = streamable_parquet(),
-    lines = 50000, tables = "flights", overwrite = TRUE,
-    filter_statement = "WHERE month = 12", method = "window", compress = "none"
-  )
-
-  r <- arrow::read_parquet(paste0(dir, "/flights/part-00001.parquet"))
-  expect_true(all(r$month == 12))
-  expect_true(nrow(r) == nrow(nycflights13::flights[nycflights13::flights$month == 12, ]))
+  testthat::expect_equal(length(list.files(paste0(dir, "/flights"))), 2)
+  testthat::expect_true(all(r$month == 12))
+  testthat::expect_true(nrow(r) == 20000) # expect split into chunks of 20k
 })
 
 test_that("Errors on window-parallel and not streamable parquet", {
@@ -334,6 +356,7 @@ test_that("Warns when applying filter to multiple tables", {
   # clean up previous test
   #unlink(paste0(dir, "/flights"), TRUE)
   #unlink(paste0(dir, "/weather"), TRUE)
+  
   expect_warning(
     ark(db, dir,
       streamable_table = streamable_parquet(),

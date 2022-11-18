@@ -21,35 +21,41 @@ process_chunks <- function(file,
   if (is.null(streamable_table)) {
     streamable_table <- guess_stream(file)
   }
-  con <- generic_connection(file, "rb", encoding = encoding)
-  on.exit(close(con))
-
-
-  header <- readLines(con, n = 1L, encoding = encoding, warn = FALSE)
-  if (length(header) == 0) { # empty file, would throw error
-    return(NULL)
-  }
-  reader <- read_chunked(con, lines, encoding)
-
-  # May throw an error if we need to read more than 'total' chunks?
-  p <- progress("[:spin] chunk :current", total = 100000)
-  message(sprintf(
-    "Importing %s in %d line chunks:",
-    summary(con)$description, lines
-  ))
-  t0 <- Sys.time()
-  repeat {
-    d <- reader()
-    body <- paste0(c(header, d$data), "\n", collapse = "")
-    p$tick()
-    chunk <- streamable_table$read(body, ...)
+  
+  if(streamable_table$extension == "parquet") { 
+    chunk <- streamable_table$read(file)
     process_fn(chunk)
-
-    if (d$complete) {
-      break
+  } else {
+    con <- generic_connection(file, "rb", encoding = encoding)
+    on.exit(close(con))
+    
+    
+    header <- readLines(con, n = 1L, encoding = encoding, warn = FALSE)
+    if (length(header) == 0) { # empty file, would throw error
+      return(NULL)
     }
+    reader <- read_chunked(con, lines, encoding)
+    
+    # May throw an error if we need to read more than 'total' chunks?
+    p <- progress("[:spin] chunk :current", total = 100000)
+    message(sprintf(
+      "Importing %s in %d line chunks:",
+      summary(con)$description, lines
+    ))
+    t0 <- Sys.time()
+    repeat {
+      d <- reader()
+      body <- paste0(c(header, d$data), "\n", collapse = "")
+      p$tick()
+      chunk <- streamable_table$read(body, ...)
+      process_fn(chunk)
+      
+      if (d$complete) {
+        break
+      }
+    }
+    message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
   }
-  message(sprintf("\t...Done! (in %s)", format(Sys.time() - t0)))
 }
 
 
