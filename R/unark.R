@@ -69,9 +69,12 @@ unark <- function(files,
 
   assert_streamable(streamable_table)
 
-
   if (is.null(tablenames)) {
     tablenames <- vapply(files, base_name, character(1))
+  }
+
+  if(streamable_table$extension == "parquet") {
+    tablenames <- as.list(rep(tablenames, length(files)))
   }
 
   db <- normalize_con(db_con)
@@ -115,8 +118,11 @@ unark_file <- function(filename,
                        tablename = base_name(filename),
                        try_native = try_native,
                        ...) {
-  if (!assert_overwrite_db(db_con, tablename, overwrite)) {
-    return(NULL)
+  
+  if(streamable_table$extension != "parquet") {
+    if (!assert_overwrite_db(db_con, tablename, overwrite)) {
+      return(NULL)
+    }
   }
 
   ## Check for a bulk importer first
@@ -144,6 +150,7 @@ unark_file <- function(filename,
   dbi_writer <- function(chunk) {
     DBI::dbWriteTable(db_con, tablename, chunk, append = TRUE)
   }
+  
   process_chunks(filename,
     process_fn = dbi_writer,
     streamable_table = streamable_table,
@@ -181,6 +188,7 @@ guess_stream <- function(x) {
     switch(ext,
       "csv" = streamable_base_csv(),
       "tsv" = streamable_base_tsv(),
+      "parquet" = streamable_parquet(),
       stop(paste(
         "Streaming file parser could not be",
         "guessed from file extension.",
