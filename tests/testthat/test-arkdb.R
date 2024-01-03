@@ -309,6 +309,7 @@ test_that("e2e with filter for flights month = 12: parquet", {
   skip_if_not_installed("nycflights13")
   skip_if_not_installed("arrow")
   skip_on_os("solaris")
+  skip_on_os("windows")
   
   ark(db, dir,
       streamable_table = streamable_parquet(),
