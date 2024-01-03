@@ -4,9 +4,9 @@
 [![R build
 status](https://github.com/ropensci/arkdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/arkdb/actions)
 [![Travis build
-status](https://travis-ci.org/ropensci/arkdb.svg?branch=master)](https://travis-ci.org/ropensci/arkdb)
+status](https://app.travis-ci.com/ropensci/arkdb.svg?branch=master)](https://app.travis-ci.com/ropensci/arkdb)
 [![Coverage
-status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://codecov.io/github/ropensci/arkdb?branch=master)
+status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://app.codecov.io/github/ropensci/arkdb?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
 [![](https://badges.ropensci.org/224_status.svg)](https://github.com/ropensci/software-review/issues/224)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)

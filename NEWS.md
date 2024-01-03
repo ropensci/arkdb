@@ -1,3 +1,7 @@
+# arkdb 0.0.17
+
+- patch test infrastructure for Windows
+
 # arkdb 0.0.16
 
 - patch for `local_db()` by defaulting path to subdir.
