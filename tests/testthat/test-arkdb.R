@@ -283,7 +283,8 @@ test_that("e2e with filter for flights month = 2: readr tsv", {
 # ark and unark parquet ----
 
 test_that("We can ark and unark parquet", {
-  
+  skip_if_not_installed("arrow")
+  skip_on_cran()
   ark(db, dir,
       streamable_table = streamable_parquet(),
       lines = 50000, tables = "flights", overwrite = TRUE, 
