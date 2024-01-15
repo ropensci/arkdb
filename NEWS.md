@@ -1,3 +1,7 @@
+# arkdb 0.0.18
+
+- patch test infrastructure for handling soft dependency on arrow
+
 # arkdb 0.0.17
 
 - patch test infrastructure for Windows
