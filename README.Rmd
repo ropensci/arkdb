@@ -16,6 +16,16 @@ output: github_document
   
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+🗞️ ***PLEASE NOTE*** 🗞️
+
+It is now easy to accomplish `arkdb`'s tasks of moving between larger-than-ram csv/parquet/etc flatfiles and SQL databases using `duckdb`. 
+Even better, `duckdb` supports larger-than-ram DBI operations directly on flatfiles without even importing, better compatibility with a wide range
+of SQL databases (see extensions), and better performance. See the R package, [`duckdbfs`](https://github.com/cboettig/duckdbfs) for an
+easy way to use `duckdb` from R. 
+
+
+---
+
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
