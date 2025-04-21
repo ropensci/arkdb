@@ -3,8 +3,6 @@
 
 [![R build
 status](https://github.com/ropensci/arkdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/arkdb/actions)
-[![Travis build
-status](https://app.travis-ci.com/ropensci/arkdb.svg?branch=master)](https://app.travis-ci.com/ropensci/arkdb)
 [![Coverage
 status](https://codecov.io/gh/ropensci/arkdb/branch/master/graph/badge.svg)](https://app.codecov.io/github/ropensci/arkdb?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/arkdb)](https://cran.r-project.org/package=arkdb)
@@ -16,6 +14,17 @@ downloads](http://cranlogs.r-pkg.org/badges/grand-total/arkdb)](https://CRAN.R-p
 <!-- badges: end -->
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
+🗞️ ***PLEASE NOTE*** 🗞️
+
+It is now easy to accomplish `arkdb`'s tasks of moving between larger-than-ram csv/parquet/etc flatfiles and SQL databases using `duckdb`. 
+Even better, `duckdb` supports larger-than-ram DBI operations directly on flatfiles without even importing, better compatibility with a wide range
+of SQL databases (see extensions), and better performance. See the R package, [`duckdbfs`](https://github.com/cboettig/duckdbfs) for an
+easy way to use `duckdb` from R. 
+
+
+---
 
 The goal of `arkdb` is to provide a convenient way to move data from
 large compressed text files (tsv, csv, etc) into any DBI-compliant
