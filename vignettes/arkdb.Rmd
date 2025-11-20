@@ -21,12 +21,12 @@ knitr::opts_chunk$set(
 
 ## Package rationale
 
-Increasing data sizes create challenges for the fundamental tasks of publishing, distributing, and preserving data.  Despite (or perhaps because of) the diverse and ever-expanding number of database and file formats, the humble plain text file such as  comma or tab-separated-values (e.g. `.csv` or `.tsv` files) remains the gold standard for data archiving and distribution.  These files can read on almost any platform or tool and can be efficiently compressed using long-standing and widely available standard open source libraries like `gzip` or `bzip2`.  In contrast, database storage formats and dumps are usually particular to the database platform used to generate them, and will likely not be compatible between different database engines (e.g. PostgreSQL -> SQLite) or even between different versions of the same engine. Researchers unfamiliar with these databases will have difficulty accessing such data, and these dumps may also be in formats that are less efficient to compress.    
+Increasing data sizes create challenges for the fundamental tasks of publishing, distributing, and preserving data.  Despite (or perhaps because of) the diverse and ever-expanding number of database and file formats, the humble plain text file such as  comma or tab-separated-values (e.g. `.csv` or `.tsv` files) remains the gold standard for data archiving and distribution.  These files can read on almost any platform or tool and can be efficiently compressed using long-standing and widely available standard open source libraries like `gzip` or `bzip2`.  In contrast, database storage formats and dumps are usually particular to the database platform used to generate them, and will likely not be compatible between different database engines (e.g. PostgreSQL -> SQLite) or even between different versions of the same engine. Researchers unfamiliar with these databases will have difficulty accessing such data, and these dumps may also be in formats that are less efficient to compress.
 
-Working with tables that are too large for working memory on most machines by using external relational database stores is now a common R practice, thanks to ever-rising availability of data and increasing support and popularity of packages such as `DBI`, `dplyr`, and `dbplyr`.  Working with plain text files becomes increasingly difficult in this context.  Many R users will not have sufficient RAM to simply read in a 10 GB `.tsv` file into R.  Similarly, moving a 10 GB database out of a relational data file and into a plain text file for archiving and distribution is similarly challenging from R. While most relational database back-ends implement some form of `COPY` or `IMPORT` that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface.  Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client.  `arkdb` provides a simple solution to these two tasks. 
- 
+Working with tables that are too large for working memory on most machines by using external relational database stores is now a common R practice, thanks to ever-rising availability of data and increasing support and popularity of packages such as `DBI`, `dplyr`, and `dbplyr`.  Working with plain text files becomes increasingly difficult in this context.  Many R users will not have sufficient RAM to simply read in a 10 GB `.tsv` file into R.  Similarly, moving a 10 GB database out of a relational data file and into a plain text file for archiving and distribution is similarly challenging from R. While most relational database back-ends implement some form of `COPY` or `IMPORT` that allows them to read in and export out plain text files directly, these methods are not consistent across database types and not part of the standard SQL interface.  Most importantly for our case, they also cannot be called directly from R, but require a separate stand-alone installation of the database client.  `arkdb` provides a simple solution to these two tasks.
 
-The goal of `arkdb` is to provide a convenient way to move data from large compressed text files (e.g. `*.tsv.bz2`) into any DBI-compliant database connection (see [DBI](https://solutions.rstudio.com/db/r-packages/DBI/)), and move tables out of such databases into text files. The key feature of `arkdb` is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.  This will be slower than reading the file into memory at one go, but can be scaled to larger data and larger data with no additional memory requirement. 
+
+The goal of `arkdb` is to provide a convenient way to move data from large compressed text files (e.g. `*.tsv.bz2`) into any DBI-compliant database connection (see [DBI](https://solutions.rstudio.com/db/r-packages/DBI/)), and move tables out of such databases into text files. The key feature of `arkdb` is that files are moved between databases and text files in chunks of a fixed size, allowing the package functions to work with tables that would be much to large to read into memory all at once.  This will be slower than reading the file into memory at one go, but can be scaled to larger data and larger data with no additional memory requirement.
 
 
 ## Installation
@@ -60,7 +60,7 @@ tmp <- tempdir() # Or can be your working directory, "."
 db <- dbplyr::nycflights13_sqlite(tmp)
 ```
 
-To create an archive, we just give `ark` the connection to the database and tell it where we want the `*.tsv.bz2` files to be archived.   We can also set the chunk size as the number of `lines` read in a single chunk.  More lines per chunk usually means faster run time at the cost of higher memory requirements. 
+To create an archive, we just give `ark` the connection to the database and tell it where we want the `*.tsv.bz2` files to be archived.   We can also set the chunk size as the number of `lines` read in a single chunk.  More lines per chunk usually means faster run time at the cost of higher memory requirements.
 
 ```{r}
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
@@ -72,11 +72,11 @@ ark(db, dir, lines = 50000)
 We can take a look and confirm the files have been written. Note that we can use `fs::dir_info` to get a nice snapshot of the file sizes.  Compare the compressed sizes to the original database:
 
 ```{r}
-fs::dir_info(dir) %>% 
+fs::dir_info(dir) %>%
   select(path, size) %>%
   mutate(path = fs::path_file(path))
 
-fs::file_info(fs::path(tmp,"nycflights13.sqlite")) %>% 
+fs::file_info(fs::path(tmp,"nycflights13.sqlite")) %>%
   pull(size)
 
 
@@ -85,7 +85,7 @@ fs::file_info(fs::path(tmp,"nycflights13.sqlite")) %>%
 
 ## Unarchive
 
-Now that we've gotten all the database into (compressed) plain text files, let's get them back out.  We simply need to pass `unark` a list of these compressed files and a connection to the database.  Here we create a new local SQLite database.  Note that this design means that it is also easy to use `arkdb` to move data between databases.  
+Now that we've gotten all the database into (compressed) plain text files, let's get them back out.  We simply need to pass `unark` a list of these compressed files and a connection to the database.  Here we create a new local SQLite database.  Note that this design means that it is also easy to use `arkdb` to move data between databases.
 
 
 ```{r}
@@ -97,7 +97,7 @@ new_db <- DBI::dbConnect(RSQLite::SQLite(), fs::path(tmp, "local.sqlite"))
 As with `ark`, we can set the chunk size to control the memory footprint required:
 
 ```{r}
-unark(files, new_db, lines = 50000)  
+unark(files, new_db, lines = 50000)
 ```
 
 `unark` returns a `dplyr` database connection that we can use in the usual way:
@@ -120,7 +120,7 @@ unlink(fs::path(tmp, "local.sqlite"))
 
 ## Pluggable text formats
 
- 
+
 
 By default, `arkdb` uses `tsv` format, implemented in base tools, as the text-based serialization.  The `tsv` standard is particularly attractive because it side-steps some of the ambiguities present in the CSV format due to string quoting.  The [IANA Standard for TSV](https://www.iana.org/assignments/media-types/text/tab-separated-values) neatly avoids this for tab-separated values by insisting that a tab can only ever be a separator.
 
@@ -129,7 +129,7 @@ By default, `arkdb` uses `tsv` format, implemented in base tools, as the text-ba
 ```{r}
 dir <- fs::dir_create(fs::path(tmp, "nycflights"))
 
-ark(db, dir, 
+ark(db, dir,
     streamable_table = streamable_base_csv())
 ```
 
@@ -149,11 +149,11 @@ unark(files, new_db,
 `arkdb` also provides the function `streamable_table()` to facilitate users creating their own streaming table interfaces.  For instance, if you would prefer to use `readr` methods to read and write `tsv` files, we could construct the table as follows (`streamable_readr_tsv()` and `streamable_readr_csv()` are also shipped inside `arkdb` for convenience):
 
 ```{r}
-stream <- 
+stream <-
    streamable_table(
      function(file, ...) readr::read_tsv(file, ...),
-     function(x, path, omit_header)
-       readr::write_tsv(x = x, path = path, append = omit_header),
+     function(x, file, omit_header)
+       readr::write_tsv(x = x, file = file, append = omit_header),
      "tsv")
 
 ```
@@ -161,7 +161,7 @@ stream <-
 and we can then pass such a streamable table directly to `ark()` and `unark()`, like so:
 
 ```{r}
-ark(db, dir, 
+ark(db, dir,
     streamable_table = stream)
 ```
 
@@ -170,12 +170,12 @@ Note several constraints on this design. The write method must be able to take a
 
 ## A note on compression
 
-`unark` can read from a variety of compression formats recognized by base R: `bzip2`, `gzip`, `zip`, and `xz`, and `ark` can choose any of these as the compression algorithm.  Note that there is some trade-off between speed of compression and efficiency (i.e. the final file size).  `ark` uses the `bz2` compression algorithm by default, supported in base R, to compress `tsv` files.  The  `bz2` offers excellent compression levels, but is considerably slower to compress than `gzip` or `zip`.  It is comparably fast to uncompress.  For faster archiving when maximum file size reduction is not critical, `gzip` will give nearly as effective compression in significantly less time.  Compression can also be turned off, e.g. by using `ark()` with `compress="none"` and `unark()` with files that have no compression suffix (e.g. `*.tsv` instead of `*.tsv.gz`). 
+`unark` can read from a variety of compression formats recognized by base R: `bzip2`, `gzip`, `zip`, and `xz`, and `ark` can choose any of these as the compression algorithm.  Note that there is some trade-off between speed of compression and efficiency (i.e. the final file size).  `ark` uses the `bz2` compression algorithm by default, supported in base R, to compress `tsv` files.  The  `bz2` offers excellent compression levels, but is considerably slower to compress than `gzip` or `zip`.  It is comparably fast to uncompress.  For faster archiving when maximum file size reduction is not critical, `gzip` will give nearly as effective compression in significantly less time.  Compression can also be turned off, e.g. by using `ark()` with `compress="none"` and `unark()` with files that have no compression suffix (e.g. `*.tsv` instead of `*.tsv.gz`).
 
 
 ## Distributing data
 
-Once you have archived your database files with `ark`, consider sharing them privately or publicly as part of your project GitHub repo using the [`piggyback` R package](https://github.com/ropensci/piggyback). For more permanent, versioned, and citable data archiving, upload your `*.tsv.bz2` files to a data repository like [Zenodo.org](https://zenodo.org).  
+Once you have archived your database files with `ark`, consider sharing them privately or publicly as part of your project GitHub repo using the [`piggyback` R package](https://github.com/ropensci/piggyback). For more permanent, versioned, and citable data archiving, upload your `*.tsv.bz2` files to a data repository like [Zenodo.org](https://zenodo.org).
 
 
 
@@ -183,7 +183,7 @@ Once you have archived your database files with `ark`, consider sharing them pri
 ```{r include=FALSE}
 
 disconnect <- function(db){
-  ## Cleanup 
+  ## Cleanup
   if(inherits(db, "DBIConnection")){
     DBI::dbDisconnect(db)
   } else {

@@ -25,8 +25,8 @@
 #' streamable_readr_tsv <- function() {
 #'   streamable_table(
 #'     function(file, ...) readr::read_tsv(file, ...),
-#'     function(x, path, omit_header) {
-#'       readr::write_tsv(x = x, path = path, omit_header = omit_header)
+#'     function(x, file, omit_header) {
+#'       readr::write_tsv(x = x, file = file, omit_header = omit_header)
 #'     },
 #'     "tsv"
 #'   )
@@ -66,7 +66,7 @@ assert_streamable <- function(x, name = deparse(substitute(x))) {
 #'
 streamable_vroom <- function() {
 
-  ## Avoids a hard dependency on readr for this courtesy function
+  ## Avoids a hard dependency on vroom for this courtesy function
   if (!requireNamespace("vroom", quietly = TRUE)) {
     stop("vroom package must be installed to use readr-based methods",
       call. = FALSE
@@ -80,8 +80,8 @@ streamable_vroom <- function() {
   read <- function(file, ...) {
     read_tsv(file, ...)
   }
-  write <- function(x, path, omit_header = FALSE) {
-    write_tsv(x = x, path = path, append = omit_header)
+  write <- function(x, file, omit_header = FALSE) {
+    write_tsv(x = x, file = file, append = omit_header)
   }
 
   streamable_table(read, write, "tsv")
@@ -113,8 +113,8 @@ streamable_readr_tsv <- function() {
   read <- function(file, ...) {
     read_tsv(file, ...)
   }
-  write <- function(x, path, omit_header = FALSE) {
-    write_tsv(x = x, file = path, append = omit_header)
+  write <- function(x, file, omit_header = FALSE) {
+    write_tsv(x = x, file = file, append = omit_header)
   }
 
   streamable_table(read, write, "tsv")
@@ -140,8 +140,8 @@ streamable_readr_csv <- function() {
   read <- function(file, ...) {
     read_csv(file, ...)
   }
-  write <- function(x, path, omit_header = FALSE) {
-    write_csv(x = x, file = path, append = omit_header)
+  write <- function(x, file, omit_header = FALSE) {
+    write_csv(x = x, file = file, append = omit_header)
   }
 
   streamable_table(read, write, "csv")
@@ -285,14 +285,14 @@ streamable_parquet <- function() {
       )
     } else {
       fls <- list.files(dir_path)
-      
+
       if(length(fls) == 0) {
         n <- 1
       } else {
         # Find max part number, and increment
         n <- max(as.integer(gsub(".*?([0-9]+).*", "\\1", fls))) + 1
       }
-      
+
       # Overload path accordingly
       path <- paste0(
         dir_path, "/part-", formatC(n, width=5, flag="0"), ".parquet")
