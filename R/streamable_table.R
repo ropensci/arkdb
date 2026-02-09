@@ -1,4 +1,3 @@
-
 #' streamable table
 #'
 #' @param read read function. Arguments should be "`file`"
@@ -26,7 +25,7 @@
 #'   streamable_table(
 #'     function(file, ...) readr::read_tsv(file, ...),
 #'     function(x, file, omit_header) {
-#'       readr::write_tsv(x = x, file = file, omit_header = omit_header)
+#'       readr::write_tsv(x = x, file = file, append = omit_header)
 #'     },
 #'     "tsv"
 #'   )
@@ -65,16 +64,15 @@ assert_streamable <- function(x, name = deparse(substitute(x))) {
 #' @seealso [readr::read_tsv()], [readr::write_tsv()]
 #'
 streamable_vroom <- function() {
-
   ## Avoids a hard dependency on vroom for this courtesy function
   if (!requireNamespace("vroom", quietly = TRUE)) {
-    stop("vroom package must be installed to use readr-based methods",
+    stop(
+      "vroom package must be installed to use readr-based methods",
       call. = FALSE
     )
   }
   read_tsv <- getExportedValue("vroom", "vroom")
   write_tsv <- getExportedValue("vroom", "vroom_write")
-
 
   ## actual definitions
   read <- function(file, ...) {
@@ -88,9 +86,6 @@ streamable_vroom <- function() {
 }
 
 
-
-
-
 #' streamable tsv using `readr`
 #'
 #' @return a `streamable_table` object (S3)
@@ -98,16 +93,15 @@ streamable_vroom <- function() {
 #' @seealso [readr::read_tsv()], [readr::write_tsv()]
 #'
 streamable_readr_tsv <- function() {
-
   ## Avoids a hard dependency on readr for this courtesy function
   if (!requireNamespace("readr", quietly = TRUE)) {
-    stop("readr package must be installed to use readr-based methods",
+    stop(
+      "readr package must be installed to use readr-based methods",
       call. = FALSE
     )
   }
   read_tsv <- getExportedValue("readr", "read_tsv")
   write_tsv <- getExportedValue("readr", "write_tsv")
-
 
   ## actual definitions
   read <- function(file, ...) {
@@ -126,16 +120,15 @@ streamable_readr_tsv <- function() {
 #' @export
 #' @seealso [readr::read_csv()], [readr::write_csv()]
 streamable_readr_csv <- function() {
-
   ## Avoids a hard dependency on readr for this courtesy function
   if (!requireNamespace("readr", quietly = TRUE)) {
-    stop("readr package must be installed to use readr-based methods",
+    stop(
+      "readr package must be installed to use readr-based methods",
       call. = FALSE
     )
   }
   read_csv <- getExportedValue("readr", "read_csv")
   write_csv <- getExportedValue("readr", "write_csv")
-
 
   read <- function(file, ...) {
     read_csv(file, ...)
@@ -162,7 +155,8 @@ streamable_readr_csv <- function() {
 #' @importFrom utils read.table write.table
 streamable_base_tsv <- function() {
   read_tsv <- function(file, comment.char = "", ...) {
-    utils::read.table(textConnection(file),
+    utils::read.table(
+      textConnection(file),
       header = TRUE,
       sep = "\t",
       quote = "",
@@ -172,7 +166,8 @@ streamable_base_tsv <- function() {
     )
   }
   write_tsv <- function(x, path, omit_header) {
-    utils::write.table(x,
+    utils::write.table(
+      x,
       file = path,
       append = omit_header,
       sep = "\t",
@@ -199,7 +194,8 @@ streamable_base_tsv <- function() {
 streamable_base_csv <- function() {
   read_csv <- function(file, comment.char = "", ...) {
     ## Consider case of header = FALSE...
-    utils::read.table(textConnection(file),
+    utils::read.table(
+      textConnection(file),
       header = TRUE,
       sep = ",",
       quote = "\"",
@@ -211,7 +207,8 @@ streamable_base_csv <- function() {
   ## NOTE: write.csv does not permit setting
   ## `col.names = FALSE``, so cannot omit_header
   write_csv <- function(x, path, omit_header) {
-    utils::write.table(x,
+    utils::write.table(
+      x,
       file = path,
       sep = ",",
       quote = TRUE,
@@ -237,12 +234,9 @@ streamable_base_csv <- function() {
 #' @export
 #' @seealso [arrow::read_parquet()], [arrow::write_parquet()]
 streamable_parquet <- function() {
-
   ## Avoids a hard dependency on arrow for this courtesy function
   if (!requireNamespace("arrow", quietly = TRUE)) {
-    stop("arrow package must be installed to use parquet",
-      call. = FALSE
-    )
+    stop("arrow package must be installed to use parquet", call. = FALSE)
   }
 
   read_parquet <- getExportedValue("arrow", "read_parquet")
@@ -286,7 +280,7 @@ streamable_parquet <- function() {
     } else {
       fls <- list.files(dir_path)
 
-      if(length(fls) == 0) {
+      if (length(fls) == 0) {
         n <- 1
       } else {
         # Find max part number, and increment
@@ -295,9 +289,12 @@ streamable_parquet <- function() {
 
       # Overload path accordingly
       path <- paste0(
-        dir_path, "/part-", formatC(n, width=5, flag="0"), ".parquet")
+        dir_path,
+        "/part-",
+        formatC(n, width = 5, flag = "0"),
+        ".parquet"
+      )
     }
-
 
     write_parquet(x, sink = path, ...)
   }
